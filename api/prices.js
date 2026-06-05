@@ -98,20 +98,9 @@ async function apifyPrices(actorId) {
       if (typeof price === "string") price = parseFloat(price.replace(/[^0-9.]/g, ""));
       if (typeof price !== "number" || !(price > 0)) continue;
 
-      // resolve which part this item is
-      let id = (asin && byAsin[asin]) || null;
-      let viaAsin = !!id;
-      if (!id) id = byQuery[norm(query)] || null;
-      if (!id) {
-        const nt = norm(title);
-        for (const [qn, pid] of Object.entries(byQuery)) {
-          if (nt && nt.includes(qn)) { id = pid; break; }
-        }
-      }
+      // resolve which part this item is — EXACT ASIN ONLY (no fuzzy/used/wrong fallback)
+      const id = (asin && byAsin[asin]) || null;
       if (!id) continue;
-
-      // if we matched by ASIN it's exact — trust it. Otherwise drop obvious accessories.
-      if (!viaAsin && ACCESSORY.test(title)) continue;
       if (price < floorFor(id)) continue; // drop junk/accessory mis-prices
 
       if (out[id] == null || price < out[id]) out[id] = price;
