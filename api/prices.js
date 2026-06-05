@@ -28,6 +28,20 @@ const NEWEGG_ACTOR = process.env.NEWEGG_ACTOR_ID;
 
 const norm = (s) => (s || "").toLowerCase().replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
 
+// Reject implausibly-low prices (wrong/accessory listings, e.g. a $10 "motherboard").
+const FLOORS = { cpu: 40, gpu: 80, mobo: 50, ram: 20, storage: 25, psu: 25, case: 30, cooler: 10 };
+function floorFor(id) {
+  if (id.startsWith("cpu")) return FLOORS.cpu;
+  if (id.startsWith("gpu")) return FLOORS.gpu;
+  if (id.startsWith("mb")) return FLOORS.mobo;
+  if (id.startsWith("ram")) return FLOORS.ram;
+  if (id.startsWith("ssd")) return FLOORS.storage;
+  if (id.startsWith("psu")) return FLOORS.psu;
+  if (id.startsWith("cs")) return FLOORS.case;
+  if (id.startsWith("cl")) return FLOORS.cooler;
+  return 0;
+}
+
 // ---------------- Best Buy (live official API) ----------------
 async function bestBuyPrices() {
   const out = {};
@@ -41,7 +55,7 @@ async function bestBuyPrices() {
       if (r.ok) {
         const d = await r.json();
         const p = d.products && d.products[0];
-        if (p && typeof p.salePrice === "number" && p.salePrice > 0) out[id] = p.salePrice;
+        if (p && typeof p.salePrice === "number" && p.salePrice >= floorFor(id)) out[id] = p.salePrice;
       }
       await new Promise((res) => setTimeout(res, 220));
     } catch (e) {}
@@ -54,12 +68,13 @@ async function bestBuyPrices() {
 // scraped item back to a part by matching the search query / product title.
 async function apifyPrices(actorId) {
   const out = {};
-  if (!APIFY_TOKEN || !actorId) return out;
+  const media = {};
+  if (!APIFY_TOKEN || !actorId) return { out, media };
   try {
     const r = await fetch(
       `https://api.apify.com/v2/acts/${actorId}/runs/last/dataset/items?token=${APIFY_TOKEN}&status=SUCCEEDED&clean=true&limit=5000`
     );
-    if (!r.ok) return out;
+    if (!r.ok) return { out, media };
     const items = await r.json();
 
     // build lookups: exact ASIN match first (most reliable), then query, then title
@@ -97,11 +112,16 @@ async function apifyPrices(actorId) {
 
       // if we matched by ASIN it's exact — trust it. Otherwise drop obvious accessories.
       if (!viaAsin && ACCESSORY.test(title)) continue;
+      if (price < floorFor(id)) continue; // drop junk/accessory mis-prices
 
       if (out[id] == null || price < out[id]) out[id] = price;
+      // capture product image + link (first decent one wins)
+      const thumb = it.thumbnailImage || it.image || it.img || (Array.isArray(it.images) ? it.images[0] : "");
+      const link = it.url || (asin ? `https://www.amazon.com/dp/${asin}` : "");
+      if (!media[id] && (thumb || link)) media[id] = { img: thumb || "", url: link || "" };
     }
   } catch (e) {}
-  return out;
+  return { out, media };
 }
 
 export default async function handler(req, res) {
@@ -117,9 +137,11 @@ export default async function handler(req, res) {
   ]);
 
   for (const [id, v] of Object.entries(bb)) add(id, "bestbuy", v);
-  for (const [id, v] of Object.entries(amz)) add(id, "amazon", v);
-  for (const [id, v] of Object.entries(neg)) add(id, "newegg", v);
+  for (const [id, v] of Object.entries(amz.out)) add(id, "amazon", v);
+  for (const [id, v] of Object.entries(neg.out)) add(id, "newegg", v);
+
+  const media = { ...neg.media, ...amz.media }; // Amazon images preferred
 
   res.setHeader("Cache-Control", "s-maxage=86400, stale-while-revalidate=43200");
-  res.status(200).json({ updatedAt: new Date().toISOString(), prices });
+  res.status(200).json({ updatedAt: new Date().toISOString(), prices, media });
 }
