@@ -5,6 +5,7 @@ import {
   Sparkles, Save, Plus, Trash2, Check, X, AlertTriangle, ChevronRight,
   ChevronLeft, Zap, DollarSign, RotateCcw, ShieldCheck, ShieldAlert, Repeat2, Wrench, Send, Bot, MessageCircle, Maximize, Minimize, Settings, Sun, Moon
 } from "lucide-react";
+import { MEDIA } from "../data/part-media.js";
 
 // Live-pricing endpoint (your deployed serverless function). When reachable it
 // overrides the built-in sample prices; when not (e.g. inside Claude or offline)
@@ -688,7 +689,10 @@ const MAX_PERF = Object.fromEntries(
 );
 const CATALOG_COUNT = Object.values(CATALOG).reduce((s, a) => s + a.length, 0);
 
-const fmt = (n) => "$" + Math.round(n).toLocaleString();
+// Attach product image + link to each part (refreshed live by /api/prices when available).
+for (const _c in CATALOG) for (const _p of CATALOG[_c]) { const _m = MEDIA[_p.id]; if (_m) { _p.img = _m.img; _p.url = _m.url; } }
+
+const fmt = (n) => "$" + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
 /* ----------------------------- SCORING ----------------------------- */
@@ -1193,6 +1197,8 @@ export default function RigForge() {
               const vals = Object.values(entry).filter((v) => typeof v === "number" && v > 0);
               if (vals.length) { part.price = Math.min(...vals); n++; }
             }
+            const m = data.media && data.media[part.id];
+            if (m) { if (m.img) part.img = m.img; if (m.url) part.url = m.url; }
           }
         }
         if (n) setPriceInfo({ updatedAt: data.updatedAt, count: n });
@@ -1594,7 +1600,13 @@ function Results({ useCase, budget, parts, analysis, verdict, expanded, setExpan
           return (
             <div key={cat} className="rf-part rf-pop" style={{ animationDelay: i * 45 + "ms" }}>
               <div className="rf-part-top">
-                <div className="rf-part-icon"><Meta.Icon size={20} /></div>
+                {part && part.img ? (
+                  <a href={part.url || "#"} target="_blank" rel="noopener noreferrer" className="rf-part-img-link" onClick={(e) => e.stopPropagation()} title="View product page">
+                    <img src={part.img} alt={part.name} className="rf-part-img" loading="lazy" />
+                  </a>
+                ) : (
+                  <div className="rf-part-icon"><Meta.Icon size={20} /></div>
+                )}
                 <div className="rf-part-info">
                   <div className="rf-part-cat">{Meta.label}</div>
                   {part ? (
@@ -1849,6 +1861,11 @@ function Picker({ cat, current, useCase, budget, parts, onClose, onPick }) {
                   onClick={g.single ? undefined : () => setOpenModel(expanded ? null : g.model)}
                 >
                   <div className="rf-pick-score" style={{ borderColor: scoreColor(g.score), color: scoreColor(g.score) }}>{g.score}</div>
+                  {g.rep.img && (
+                    <a href={g.rep.url || "#"} target="_blank" rel="noopener noreferrer" className="rf-pick-img-link" onClick={(e) => e.stopPropagation()} title="View product page">
+                      <img src={g.rep.img} alt={g.model} className="rf-pick-img" loading="lazy" />
+                    </a>
+                  )}
                   <div className="rf-pick-info">
                     <div className="rf-pick-name">
                       {g.model}
@@ -1881,6 +1898,11 @@ function Picker({ cat, current, useCase, budget, parts, onClose, onPick }) {
                       <div key={v.id} className={"rf-variant" + (current && current.id === v.id ? " current" : "")}>
                         <div className="rf-variant-row">
                           <div className="rf-pick-score sm" style={{ borderColor: scoreColor(v._score), color: scoreColor(v._score) }}>{v._score}</div>
+                          {v.img && (
+                            <a href={v.url || "#"} target="_blank" rel="noopener noreferrer" className="rf-pick-img-link" onClick={(e) => e.stopPropagation()} title="View product page">
+                              <img src={v.img} alt={v.variantLabel || v.brand} className="rf-pick-img sm" loading="lazy" />
+                            </a>
+                          )}
                           <div className="rf-variant-name">{v.variantLabel || v.brand}</div>
                           <div className="rf-variant-right">
                             <span className={"rf-part-price " + v._status}>{fmt(v.price)}</span>
@@ -2298,6 +2320,13 @@ background:var(--c-panel);border:1px solid var(--c-border);border-radius:18px;pa
 .rf-part-top{display:flex;align-items:center;gap:14px;padding:14px 16px 0;}
 .rf-part-actions{display:flex;gap:8px;justify-content:flex-end;padding:11px 16px 14px;}
 .rf-part-icon{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;color:var(--c-accent);background:rgba(46,230,207,0.08);border:1px solid rgba(46,230,207,0.16);flex-shrink:0;}
+.rf-part-img-link{flex-shrink:0;display:block;}
+.rf-part-img{width:42px;height:42px;border-radius:11px;object-fit:contain;background:#fff;border:1px solid var(--c-border);padding:2px;cursor:pointer;transition:transform .12s ease;}
+.rf-part-img:hover{transform:scale(1.06);}
+.rf-pick-img-link{flex-shrink:0;display:block;}
+.rf-pick-img{width:34px;height:34px;border-radius:8px;object-fit:contain;background:#fff;border:1px solid var(--c-border);padding:2px;cursor:pointer;transition:transform .12s ease;}
+.rf-pick-img.sm{width:28px;height:28px;border-radius:7px;}
+.rf-pick-img:hover{transform:scale(1.08);}
 .rf-part-info{flex:1;min-width:0;}
 .rf-part-cat{font-size:11px;letter-spacing:1px;color:var(--c-muted);text-transform:uppercase;font-family:'JetBrains Mono';}
 .rf-part-name{font-family:'Chakra Petch';font-weight:600;font-size:16px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
