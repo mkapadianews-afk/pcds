@@ -6,6 +6,17 @@ import {
   ChevronLeft, Zap, DollarSign, RotateCcw, ShieldCheck, ShieldAlert, Repeat2, Wrench, Send, Bot, MessageCircle, Maximize, Minimize, Settings, Sun, Moon
 } from "lucide-react";
 import { MEDIA } from "../data/part-media.js";
+/* ----------------------------- i18n ----------------------------- */
+const LANGS = [{"code": "en", "name": "English"}, {"code": "es", "name": "Español"}, {"code": "zh", "name": "中文"}, {"code": "hi", "name": "हिन्दी"}, {"code": "ar", "name": "العربية"}, {"code": "pt", "name": "Português"}, {"code": "fr", "name": "Français"}, {"code": "ru", "name": "Русский"}, {"code": "ja", "name": "日本語"}, {"code": "de", "name": "Deutsch"}];
+const I18N = {"en": {"myRigs": "My Rigs", "settings": "Settings", "appearance": "Appearance", "language": "Language", "theme": "Theme", "dark": "Dark", "light": "Light", "back": "Back", "saveRig": "Save rig", "select": "Select", "selected": "Selected", "moreInfo": "More info", "hideInfo": "Hide info", "autoForge": "Auto-Forge", "buildYourself": "Build It Yourself", "yourBuild": "Your build", "budgetQ": "What's your budget?", "useCaseQ": "What will this PC be for?", "livePrices": "Live prices", "samplePrices": "sample prices", "updated": "updated", "componentsDb": "components in the database", "overBudgetCat": "Over your {x} budget", "performance": "PERFORMANCE", "pricePerf": "PRICE / PERF", "pros": "PROS", "cons": "CONS"}, "es": {"myRigs": "Mis Equipos", "settings": "Ajustes", "appearance": "Apariencia", "language": "Idioma", "theme": "Tema", "dark": "Oscuro", "light": "Claro", "back": "Atrás", "saveRig": "Guardar", "select": "Elegir", "selected": "Elegido", "moreInfo": "Más info", "hideInfo": "Ocultar", "autoForge": "Auto-Forjar", "buildYourself": "Hazlo tú mismo", "yourBuild": "Tu equipo", "budgetQ": "¿Cuál es tu presupuesto?", "useCaseQ": "¿Para qué será este PC?", "livePrices": "Precios en vivo", "samplePrices": "precios de muestra", "updated": "actualizado", "componentsDb": "componentes en la base de datos", "overBudgetCat": "Supera tu presupuesto de {x}", "performance": "RENDIMIENTO", "pricePerf": "PRECIO / REND", "pros": "PROS", "cons": "CONTRAS"}, "zh": {"myRigs": "我的配置", "settings": "设置", "appearance": "外观", "language": "语言", "theme": "主题", "dark": "深色", "light": "浅色", "back": "返回", "saveRig": "保存配置", "select": "选择", "selected": "已选", "moreInfo": "更多信息", "hideInfo": "隐藏", "autoForge": "自动配置", "buildYourself": "自己组装", "yourBuild": "你的配置", "budgetQ": "你的预算是多少？", "useCaseQ": "这台电脑用来做什么？", "livePrices": "实时价格", "samplePrices": "示例价格", "updated": "更新于", "componentsDb": "个组件已入库", "overBudgetCat": "超出{x}预算", "performance": "性能", "pricePerf": "性价比", "pros": "优点", "cons": "缺点"}, "hi": {"myRigs": "मेरे रिग", "settings": "सेटिंग्स", "appearance": "रूप", "language": "भाषा", "theme": "थीम", "dark": "गहरा", "light": "हल्का", "back": "वापस", "saveRig": "सहेजें", "select": "चुनें", "selected": "चयनित", "moreInfo": "और जानकारी", "hideInfo": "छिपाएं", "autoForge": "ऑटो-फोर्ज", "buildYourself": "खुद बनाएं", "yourBuild": "आपका बिल्ड", "budgetQ": "आपका बजट क्या है?", "useCaseQ": "यह पीसी किसलिए होगा?", "livePrices": "लाइव कीमतें", "samplePrices": "नमूना कीमतें", "updated": "अपडेट", "componentsDb": "घटक डेटाबेस में", "overBudgetCat": "{x} बजट से अधिक", "performance": "प्रदर्शन", "pricePerf": "मूल्य/प्रदर्शन", "pros": "फायदे", "cons": "नुकसान"}, "ar": {"myRigs": "أجهزتي", "settings": "الإعدادات", "appearance": "المظهر", "language": "اللغة", "theme": "السمة", "dark": "داكن", "light": "فاتح", "back": "رجوع", "saveRig": "حفظ", "select": "اختيار", "selected": "محدد", "moreInfo": "المزيد", "hideInfo": "إخفاء", "autoForge": "تجميع تلقائي", "buildYourself": "اصنعه بنفسك", "yourBuild": "تجميعتك", "budgetQ": "ما هي ميزانيتك؟", "useCaseQ": "لأي غرض هذا الحاسوب؟", "livePrices": "أسعار حية", "samplePrices": "أسعار تجريبية", "updated": "محدّث", "componentsDb": "مكوّن في قاعدة البيانات", "overBudgetCat": "يتجاوز ميزانية {x}", "performance": "الأداء", "pricePerf": "السعر/الأداء", "pros": "الإيجابيات", "cons": "السلبيات"}, "pt": {"myRigs": "Meus PCs", "settings": "Configurações", "appearance": "Aparência", "language": "Idioma", "theme": "Tema", "dark": "Escuro", "light": "Claro", "back": "Voltar", "saveRig": "Salvar", "select": "Selecionar", "selected": "Selecionado", "moreInfo": "Mais info", "hideInfo": "Ocultar", "autoForge": "Auto-Forjar", "buildYourself": "Faça você mesmo", "yourBuild": "Sua build", "budgetQ": "Qual é o seu orçamento?", "useCaseQ": "Para que será este PC?", "livePrices": "Preços ao vivo", "samplePrices": "preços de exemplo", "updated": "atualizado", "componentsDb": "componentes no banco de dados", "overBudgetCat": "Acima do orçamento de {x}", "performance": "DESEMPENHO", "pricePerf": "PREÇO / DESEMP", "pros": "PRÓS", "cons": "CONTRAS"}, "fr": {"myRigs": "Mes Configs", "settings": "Réglages", "appearance": "Apparence", "language": "Langue", "theme": "Thème", "dark": "Sombre", "light": "Clair", "back": "Retour", "saveRig": "Enregistrer", "select": "Choisir", "selected": "Choisi", "moreInfo": "Plus d'infos", "hideInfo": "Masquer", "autoForge": "Auto-Forge", "buildYourself": "Faites-le vous-même", "yourBuild": "Votre config", "budgetQ": "Quel est votre budget ?", "useCaseQ": "À quoi servira ce PC ?", "livePrices": "Prix en direct", "samplePrices": "prix indicatifs", "updated": "mis à jour", "componentsDb": "composants dans la base", "overBudgetCat": "Au-dessus du budget {x}", "performance": "PERFORMANCE", "pricePerf": "PRIX / PERF", "pros": "ATOUTS", "cons": "INCONVÉNIENTS"}, "ru": {"myRigs": "Мои сборки", "settings": "Настройки", "appearance": "Вид", "language": "Язык", "theme": "Тема", "dark": "Тёмная", "light": "Светлая", "back": "Назад", "saveRig": "Сохранить", "select": "Выбрать", "selected": "Выбрано", "moreInfo": "Подробнее", "hideInfo": "Скрыть", "autoForge": "Авто-сборка", "buildYourself": "Собрать самому", "yourBuild": "Ваша сборка", "budgetQ": "Каков ваш бюджет?", "useCaseQ": "Для чего этот ПК?", "livePrices": "Цены в реальном времени", "samplePrices": "примерные цены", "updated": "обновлено", "componentsDb": "компонентов в базе", "overBudgetCat": "Сверх бюджета на {x}", "performance": "ПРОИЗВОДИТ.", "pricePerf": "ЦЕНА/КАЧ.", "pros": "ПЛЮСЫ", "cons": "МИНУСЫ"}, "ja": {"myRigs": "マイ構成", "settings": "設定", "appearance": "外観", "language": "言語", "theme": "テーマ", "dark": "ダーク", "light": "ライト", "back": "戻る", "saveRig": "保存", "select": "選択", "selected": "選択済", "moreInfo": "詳細", "hideInfo": "隠す", "autoForge": "自動構成", "buildYourself": "自分で組む", "yourBuild": "あなたの構成", "budgetQ": "予算はいくらですか？", "useCaseQ": "このPCの用途は？", "livePrices": "ライブ価格", "samplePrices": "サンプル価格", "updated": "更新", "componentsDb": "個のパーツを収録", "overBudgetCat": "{x}予算オーバー", "performance": "性能", "pricePerf": "価格性能", "pros": "長所", "cons": "短所"}, "de": {"myRigs": "Meine Builds", "settings": "Einstellungen", "appearance": "Darstellung", "language": "Sprache", "theme": "Thema", "dark": "Dunkel", "light": "Hell", "back": "Zurück", "saveRig": "Speichern", "select": "Wählen", "selected": "Gewählt", "moreInfo": "Mehr Info", "hideInfo": "Verbergen", "autoForge": "Auto-Forge", "buildYourself": "Selbst bauen", "yourBuild": "Dein Build", "budgetQ": "Wie hoch ist dein Budget?", "useCaseQ": "Wofür ist dieser PC?", "livePrices": "Live-Preise", "samplePrices": "Beispielpreise", "updated": "aktualisiert", "componentsDb": "Komponenten in der Datenbank", "overBudgetCat": "Über dem {x}-Budget", "performance": "LEISTUNG", "pricePerf": "PREIS / LEIST", "pros": "VORTEILE", "cons": "NACHTEILE"}};
+let CUR_LANG = "en";
+function t(key, vars) {
+  const d = I18N[CUR_LANG] || I18N.en;
+  let str = (d && d[key]) || I18N.en[key] || key;
+  if (vars) for (const k in vars) str = str.split('{'+k+'}').join(vars[k]);
+  return str;
+}
+
 
 // Live-pricing endpoint (your deployed serverless function). When reachable it
 // overrides the built-in sample prices; when not (e.g. inside Claude or offline)
@@ -692,7 +703,7 @@ const CATALOG_COUNT = Object.values(CATALOG).reduce((s, a) => s + a.length, 0);
 // Attach product image + link to each part (refreshed live by /api/prices when available).
 for (const _c in CATALOG) for (const _p of CATALOG[_c]) { const _m = MEDIA[_p.id]; if (_m) { _p.img = _m.img; _p.url = _m.url; } }
 
-const fmt = (n) => "$" + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fmt = (n) => "$" + (Number.isInteger(Number(n)) ? Number(n).toLocaleString() : Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
 /* ----------------------------- SCORING ----------------------------- */
@@ -1157,6 +1168,9 @@ export default function RigForge() {
   const [priceInfo, setPriceInfo] = useState(null);
   const [theme, setTheme] = useState("dark"); // default dark mode
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsTab, setSettingsTab] = useState("appearance");
+  const [lang, setLang] = useState("en");
+  CUR_LANG = lang;
 
   useEffect(() => {
     (async () => {
@@ -1165,6 +1179,8 @@ export default function RigForge() {
     })();
   }, []);
   const changeTheme = (t) => { setTheme(t); sSet("rf:theme", t); setSettingsOpen(false); };
+  useEffect(() => { (async () => { const l = await sGet("rf:lang"); if (l && LANGS.some((x) => x.code === l)) setLang(l); })(); }, []);
+  const changeLang = (l) => { setLang(l); sSet("rf:lang", l); };
 
   useEffect(() => {
     if (!settingsOpen) return;
@@ -1273,7 +1289,7 @@ export default function RigForge() {
   const openSaved = (b) => { setUseCase(b.useCase); setBudget(b.budget); setParts(b.parts); setView("results"); };
 
   return (
-    <div className={"rf-root" + (theme === "light" ? " rf-light" : "")}>
+    <div className={"rf-root" + (theme === "light" ? " rf-light" : "")} dir={lang === "ar" ? "rtl" : "ltr"}>
       <StyleBlock />
       <div className="rf-bg" />
       <div className="rf-grid" />
@@ -1286,18 +1302,37 @@ export default function RigForge() {
         <div className="rf-header-right">
           {view !== "home" && (
             <button className="rf-ghost" onClick={() => setView("home")}>
-              <ChevronLeft size={16} /> My Rigs
+              <ChevronLeft size={16} /> {t("myRigs")}
             </button>
           )}
           <div className="rf-settings-wrap">
             <button className="rf-ghost rf-fs-btn" onClick={(e) => { e.stopPropagation(); setSettingsOpen((o) => !o); }} title="Settings"><Settings size={16} /></button>
             {settingsOpen && (
               <div className="rf-settings-menu" onClick={(e) => e.stopPropagation()}>
-                <div className="rf-settings-title">Theme</div>
-                <div className="rf-theme-toggle">
-                  <button className={"rf-theme-opt" + (theme === "dark" ? " active" : "")} onClick={() => changeTheme("dark")}><Moon size={14} /> Dark</button>
-                  <button className={"rf-theme-opt" + (theme === "light" ? " active" : "")} onClick={() => changeTheme("light")}><Sun size={14} /> Light</button>
+                <div className="rf-settings-tabs">
+                  <button className={"rf-settings-tab" + (settingsTab === "appearance" ? " active" : "")} onClick={() => setSettingsTab("appearance")}>{t("appearance")}</button>
+                  <button className={"rf-settings-tab" + (settingsTab === "language" ? " active" : "")} onClick={() => setSettingsTab("language")}>{t("language")}</button>
                 </div>
+                {settingsTab === "appearance" ? (
+                  <div className="rf-settings-pane">
+                    <div className="rf-settings-title">{t("theme")}</div>
+                    <div className="rf-theme-toggle">
+                      <button className={"rf-theme-opt" + (theme === "dark" ? " active" : "")} onClick={() => changeTheme("dark")}><Moon size={14} /> {t("dark")}</button>
+                      <button className={"rf-theme-opt" + (theme === "light" ? " active" : "")} onClick={() => changeTheme("light")}><Sun size={14} /> {t("light")}</button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="rf-settings-pane">
+                    <div className="rf-settings-title">{t("language")}</div>
+                    <div className="rf-lang-list">
+                      {LANGS.map((L) => (
+                        <button key={L.code} className={"rf-lang-opt" + (lang === L.code ? " active" : "")} onClick={() => changeLang(L.code)}>
+                          <span>{L.name}</span>{lang === L.code && <Check size={14} />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -1345,7 +1380,7 @@ export default function RigForge() {
             />
             <div className="rf-modal-actions">
               <button className="rf-ghost" onClick={() => setSavingOpen(false)}>Cancel</button>
-              <button className="rf-btn" onClick={saveBuild}><Save size={16} /> Save rig</button>
+              <button className="rf-btn" onClick={saveBuild}><Save size={16} /> {t("saveRig")}</button>
             </div>
           </div>
         </div>
@@ -1376,18 +1411,18 @@ function Home({ saved, loading, onNew, onOpen, onDelete, priceInfo }) {
         </p>
         <button className="rf-btn rf-btn-lg" onClick={onNew}><Plus size={18} /> Start a new build</button>
         <div className="rf-price-status">
-          <span className="rf-db-count"><Boxes size={13} /> {CATALOG_COUNT} components in the database</span>
+          <span className="rf-db-count"><Boxes size={13} /> {CATALOG_COUNT} {t("componentsDb")}</span>
           <span className="rf-dot-sep">·</span>
           {priceInfo ? (
-            <><span className="rf-live-dot" /> Live Best Buy prices · updated {new Date(priceInfo.updatedAt).toLocaleDateString()}</>
+            <><span className="rf-live-dot" /> {t("livePrices")} · {t("updated")} {new Date(priceInfo.updatedAt).toLocaleDateString()}</>
           ) : (
-            <>sample prices (deploy the pricing function for live data)</>
+            <>{t("samplePrices")}</>
           )}
         </div>
       </div>
 
       <div className="rf-section-head">
-        <h2>My Rigs</h2>
+        <h2>{t("myRigs")}</h2>
         <span className="rf-muted">{saved.length} saved</span>
       </div>
 
@@ -1451,7 +1486,7 @@ function Survey({ onPick }) {
     <div className="rf-fade rf-step">
       <div className="rf-step-head">
         <div className="rf-eyebrow">STEP 1 OF 2</div>
-        <h2>What will this PC be for?</h2>
+        <h2>{t("useCaseQ")}</h2>
         <p className="rf-muted">This sets which parts matter most and how your budget gets split.</p>
       </div>
       <div className="rf-uc-grid">
@@ -1478,7 +1513,7 @@ function BudgetStep({ useCase, budget, setBudget, onBack, onAuto, onManual }) {
     <div className="rf-fade rf-step">
       <div className="rf-step-head">
         <div className="rf-eyebrow">STEP 2 OF 2 · {UC.label.toUpperCase()}</div>
-        <h2>What's your budget?</h2>
+        <h2>{t("budgetQ")}</h2>
         <p className="rf-muted">Drag to set your total spend. We reserve the essentials first, then spend the rest where it counts.</p>
       </div>
 
@@ -1516,15 +1551,15 @@ function BudgetStep({ useCase, budget, setBudget, onBack, onAuto, onManual }) {
 
       <div className="rf-forge-btns">
         <button type="button" className="rf-forge-btn primary" onClick={onAuto}>
-          <Sparkles size={15} /> Auto-Forge
+          <Sparkles size={15} /> {t("autoForge")}
         </button>
         <button type="button" className="rf-forge-btn outline" onClick={onManual}>
-          <Wrench size={15} /> Build It Yourself
+          <Wrench size={15} /> {t("buildYourself")}
         </button>
       </div>
 
       <div className="rf-step-actions center">
-        <button type="button" className="rf-ghost" onClick={onBack}><ChevronLeft size={16} /> Back</button>
+        <button type="button" className="rf-ghost" onClick={onBack}><ChevronLeft size={16} /> {t("back")}</button>
       </div>
     </div>
   );
@@ -1540,19 +1575,19 @@ function Results({ useCase, budget, parts, analysis, verdict, expanded, setExpan
       <div className="rf-results-head">
         <div>
           <div className="rf-eyebrow"><UC.Icon size={13} /> {UC.label} · {fmt(budget)} budget</div>
-          <h2>Your build</h2>
+          <h2>{t("yourBuild")}</h2>
         </div>
         <div className="rf-results-actions">
           <button className="rf-ghost" onClick={onRegen}><Sparkles size={15} /> Auto-forge</button>
-          <button className="rf-btn" onClick={onSave}><Save size={16} /> Save rig</button>
+          <button className="rf-btn" onClick={onSave}><Save size={16} /> {t("saveRig")}</button>
         </div>
       </div>
 
       {/* scorecard */}
       <div className="rf-scorecard rf-pop">
         <div className="rf-gauges">
-          <Gauge value={a.score} max={1000} label="PERFORMANCE" accent={scoreColor(a.score / 10)} />
-          <Gauge value={a.ppScore} label="PRICE / PERF" accent={scoreColor(a.ppScore)} delay={120} />
+          <Gauge value={a.score} max={1000} label={t("performance")} accent={scoreColor(a.score / 10)} />
+          <Gauge value={a.ppScore} label={t("pricePerf")} accent={scoreColor(a.ppScore)} delay={120} />
         </div>
         <div className="rf-verdict">
           <div className="rf-verdict-tag"><Sparkles size={13} /> AI verdict <span className="rf-hybrid">hybrid</span></div>
@@ -1634,7 +1669,7 @@ function Results({ useCase, budget, parts, analysis, verdict, expanded, setExpan
                 {part && (
                   <button className="rf-chip-btn" onClick={() => setExpanded((e) => ({ ...e, [cat]: !e[cat] }))}>
                     {isOpen ? <ChevronLeft size={13} style={{ transform: "rotate(90deg)" }} /> : <Sparkles size={13} />}
-                    {isOpen ? "Hide info" : "More info"}
+                    {isOpen ? t("hideInfo") : t("moreInfo")}
                   </button>
                 )}
                 <button className="rf-chip-btn primary" onClick={() => onSwap(cat)}><Repeat2 size={13} /> {part ? "Swap" : "Add"}</button>
@@ -1758,13 +1793,13 @@ function InfoPanel({ cat, part, band, status, useCase, compact, incompatible }) 
       <div className="rf-pc-head"><Sparkles size={12} /> AI PROS &amp; CONS <span className="rf-hybrid">auto</span></div>
       <div className="rf-pc-grid">
         <div>
-          <div className="rf-pc-h pros">PROS</div>
+          <div className="rf-pc-h pros">{t("pros")}</div>
           <ul className="rf-pc-list">
             {pros.map((p, i) => <li key={i} className="rf-pc pro"><Check size={13} /> {p}</li>)}
           </ul>
         </div>
         <div>
-          <div className="rf-pc-h cons">CONS</div>
+          <div className="rf-pc-h cons">{t("cons")}</div>
           <ul className="rf-pc-list">
             {allCons.map((c, i) => (
               <li key={i} className={"rf-pc con" + (strong(c) ? " strong" : "")}><X size={13} /> {c}</li>
@@ -1804,7 +1839,7 @@ function Picker({ cat, current, useCase, budget, parts, onClose, onPick }) {
       (groups[key] = groups[key] || []).push(v);
     }
     const list = Object.entries(groups).map(([model, variants]) => {
-      variants.sort((a, b) => b._score - a._score || a.price - b.price);
+      variants.sort((a, b) => (a._status === "over" ? 1 : 0) - (b._status === "over" ? 1 : 0) || b._score - a._score || a.price - b.price);
       const prices = variants.map((v) => v.price);
       const rep = variants[0];
       return {
@@ -1815,11 +1850,12 @@ function Picker({ cat, current, useCase, budget, parts, onClose, onPick }) {
         minPrice: Math.min(...prices),
         maxPrice: Math.max(...prices),
         score: rep._score,
+        _over: budgetStatus(Math.min(...prices), band) === "over",
         compat: variants.some((v) => v._compat),
         hasCurrent: current && variants.some((v) => v.id === current.id),
       };
     });
-    list.sort((a, b) => b.score - a.score || a.minPrice - b.minPrice);
+    list.sort((a, b) => (a._over ? 1 : 0) - (b._over ? 1 : 0) || b.score - a.score || a.minPrice - b.minPrice);
     return list;
   }, [cat, parts, band, useCase, current]);
 
@@ -1831,9 +1867,9 @@ function Picker({ cat, current, useCase, budget, parts, onClose, onPick }) {
         <div className="rf-pick-actions">
           <button className="rf-chip-btn" onClick={() => setOpenId(open ? null : v.id)}>
             {open ? <ChevronLeft size={13} style={{ transform: "rotate(90deg)" }} /> : <Sparkles size={13} />}
-            {open ? "Hide info" : "More info"}
+            {open ? t("hideInfo") : t("moreInfo")}
           </button>
-          <button className="rf-chip-btn primary" onClick={() => onPick(v)}>{isCur ? "Selected" : "Select"}</button>
+          <button className="rf-chip-btn primary" onClick={() => onPick(v)}>{isCur ? t("selected") : t("select")}</button>
         </div>
         {open && <InfoPanel cat={cat} part={v} band={band} status={v._status} useCase={useCase} compact incompatible={!v._compat} />}
       </>
@@ -1851,11 +1887,14 @@ function Picker({ cat, current, useCase, budget, parts, onClose, onPick }) {
           <button className="rf-icon-btn" onClick={onClose}><X size={18} /></button>
         </div>
         <div className="rf-drawer-list">
-          {models.map((g) => {
+          {models.map((g, gi) => {
             const expanded = openModel === g.model;
             const priceLabel = g.single || g.minPrice === g.maxPrice ? fmt(g.minPrice) : `${fmt(g.minPrice)}–${fmt(g.maxPrice)}`;
+            const showDivider = gi > 0 && g._over && !models[gi - 1]._over;
             return (
-              <div key={g.model} className={"rf-pick" + (g.hasCurrent ? " current" : "")}>
+              <React.Fragment key={g.model}>
+                {showDivider && <div className="rf-pick-divider"><span>{t("overBudgetCat", { x: Meta.label.toLowerCase() })}</span></div>}
+              <div className={"rf-pick" + (g.hasCurrent ? " current" : "") + (g._over ? " over" : "")}>
                 <div
                   className={"rf-pick-row" + (g.single ? "" : " rf-clickable")}
                   onClick={g.single ? undefined : () => setOpenModel(expanded ? null : g.model)}
@@ -1916,6 +1955,7 @@ function Picker({ cat, current, useCase, budget, parts, onClose, onPick }) {
                   </div>
                 )}
               </div>
+              </React.Fragment>
             );
           })}
         </div>
@@ -2160,6 +2200,7 @@ function StyleBlock() {
 --c-border:rgba(255,255,255,0.09);--c-text:#e8edf4;--c-muted:#7c8798;
 --c-accent:#2ee6cf;--c-accent2:#7c5cff;--c-good:#46e0a0;--c-warn:#ffc24b;--c-bad:#ff5c72;
 --c-track:rgba(255,255,255,0.08);--c-hover:rgba(255,255,255,0.2);--c-grid:rgba(255,255,255,0.035);
+--ease:cubic-bezier(.16,1,.3,1);--ease-spring:cubic-bezier(.34,1.35,.5,1);--ease-soft:cubic-bezier(.45,0,.15,1);
 position:relative;min-height:100vh;width:100%;background:var(--c-bg);color:var(--c-text);
 font-family:'Sora',system-ui,sans-serif;overflow-x:hidden;}
 .rf-root.rf-light{--c-bg:#eef1f6;--c-panel:rgba(15,28,50,0.04);--c-panel-2:rgba(15,28,50,0.08);
@@ -2188,6 +2229,17 @@ background:transparent;border:none;color:var(--c-muted);font-family:'Sora';font-
 padding:8px 10px;border-radius:8px;cursor:pointer;transition:.15s;}
 .rf-theme-opt.active{background:var(--c-accent);color:#04110f;}
 .rf-theme-opt:not(.active):hover{color:var(--c-text);background:var(--c-panel-2);}
+.rf-settings-menu{min-width:212px;animation:rfPop .26s var(--ease) backwards;}
+.rf-settings-tabs{display:flex;gap:4px;margin-bottom:12px;background:var(--c-panel);border:1px solid var(--c-border);border-radius:10px;padding:3px;}
+.rf-settings-tab{flex:1;background:transparent;border:none;color:var(--c-muted);font-family:'Sora';font-weight:600;font-size:12.5px;padding:7px 8px;border-radius:8px;cursor:pointer;transition:background .2s var(--ease),color .2s var(--ease);}
+.rf-settings-tab.active{background:var(--c-accent);color:#04110f;}
+.rf-settings-tab:not(.active):hover{color:var(--c-text);}
+.rf-settings-pane{animation:rfFade .22s var(--ease);}
+.rf-lang-list{display:flex;flex-direction:column;gap:3px;max-height:248px;overflow-y:auto;margin:0 -4px;padding:0 4px;}
+.rf-lang-opt{display:flex;align-items:center;justify-content:space-between;gap:8px;background:transparent;border:1px solid transparent;color:var(--c-text);font-family:'Sora';font-size:13.5px;padding:8px 10px;border-radius:8px;cursor:pointer;text-align:left;transition:background .16s var(--ease),color .16s var(--ease),border-color .16s var(--ease);}
+.rf-lang-opt:hover{background:var(--c-panel-2);}
+.rf-lang-opt.active{color:var(--c-accent);border-color:rgba(46,230,207,0.3);background:rgba(46,230,207,0.08);}
+.rf-root[dir="rtl"] .rf-lang-opt,.rf-root[dir="rtl"] .rf-settings-title{text-align:right;}
 .rf-fs-btn{padding:9px 11px;}
 .rf-brand{display:flex;align-items:center;gap:10px;font-family:'Chakra Petch';font-weight:700;
 font-size:20px;letter-spacing:1px;cursor:pointer;}
@@ -2202,7 +2254,7 @@ background:linear-gradient(135deg,var(--c-accent),#19b89f);box-shadow:0 0 18px r
 .rf-btn{display:inline-flex;align-items:center;gap:8px;border:none;cursor:pointer;
 background:linear-gradient(135deg,var(--c-accent),#19b89f);color:#04110f;font-weight:600;
 font-family:'Sora';font-size:14px;padding:11px 18px;border-radius:11px;
-box-shadow:0 6px 22px rgba(46,230,207,0.28);transition:transform .18s,box-shadow .18s,filter .18s;}
+box-shadow:0 6px 22px rgba(46,230,207,0.28);transition:transform .25s var(--ease),box-shadow .25s var(--ease),filter .25s var(--ease);}
 .rf-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(46,230,207,0.42);filter:brightness(1.05);}
 .rf-btn:active{transform:translateY(0);}
 .rf-btn-lg{font-size:15.5px;padding:14px 26px;border-radius:13px;}
@@ -2284,7 +2336,7 @@ font-size:13px;padding:8px 16px;border-radius:9px;cursor:pointer;transition:.16s
 .rf-alloc-row{display:grid;grid-template-columns:96px 1fr 60px;align-items:center;gap:12px;margin-bottom:9px;}
 .rf-alloc-lbl{font-size:12.5px;color:var(--c-muted);}
 .rf-alloc-track{height:7px;background:var(--c-track);border-radius:5px;overflow:hidden;}
-.rf-alloc-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--c-accent),var(--c-accent2));transition:width .6s cubic-bezier(.2,.8,.2,1);}
+.rf-alloc-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--c-accent),var(--c-accent2));transition:width .7s var(--ease);}
 .rf-alloc-val{font-family:'JetBrains Mono';font-size:12.5px;text-align:right;}
 .rf-step-actions{display:flex;justify-content:space-between;align-items:center;max-width:560px;margin:30px auto 0;}
 
@@ -2306,7 +2358,7 @@ background:var(--c-panel);border:1px solid var(--c-border);border-radius:18px;pa
 .rf-total{font-family:'JetBrains Mono';font-weight:700;font-size:18px;}
 .rf-total.over{color:var(--c-bad);}
 .rf-budget-bar{flex:1;height:7px;background:var(--c-track);border-radius:5px;overflow:hidden;min-width:80px;}
-.rf-budget-fill{height:100%;border-radius:5px;transition:width .8s cubic-bezier(.2,.8,.2,1);}
+.rf-budget-fill{height:100%;border-radius:5px;transition:width .8s var(--ease);}
 
 .rf-compat{display:flex;gap:12px;align-items:flex-start;border-radius:14px;padding:15px 18px;margin-bottom:18px;font-size:14px;}
 .rf-compat.ok{background:rgba(70,224,160,0.08);border:1px solid rgba(70,224,160,0.28);color:var(--c-good);}
@@ -2370,15 +2422,20 @@ font-family:'Sora';font-size:12.5px;padding:7px 12px;border-radius:9px;cursor:po
 .rf-fy.warn{color:var(--c-warn);}
 
 /* DRAWER */
-.rf-drawer-wrap{position:fixed;inset:0;z-index:40;background:rgba(2,4,8,0.66);backdrop-filter:blur(4px);display:flex;justify-content:flex-end;animation:rfFade .2s ease;}
+.rf-drawer-wrap{position:fixed;inset:0;z-index:40;background:rgba(2,4,8,0.66);backdrop-filter:blur(4px);display:flex;justify-content:flex-end;animation:rfFade .28s var(--ease);}
 .rf-drawer{width:min(460px,100%);height:100%;background:#0b0f16;border-left:1px solid var(--c-border);
-display:flex;flex-direction:column;animation:rfSlideR .28s cubic-bezier(.2,.8,.2,1);}
+display:flex;flex-direction:column;animation:rfSlideR .42s var(--ease);will-change:transform,opacity;}
 .rf-drawer-head{display:flex;align-items:flex-start;justify-content:space-between;padding:20px;border-bottom:1px solid var(--c-border);}
 .rf-drawer-list{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px;}
 .rf-pick{display:flex;flex-direction:column;background:var(--c-panel);border:1px solid var(--c-border);
 border-radius:12px;padding:12px;color:var(--c-text);transition:border-color .16s,background .16s;}
 .rf-pick:hover{border-color:rgba(46,230,207,0.3);}
 .rf-pick.current{border-color:rgba(46,230,207,0.5);background:rgba(46,230,207,0.06);}
+.rf-pick.over{opacity:.6;}
+.rf-pick.over:hover{opacity:1;}
+.rf-pick-divider{display:flex;align-items:center;gap:10px;margin:8px 2px 2px;font-family:'JetBrains Mono';font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--c-muted);}
+.rf-pick-divider span{flex:0 0 auto;}
+.rf-pick-divider::before,.rf-pick-divider::after{content:'';flex:1;height:1px;background:var(--c-border);}
 .rf-pick-row{display:flex;align-items:center;gap:13px;}
 .rf-pick-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:11px;}
 .rf-clickable{cursor:pointer;}
@@ -2405,8 +2462,8 @@ padding:1px 7px;border-radius:20px;font-family:'JetBrains Mono';letter-spacing:0
 .rf-compat-bad{color:var(--c-bad);}
 
 /* MODAL */
-.rf-modal-wrap{position:fixed;inset:0;z-index:50;background:rgba(2,4,8,0.7);backdrop-filter:blur(4px);display:grid;place-items:center;animation:rfFade .2s ease;padding:20px;}
-.rf-modal{width:min(420px,100%);background:#0c1119;border:1px solid var(--c-border);border-radius:18px;padding:26px;animation:rfPop .26s cubic-bezier(.2,.9,.3,1.2);}
+.rf-modal-wrap{position:fixed;inset:0;z-index:50;background:rgba(2,4,8,0.7);backdrop-filter:blur(4px);display:grid;place-items:center;animation:rfFade .28s var(--ease);padding:20px;}
+.rf-modal{width:min(420px,100%);background:#0c1119;border:1px solid var(--c-border);border-radius:18px;padding:26px;animation:rfPop .4s var(--ease-spring);will-change:transform,opacity;}
 .rf-input{width:100%;background:var(--c-panel);border:1px solid var(--c-border);color:var(--c-text);font-family:'Sora';
 font-size:15px;padding:12px 14px;border-radius:11px;margin:14px 0 18px;outline:none;transition:.16s;}
 .rf-input:focus{border-color:var(--c-accent);box-shadow:0 0 0 3px rgba(46,230,207,0.12);}
@@ -2415,18 +2472,18 @@ font-size:15px;padding:12px 14px;border-radius:11px;margin:14px 0 18px;outline:n
 /* TOAST */
 .rf-toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:8px;
 background:#0d1620;border:1px solid rgba(70,224,160,0.4);color:var(--c-good);padding:12px 20px;border-radius:12px;
-font-size:14px;box-shadow:0 10px 40px rgba(0,0,0,0.5);animation:rfToast .3s cubic-bezier(.2,.9,.3,1.2);}
+font-size:14px;box-shadow:0 10px 40px rgba(0,0,0,0.5);animation:rfToast .45s var(--ease-spring);}
 
 /* ANIMATIONS */
 @keyframes rfFade{from{opacity:0}to{opacity:1}}
-@keyframes rfUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes rfUp{from{opacity:0;transform:translateY(16px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes rfPop{from{opacity:0;transform:scale(.94) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
 @keyframes rfSlideR{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}
-@keyframes rfSlideDown{from{opacity:0;max-height:0}to{opacity:1;max-height:300px}}
+@keyframes rfSlideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes rfToast{from{opacity:0;transform:translateX(-50%) translateY(14px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-.rf-fade{animation:rfFade .35s ease;}
-.rf-pop{animation:rfUp .5s cubic-bezier(.2,.8,.2,1) backwards;}
-.rf-slidein{animation:rfSlideDown .3s ease;}
+.rf-fade{animation:rfFade .45s var(--ease);}
+.rf-pop{animation:rfUp .6s var(--ease) backwards;will-change:transform,opacity;}
+.rf-slidein{animation:rfSlideDown .28s cubic-bezier(.2,.8,.2,1);}
 
 /* FORGE MODE BUTTONS */
 .rf-forge-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:24px auto 0;}
@@ -2452,7 +2509,7 @@ box-shadow:0 8px 28px rgba(124,92,255,0.45);transition:transform .18s,box-shadow
 .rf-fab:hover{transform:translateY(-2px);box-shadow:0 12px 34px rgba(124,92,255,0.6);}
 .rf-assistant{position:fixed;top:0;right:0;height:100vh;width:min(390px,100%);z-index:46;
 background:#0b0f16;border-left:1px solid var(--c-border);display:flex;flex-direction:column;
-box-shadow:-12px 0 40px rgba(0,0,0,0.5);animation:rfSlideR .28s cubic-bezier(.2,.8,.2,1);}
+box-shadow:-12px 0 40px rgba(0,0,0,0.5);animation:rfSlideR .42s var(--ease);will-change:transform,opacity;}
 .rf-asst-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--c-border);}
 .rf-asst-title{display:flex;align-items:center;gap:10px;font-family:'Chakra Petch';font-weight:600;font-size:16px;}
 .rf-asst-avatar{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;color:#fff;
@@ -2496,6 +2553,34 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .rf-pc-grid{grid-template-columns:1fr;gap:16px;}
 .rf-part-actions .rf-chip-btn{flex:1;justify-content:center;}
 .rf-part-name{font-size:14px;}
+}
+
+/* ---------- POLISH: scrollbars, focus, smoothing, reduced-motion ---------- */
+.rf-root *::-webkit-scrollbar{width:10px;height:10px;}
+.rf-root *::-webkit-scrollbar-track{background:transparent;}
+.rf-root *::-webkit-scrollbar-thumb{background:var(--c-border);border-radius:8px;border:2px solid transparent;background-clip:padding-box;}
+.rf-root *::-webkit-scrollbar-thumb:hover{background:var(--c-hover);background-clip:padding-box;}
+.rf-root{scrollbar-width:thin;scrollbar-color:var(--c-border) transparent;}
+
+.rf-root :focus-visible{outline:2px solid var(--c-accent);outline-offset:2px;border-radius:8px;}
+.rf-slider:focus-visible{outline:none;}
+
+/* consistent, springy easing across interactive surfaces */
+.rf-saved-card,.rf-uc-card,.rf-part,.rf-pick,.rf-variant{transition:transform .28s var(--ease),border-color .28s var(--ease),background .28s var(--ease),box-shadow .28s var(--ease),opacity .28s var(--ease);}
+.rf-saved-card:hover,.rf-uc-card:hover{box-shadow:0 14px 32px rgba(0,0,0,0.28);}
+.rf-part:hover{box-shadow:0 6px 20px rgba(0,0,0,0.18);}
+.rf-chip-btn,.rf-ghost,.rf-preset,.rf-asst-chip,.rf-theme-opt,.rf-icon-btn{transition:transform .2s var(--ease),background .2s var(--ease),border-color .2s var(--ease),color .2s var(--ease),box-shadow .2s var(--ease);}
+.rf-chip-btn:active,.rf-ghost:active,.rf-preset:active,.rf-asst-chip:active{transform:translateY(1px);}
+.rf-fab:active{transform:translateY(0) scale(.97);}
+.rf-asst-send:not(:disabled):hover{filter:brightness(1.08);transform:translateY(-1px);}
+.rf-asst-send:not(:disabled):active{transform:translateY(0);}
+
+/* crisper image rendering for product thumbnails */
+.rf-part-img,.rf-pick-img{image-rendering:auto;}
+.rf-part-img-link:focus-visible,.rf-pick-img-link:focus-visible{outline:2px solid var(--c-accent);outline-offset:2px;border-radius:11px;}
+
+@media (prefers-reduced-motion: reduce){
+  .rf-root *,.rf-root *::before,.rf-root *::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}
 }
 `}</style>
   );
