@@ -1299,7 +1299,7 @@ export default function RigForge() {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({
-            system: "You are a sharp, concise PC-building advisor. Given a build (parts, current prices, performance/value scores, budget and use case), write a 2-3 sentence verdict in plain prose: how well it fits the use case and budget, its main strength, and the weakest link or bottleneck if any. Be specific and honest, reference actual parts by name when useful. No markdown, no bullet lists, no preamble — just the verdict.",
+            system: "You are a sharp PC-building advisor. Given a build (parts, current prices, performance/value scores, budget and use case), write a verdict of about 3 sentences (roughly 55-70 words): how well it fits the use case and budget, its main strength, and the weakest link or bottleneck if any. Be specific and honest; reference key parts by name. Plain prose only — no markdown, no lists, no preamble.",
             messages: [{ role: "user", content: "Here is the build as JSON:\n" + JSON.stringify(summary, null, 1) + "\n\nWrite the verdict." }],
           }),
         });
