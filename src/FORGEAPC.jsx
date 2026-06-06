@@ -1164,6 +1164,20 @@ function Gauge({ value, max = 100, size = 132, label, accent = "var(--c-accent)"
 
 const scoreColor = (s) => (s >= 80 ? "var(--c-good)" : s >= 60 ? "var(--c-accent)" : s >= 40 ? "var(--c-warn)" : "var(--c-bad)");
 
+/* Rich, labeled spec sheet per part so the AI reasons from real data (with units). */
+function describePart(cat, p) {
+  const d = { name: p.name, brand: p.brand, ratingOutOf100: p.perf };
+  if (cat === "cpu") Object.assign(d, { cores: p.cores, tdpWatts: p.tdp, socket: p.socket, integratedGraphics: !!p.igpu });
+  else if (cat === "gpu") Object.assign(d, { vramGB: p.vram, tdpWatts: p.tdp, lengthMm: p.len });
+  else if (cat === "ram") Object.assign(d, { type: p.ramType, capacityGB: p.cap, speedMHz: p.speed });
+  else if (cat === "storage") Object.assign(d, { driveType: p.kind, capacityGB: p.cap, interface: p.iface });
+  else if (cat === "psu") Object.assign(d, { wattage: p.watt, efficiencyRating: p.eff });
+  else if (cat === "cooler") Object.assign(d, { coolerType: p.type, ratedForTdpWatts: p.tdpRating, heightMm: p.height, fitsSockets: p.sockets });
+  else if (cat === "mobo") Object.assign(d, { socket: p.socket, memoryType: p.ramType, formFactor: p.form, m2Slots: p.m2, maxMemoryGB: p.maxRam });
+  else if (cat === "case") Object.assign(d, { supportsFormFactors: p.forms, maxGpuLengthMm: p.maxGpu, maxAirCoolerHeightMm: p.maxCool });
+  return d;
+}
+
 /* ----------------------------- MAIN APP ----------------------------- */
 export default function RigForge() {
   const [view, setView] = useState("home"); // home | survey | budget | results
@@ -1289,9 +1303,11 @@ export default function RigForge() {
       pricePerfScore: analysis.ppScore,
       compatible: analysis.compat.pass,
       parts: CATEGORY_ORDER.filter((c) => parts[c]).map((c) => ({
-        slot: c, name: parts[c].name,
-        price: partOOS(parts[c]) ? "out of stock" : parts[c].price,
+        slot: c,
+        priceUSD: partOOS(parts[c]) ? "out of stock" : parts[c].price,
+        ...describePart(c, parts[c]),
       })),
+      compatibilityIssues: analysis.compat.issues && analysis.compat.issues.length ? analysis.compat.issues : "none",
     };
     const timer = setTimeout(async () => {
       try {
@@ -1299,7 +1315,7 @@ export default function RigForge() {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({
-            system: "You are a sharp PC-building advisor. Given a build (parts, current prices, performance/value scores, budget and use case), write a verdict of about 3 sentences (roughly 55-70 words): how well it fits the use case and budget, its main strength, and the weakest link or bottleneck if any. Be specific and honest; reference key parts by name. Plain prose only — no markdown, no lists, no preamble.",
+            system: "You are a sharp PC-building advisor. You're given a build as JSON: each part has labeled specs with units (e.g. tdpWatts, vramGB, capacityGB, speedMHz, wattage, coolerType, driveType, ratingOutOf100 where higher = stronger relative to its category), plus current prices, overall scores, budget, use case, and any compatibility issues. Write a verdict of about 3 sentences (~55-70 words): how well it fits the use case and budget, its main strength, and the weakest link or bottleneck. Use ONLY the specs given — never invent or assume a spec (e.g. read driveType for SATA vs NVMe). When judging the cooler, weigh coolerType and ratedForTdpWatts against the CPU's tdpWatts and cores: high-TDP or high-core chips (X3D, Ryzen 9, i7/i9, ~120W+) genuinely benefit from a strong air cooler or AIO — never call an AIO 'overkill' for those. Be specific; reference key parts by name. Plain prose only — no markdown, no lists, no preamble.",
             messages: [{ role: "user", content: "Here is the build as JSON:\n" + JSON.stringify(summary, null, 1) + "\n\nWrite the verdict." }],
           }),
         });
