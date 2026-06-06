@@ -1423,11 +1423,11 @@ function Home({ saved, loading, onNew, onOpen, onDelete, priceInfo }) {
         <button className="rf-btn rf-btn-lg" onClick={onNew}><Plus size={18} /> {t("startBuild")}</button>
         <div className="rf-price-status">
           <span className="rf-db-count"><Boxes size={13} /> {CATALOG_COUNT} {t("componentsDb")}</span>
-          <span className="rf-dot-sep">·</span>
-          {priceInfo ? (
-            <><span className="rf-live-dot" /> {t("livePrices")} · {t("updated")} {new Date(priceInfo.updatedAt).toLocaleDateString()}</>
-          ) : (
-            <>{t("samplePrices")}</>
+          {priceInfo && (
+            <>
+              <span className="rf-dot-sep">·</span>
+              <span className="rf-live-dot" /> {t("livePrices")} · {t("updated")} {new Date(priceInfo.updatedAt).toLocaleDateString()}
+            </>
           )}
         </div>
       </div>
@@ -1580,7 +1580,9 @@ function BudgetStep({ useCase, budget, setBudget, onBack, onAuto, onManual }) {
 function Results({ useCase, budget, parts, analysis, verdict, expanded, setExpanded, onSwap, onRemove, onRegen, onSave }) {
   const UC = USE_CASES[useCase];
   const a = analysis;
-  const overBudget = a.total > budget;
+  // Total counts only parts with a live price, so a hidden (out-of-stock) part never adds a made-up number.
+  const shownTotal = CATEGORY_ORDER.reduce((s, c) => { const p = parts[c]; return s + (p && !partOOS(p) ? p.price : 0); }, 0);
+  const overBudget = shownTotal > budget;
   return (
     <div className="rf-fade">
       <div className="rf-results-head">
@@ -1605,9 +1607,9 @@ function Results({ useCase, budget, parts, analysis, verdict, expanded, setExpan
           <p>{verdict}</p>
           <div className="rf-total-row">
             <span className="rf-muted">Total</span>
-            <span className={"rf-total" + (overBudget ? " over" : "")}>{fmt(a.total)}</span>
+            <span className={"rf-total" + (overBudget ? " over" : "")}>{fmt(shownTotal)}</span>
             <div className="rf-budget-bar">
-              <div className="rf-budget-fill" style={{ width: clamp((a.total / budget) * 100, 0, 100) + "%", background: overBudget ? "var(--c-bad)" : "var(--c-accent)" }} />
+              <div className="rf-budget-fill" style={{ width: clamp((shownTotal / budget) * 100, 0, 100) + "%", background: overBudget ? "var(--c-bad)" : "var(--c-accent)" }} />
             </div>
             <span className="rf-muted">{fmt(budget)}</span>
           </div>
@@ -1667,9 +1669,15 @@ function Results({ useCase, budget, parts, analysis, verdict, expanded, setExpan
                 {part && (
                   <>
                     <div className="rf-part-price-col">
-                      <div className={"rf-part-price " + status}>{fmt(part.price)}</div>
-                      {status === "over" && <div className="rf-flag over">OVER BUDGET</div>}
-                      {status === "tight" && <div className="rf-flag tight">A bit over</div>}
+                      {partOOS(part) ? (
+                        <div className="rf-part-price rf-oos-price">{t("outOfStock")}</div>
+                      ) : (
+                        <>
+                          <div className={"rf-part-price " + status}>{fmt(part.price)}</div>
+                          {status === "over" && <div className="rf-flag over">OVER BUDGET</div>}
+                          {status === "tight" && <div className="rf-flag tight">A bit over</div>}
+                        </>
+                      )}
                     </div>
                     <div className="rf-part-score" style={{ borderColor: scoreColor(sc), color: scoreColor(sc) }}>{sc}</div>
                   </>
@@ -1905,7 +1913,8 @@ function Picker({ cat, current, useCase, budget, parts, onClose, onPick }) {
         <div className="rf-drawer-list">
           {models.map((g, gi) => {
             const expanded = openModel === g.model;
-            const priceLabel = g.single || g.minPrice === g.maxPrice ? fmt(g.minPrice) : `${fmt(g.minPrice)}–${fmt(g.maxPrice)}`;
+            const _lp = g.variants.filter((v) => !partOOS(v)).map((v) => v.price);
+            const priceLabel = _lp.length ? (Math.min(..._lp) === Math.max(..._lp) ? fmt(Math.min(..._lp)) : `${fmt(Math.min(..._lp))}–${fmt(Math.max(..._lp))}`) : t("outOfStock");
             const showDivider = gi > 0 && g._over && !models[gi - 1]._over;
             return (
               <React.Fragment key={g.model}>
@@ -1960,7 +1969,7 @@ function Picker({ cat, current, useCase, budget, parts, onClose, onPick }) {
                           )}
                           <div className="rf-variant-name">{v.variantLabel || v.brand}</div>
                           <div className="rf-variant-right">
-                            <span className={"rf-part-price " + v._status}>{fmt(v.price)}</span>
+                            <span className={"rf-part-price " + v._status}>{partOOS(v) ? "—" : fmt(v.price)}</span>
                             {v._status === "over" && <span className="rf-flag over">OVER</span>}
                             {!v._compat && <ShieldAlert size={13} className="rf-compat-bad" />}
                           </div>
@@ -2400,6 +2409,7 @@ background:var(--c-panel);border:1px solid var(--c-border);border-radius:18px;pa
 .rf-part-name{font-family:'Chakra Petch';font-weight:600;font-size:16px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .rf-part-price-col{text-align:right;flex-shrink:0;}
 .rf-part-price{font-family:'JetBrains Mono';font-weight:700;font-size:16px;}
+.rf-oos-price{color:var(--c-muted);font-weight:600;font-size:13px;}
 .rf-part-price.within{color:var(--c-text);}
 .rf-part-price.tight{color:var(--c-warn);}
 .rf-part-price.over{color:var(--c-bad);}
