@@ -1284,17 +1284,16 @@ export default function RigForge() {
     [parts, analysis, useCase, budget]
   );
 
-  // AI overview: generate the verdict with the real model (via /api/chat), grounded
-  // in the actual parts + current live prices. The local verdict above shows instantly
-  // and is the fallback; the AI text replaces it when it arrives. Regenerates whenever
-  // the build or live prices change. Debounced + cancellable so we don't spam the API.
+  // AI overview: generated ON DEMAND (button press) via /api/chat, grounded in the
+  // actual parts + current prices. Not automatic, so it only costs an API call when
+  // the user asks for it. Cleared whenever the build/inputs change.
   const [aiVerdict, setAiVerdict] = useState(null);
   const [aiBusy, setAiBusy] = useState(false);
-  useEffect(() => {
-    setAiVerdict(null);
-    if (view !== "results" || !parts || !parts.cpu || !useCase || !analysis) { setAiBusy(false); return; }
-    let cancelled = false;
+  useEffect(() => { setAiVerdict(null); setAiBusy(false); }, [parts, useCase, budget, view]);
+  const runVerdict = useCallback(async () => {
+    if (!parts || !parts.cpu || !useCase || !analysis || aiBusy) return;
     setAiBusy(true);
+    setAiVerdict(null);
     const summary = {
       useCase: USE_CASES[useCase].label,
       budget,
@@ -1309,25 +1308,19 @@ export default function RigForge() {
       })),
       compatibilityIssues: analysis.compat.issues && analysis.compat.issues.length ? analysis.compat.issues : "none",
     };
-    const timer = setTimeout(async () => {
-      try {
-        const res = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            system: "You are a sharp PC-building advisor. You're given a build as JSON: each part has labeled specs with units (e.g. tdpWatts, vramGB, capacityGB, speedMHz, wattage, coolerType, driveType, ratingOutOf100 where higher = stronger relative to its category), plus current prices, overall scores, budget, use case, and any compatibility issues. Write a verdict of about 3 sentences (~55-70 words): how well it fits the use case and budget, its main strength, and the weakest link or bottleneck. Use ONLY the specs given — never invent or assume a spec (e.g. read driveType for SATA vs NVMe). When judging the cooler, weigh coolerType and ratedForTdpWatts against the CPU's tdpWatts and cores: high-TDP or high-core chips (X3D, Ryzen 9, i7/i9, ~120W+) genuinely benefit from a strong air cooler or AIO — never call an AIO 'overkill' for those. Be specific; reference key parts by name. Plain prose only — no markdown, no lists, no preamble.",
-            messages: [{ role: "user", content: "Here is the build as JSON:\n" + JSON.stringify(summary, null, 1) + "\n\nWrite the verdict." }],
-          }),
-        });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (!cancelled && data && data.text) setAiVerdict(data.text.trim());
-      } catch (e) { /* keep local fallback verdict */ }
-      finally { if (!cancelled) setAiBusy(false); }
-    }, 600);
-    return () => { cancelled = true; clearTimeout(timer); };
-  }, [view, parts, useCase, budget, analysis, priceInfo]);
-  const displayVerdict = aiVerdict || verdict;
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          system: "You are a sharp PC-building advisor. You're given a build as JSON: each part has labeled specs with units (e.g. tdpWatts, vramGB, capacityGB, speedMHz, wattage, coolerType, driveType, ratingOutOf100 where higher = stronger relative to its category), plus current prices, overall scores, budget, use case, and any compatibility issues. Write a verdict of about 3 sentences (~55-70 words): how well it fits the use case and budget, its main strength, and the weakest link or bottleneck. Use ONLY the specs given — never invent or assume a spec (e.g. read driveType for SATA vs NVMe). When judging the cooler, weigh coolerType and ratedForTdpWatts against the CPU's tdpWatts and cores: high-TDP or high-core chips (X3D, Ryzen 9, i7/i9, ~120W+) genuinely benefit from a strong air cooler or AIO — never call an AIO 'overkill' for those. Be specific; reference key parts by name. Plain prose only — no markdown, no lists, no preamble.",
+          messages: [{ role: "user", content: "Here is the build as JSON:\n" + JSON.stringify(summary, null, 1) + "\n\nWrite the verdict." }],
+        }),
+      });
+      if (res.ok) { const data = await res.json(); if (data && data.text) setAiVerdict(data.text.trim()); }
+    } catch (e) { /* leave unset; button stays available to retry */ }
+    finally { setAiBusy(false); }
+  }, [parts, useCase, budget, analysis, aiBusy]);
 
   const flash = (msg) => { setToast(msg); setTimeout(() => setToast(null), 2200); };
 
@@ -1434,7 +1427,7 @@ export default function RigForge() {
         )}
         {view === "results" && parts && analysis && (
           <Results
-            useCase={useCase} budget={budget} parts={parts} analysis={analysis} verdict={aiVerdict} aiBusy={aiBusy} aiLive={!!aiVerdict}
+            useCase={useCase} budget={budget} parts={parts} analysis={analysis} verdict={aiVerdict} aiBusy={aiBusy} aiLive={!!aiVerdict} onGenerate={runVerdict}
             expanded={expanded} setExpanded={setExpanded}
             onSwap={(c) => setPicker(c)} onRemove={removePart}
             onRegen={generateAuto} onSave={() => setSavingOpen(true)}
@@ -1645,7 +1638,7 @@ function BudgetStep({ useCase, budget, setBudget, onBack, onAuto, onManual }) {
 }
 
 /* ----------------------------- RESULTS ----------------------------- */
-function Results({ useCase, budget, parts, analysis, verdict, aiBusy, aiLive, expanded, setExpanded, onSwap, onRemove, onRegen, onSave }) {
+function Results({ useCase, budget, parts, analysis, verdict, aiBusy, aiLive, onGenerate, expanded, setExpanded, onSwap, onRemove, onRegen, onSave }) {
   const UC = USE_CASES[useCase];
   const a = analysis;
   // Total counts only parts with a live price, so a hidden (out-of-stock) part never adds a made-up number.
@@ -1672,9 +1665,13 @@ function Results({ useCase, budget, parts, analysis, verdict, aiBusy, aiLive, ex
         </div>
         <div className="rf-verdict">
           <div className="rf-verdict-tag"><Sparkles size={13} /> AI verdict <span className="rf-hybrid">Opus 4.8</span>{aiBusy && <span className="rf-verdict-state"> · thinking…</span>}</div>
-          <p className={aiBusy && !verdict ? "rf-verdict-busy" : ""}>
-            {verdict ? verdict : aiBusy ? "Analyzing your build with current prices…" : "AI overview is unavailable right now — make sure the AI key is set, or try again in a moment."}
-          </p>
+          {verdict ? (
+            <p>{verdict}</p>
+          ) : aiBusy ? (
+            <p className="rf-verdict-busy">Analyzing your build with current prices…</p>
+          ) : (
+            <button className="rf-forge-btn outline rf-verdict-btn" onClick={onGenerate}><Sparkles size={14} /> Generate AI verdict</button>
+          )}
           <div className="rf-total-row">
             <span className="rf-muted">Total</span>
             <span className={"rf-total" + (overBudget ? " over" : "")}>{fmt(shownTotal)}</span>
@@ -2456,6 +2453,7 @@ background:var(--c-panel);border:1px solid var(--c-border);border-radius:18px;pa
 .rf-hybrid{font-size:9px;background:rgba(124,92,255,0.16);border:1px solid rgba(124,92,255,0.3);color:var(--c-accent2);padding:1px 6px;border-radius:20px;letter-spacing:1px;}
 .rf-verdict p{margin:0 0 16px;font-size:14.5px;line-height:1.6;color:var(--c-text);}
 .rf-verdict-busy{opacity:.62;transition:opacity .4s var(--ease);}
+.rf-verdict-btn{margin:2px 0 14px;}
 .rf-total-row{display:flex;align-items:center;gap:12px;font-size:13px;}
 .rf-total{font-family:'JetBrains Mono';font-weight:700;font-size:18px;}
 .rf-total.over{color:var(--c-bad);}
