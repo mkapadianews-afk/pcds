@@ -10,9 +10,18 @@ import { MEDIA } from "../data/part-media.js";
 const LANGS = [{"code": "en", "name": "English"}, {"code": "es", "name": "Español"}, {"code": "zh", "name": "中文"}, {"code": "hi", "name": "हिन्दी"}, {"code": "ar", "name": "العربية"}, {"code": "pt", "name": "Português"}, {"code": "fr", "name": "Français"}, {"code": "ru", "name": "Русский"}, {"code": "ja", "name": "日本語"}, {"code": "de", "name": "Deutsch"}];
 const I18N = {"en": {"myRigs": "My Rigs", "settings": "Settings", "appearance": "Appearance", "language": "Language", "theme": "Theme", "dark": "Dark", "light": "Light", "back": "Back", "saveRig": "Save rig", "select": "Select", "selected": "Selected", "moreInfo": "More info", "hideInfo": "Hide info", "autoForge": "Auto-Forge", "buildYourself": "Build It Yourself", "yourBuild": "Your build", "budgetQ": "What's your budget?", "useCaseQ": "What will this PC be for?", "livePrices": "Live prices", "samplePrices": "sample prices", "updated": "updated", "componentsDb": "components in the database", "overBudgetCat": "Over your {x} budget", "performance": "PERFORMANCE", "pricePerf": "PRICE / PERF", "pros": "PROS", "cons": "CONS"}, "es": {"myRigs": "Mis Equipos", "settings": "Ajustes", "appearance": "Apariencia", "language": "Idioma", "theme": "Tema", "dark": "Oscuro", "light": "Claro", "back": "Atrás", "saveRig": "Guardar", "select": "Elegir", "selected": "Elegido", "moreInfo": "Más info", "hideInfo": "Ocultar", "autoForge": "Auto-Forjar", "buildYourself": "Hazlo tú mismo", "yourBuild": "Tu equipo", "budgetQ": "¿Cuál es tu presupuesto?", "useCaseQ": "¿Para qué será este PC?", "livePrices": "Precios en vivo", "samplePrices": "precios de muestra", "updated": "actualizado", "componentsDb": "componentes en la base de datos", "overBudgetCat": "Supera tu presupuesto de {x}", "performance": "RENDIMIENTO", "pricePerf": "PRECIO / REND", "pros": "PROS", "cons": "CONTRAS"}, "zh": {"myRigs": "我的配置", "settings": "设置", "appearance": "外观", "language": "语言", "theme": "主题", "dark": "深色", "light": "浅色", "back": "返回", "saveRig": "保存配置", "select": "选择", "selected": "已选", "moreInfo": "更多信息", "hideInfo": "隐藏", "autoForge": "自动配置", "buildYourself": "自己组装", "yourBuild": "你的配置", "budgetQ": "你的预算是多少？", "useCaseQ": "这台电脑用来做什么？", "livePrices": "实时价格", "samplePrices": "示例价格", "updated": "更新于", "componentsDb": "个组件已入库", "overBudgetCat": "超出{x}预算", "performance": "性能", "pricePerf": "性价比", "pros": "优点", "cons": "缺点"}, "hi": {"myRigs": "मेरे रिग", "settings": "सेटिंग्स", "appearance": "रूप", "language": "भाषा", "theme": "थीम", "dark": "गहरा", "light": "हल्का", "back": "वापस", "saveRig": "सहेजें", "select": "चुनें", "selected": "चयनित", "moreInfo": "और जानकारी", "hideInfo": "छिपाएं", "autoForge": "ऑटो-फोर्ज", "buildYourself": "खुद बनाएं", "yourBuild": "आपका बिल्ड", "budgetQ": "आपका बजट क्या है?", "useCaseQ": "यह पीसी किसलिए होगा?", "livePrices": "लाइव कीमतें", "samplePrices": "नमूना कीमतें", "updated": "अपडेट", "componentsDb": "घटक डेटाबेस में", "overBudgetCat": "{x} बजट से अधिक", "performance": "प्रदर्शन", "pricePerf": "मूल्य/प्रदर्शन", "pros": "फायदे", "cons": "नुकसान"}, "ar": {"myRigs": "أجهزتي", "settings": "الإعدادات", "appearance": "المظهر", "language": "اللغة", "theme": "السمة", "dark": "داكن", "light": "فاتح", "back": "رجوع", "saveRig": "حفظ", "select": "اختيار", "selected": "محدد", "moreInfo": "المزيد", "hideInfo": "إخفاء", "autoForge": "تجميع تلقائي", "buildYourself": "اصنعه بنفسك", "yourBuild": "تجميعتك", "budgetQ": "ما هي ميزانيتك؟", "useCaseQ": "لأي غرض هذا الحاسوب؟", "livePrices": "أسعار حية", "samplePrices": "أسعار تجريبية", "updated": "محدّث", "componentsDb": "مكوّن في قاعدة البيانات", "overBudgetCat": "يتجاوز ميزانية {x}", "performance": "الأداء", "pricePerf": "السعر/الأداء", "pros": "الإيجابيات", "cons": "السلبيات"}, "pt": {"myRigs": "Meus PCs", "settings": "Configurações", "appearance": "Aparência", "language": "Idioma", "theme": "Tema", "dark": "Escuro", "light": "Claro", "back": "Voltar", "saveRig": "Salvar", "select": "Selecionar", "selected": "Selecionado", "moreInfo": "Mais info", "hideInfo": "Ocultar", "autoForge": "Auto-Forjar", "buildYourself": "Faça você mesmo", "yourBuild": "Sua build", "budgetQ": "Qual é o seu orçamento?", "useCaseQ": "Para que será este PC?", "livePrices": "Preços ao vivo", "samplePrices": "preços de exemplo", "updated": "atualizado", "componentsDb": "componentes no banco de dados", "overBudgetCat": "Acima do orçamento de {x}", "performance": "DESEMPENHO", "pricePerf": "PREÇO / DESEMP", "pros": "PRÓS", "cons": "CONTRAS"}, "fr": {"myRigs": "Mes Configs", "settings": "Réglages", "appearance": "Apparence", "language": "Langue", "theme": "Thème", "dark": "Sombre", "light": "Clair", "back": "Retour", "saveRig": "Enregistrer", "select": "Choisir", "selected": "Choisi", "moreInfo": "Plus d'infos", "hideInfo": "Masquer", "autoForge": "Auto-Forge", "buildYourself": "Faites-le vous-même", "yourBuild": "Votre config", "budgetQ": "Quel est votre budget ?", "useCaseQ": "À quoi servira ce PC ?", "livePrices": "Prix en direct", "samplePrices": "prix indicatifs", "updated": "mis à jour", "componentsDb": "composants dans la base", "overBudgetCat": "Au-dessus du budget {x}", "performance": "PERFORMANCE", "pricePerf": "PRIX / PERF", "pros": "ATOUTS", "cons": "INCONVÉNIENTS"}, "ru": {"myRigs": "Мои сборки", "settings": "Настройки", "appearance": "Вид", "language": "Язык", "theme": "Тема", "dark": "Тёмная", "light": "Светлая", "back": "Назад", "saveRig": "Сохранить", "select": "Выбрать", "selected": "Выбрано", "moreInfo": "Подробнее", "hideInfo": "Скрыть", "autoForge": "Авто-сборка", "buildYourself": "Собрать самому", "yourBuild": "Ваша сборка", "budgetQ": "Каков ваш бюджет?", "useCaseQ": "Для чего этот ПК?", "livePrices": "Цены в реальном времени", "samplePrices": "примерные цены", "updated": "обновлено", "componentsDb": "компонентов в базе", "overBudgetCat": "Сверх бюджета на {x}", "performance": "ПРОИЗВОДИТ.", "pricePerf": "ЦЕНА/КАЧ.", "pros": "ПЛЮСЫ", "cons": "МИНУСЫ"}, "ja": {"myRigs": "マイ構成", "settings": "設定", "appearance": "外観", "language": "言語", "theme": "テーマ", "dark": "ダーク", "light": "ライト", "back": "戻る", "saveRig": "保存", "select": "選択", "selected": "選択済", "moreInfo": "詳細", "hideInfo": "隠す", "autoForge": "自動構成", "buildYourself": "自分で組む", "yourBuild": "あなたの構成", "budgetQ": "予算はいくらですか？", "useCaseQ": "このPCの用途は？", "livePrices": "ライブ価格", "samplePrices": "サンプル価格", "updated": "更新", "componentsDb": "個のパーツを収録", "overBudgetCat": "{x}予算オーバー", "performance": "性能", "pricePerf": "価格性能", "pros": "長所", "cons": "短所"}, "de": {"myRigs": "Meine Builds", "settings": "Einstellungen", "appearance": "Darstellung", "language": "Sprache", "theme": "Thema", "dark": "Dunkel", "light": "Hell", "back": "Zurück", "saveRig": "Speichern", "select": "Wählen", "selected": "Gewählt", "moreInfo": "Mehr Info", "hideInfo": "Verbergen", "autoForge": "Auto-Forge", "buildYourself": "Selbst bauen", "yourBuild": "Dein Build", "budgetQ": "Wie hoch ist dein Budget?", "useCaseQ": "Wofür ist dieser PC?", "livePrices": "Live-Preise", "samplePrices": "Beispielpreise", "updated": "aktualisiert", "componentsDb": "Komponenten in der Datenbank", "overBudgetCat": "Über dem {x}-Budget", "performance": "LEISTUNG", "pricePerf": "PREIS / LEIST", "pros": "VORTEILE", "cons": "NACHTEILE"}};
 let CUR_LANG = "en";
+
+const I18N_X = {"en": {"budget": "budget", "startBuild": "Start a new build", "savedWord": "saved", "loadingRigs": "Loading your rigs…", "noRigs": "No rigs yet. Build one and save it here.", "chooseA": "CHOOSE A", "outOfStock": "Out of stock"}, "es": {"budget": "presupuesto", "startBuild": "Crear nueva build", "savedWord": "guardados", "loadingRigs": "Cargando tus equipos…", "noRigs": "Aún no hay equipos. Crea uno y guárdalo aquí.", "chooseA": "ELIGE", "outOfStock": "Agotado"}, "zh": {"budget": "预算", "startBuild": "开始新配置", "savedWord": "已保存", "loadingRigs": "正在加载…", "noRigs": "还没有配置。创建并保存在这里。", "chooseA": "选择", "outOfStock": "缺货"}, "hi": {"budget": "बजट", "startBuild": "नया बिल्ड शुरू करें", "savedWord": "सहेजे गए", "loadingRigs": "आपके रिग लोड हो रहे हैं…", "noRigs": "अभी कोई रिग नहीं। एक बनाएं और सहेजें।", "chooseA": "चुनें", "outOfStock": "स्टॉक ख़त्म"}, "ar": {"budget": "ميزانية", "startBuild": "ابدأ بناءً جديدًا", "savedWord": "محفوظ", "loadingRigs": "جارٍ التحميل…", "noRigs": "لا أجهزة بعد. أنشئ واحداً واحفظه هنا.", "chooseA": "اختر", "outOfStock": "نفد المخزون"}, "pt": {"budget": "orçamento", "startBuild": "Iniciar nova build", "savedWord": "salvos", "loadingRigs": "Carregando…", "noRigs": "Nenhum PC ainda. Crie e salve aqui.", "chooseA": "ESCOLHA", "outOfStock": "Esgotado"}, "fr": {"budget": "budget", "startBuild": "Nouvelle config", "savedWord": "enregistrés", "loadingRigs": "Chargement…", "noRigs": "Aucune config. Créez-en une et enregistrez-la.", "chooseA": "CHOISIR", "outOfStock": "Rupture de stock"}, "ru": {"budget": "бюджет", "startBuild": "Новая сборка", "savedWord": "сохранено", "loadingRigs": "Загрузка…", "noRigs": "Сборок пока нет. Создайте и сохраните.", "chooseA": "ВЫБЕРИТЕ", "outOfStock": "Нет в наличии"}, "ja": {"budget": "予算", "startBuild": "新しい構成を始める", "savedWord": "保存済み", "loadingRigs": "読み込み中…", "noRigs": "まだ構成がありません。作成して保存しましょう。", "chooseA": "選択", "outOfStock": "在庫切れ"}, "de": {"budget": "Budget", "startBuild": "Neuen Build starten", "savedWord": "gespeichert", "loadingRigs": "Wird geladen…", "noRigs": "Noch keine Builds. Erstelle und speichere einen.", "chooseA": "WÄHLE", "outOfStock": "Nicht verfügbar"}};
+const _UCL = {"en": {"gaming": "Gaming", "content": "Content Creation", "streaming": "Streaming", "workstation": "3D / Workstation", "ai": "AI / ML", "office": "Office / Everyday"}, "es": {"gaming": "Juegos", "content": "Creación de Contenido", "streaming": "Streaming", "workstation": "3D / Estación", "ai": "IA / ML", "office": "Oficina / Diario"}, "zh": {"gaming": "游戏", "content": "内容创作", "streaming": "直播", "workstation": "3D 工作站", "ai": "AI / 机器学习", "office": "办公 / 日常"}, "hi": {"gaming": "गेमिंग", "content": "कंटेंट क्रिएशन", "streaming": "स्ट्रीमिंग", "workstation": "3D / वर्कस्टेशन", "ai": "एआई / एमएल", "office": "ऑफिस / रोज़"}, "ar": {"gaming": "الألعاب", "content": "صناعة المحتوى", "streaming": "البث", "workstation": "3D / محطة عمل", "ai": "ذكاء اصطناعي", "office": "مكتب / يومي"}, "pt": {"gaming": "Jogos", "content": "Criação de Conteúdo", "streaming": "Streaming", "workstation": "3D / Workstation", "ai": "IA / ML", "office": "Escritório / Diário"}, "fr": {"gaming": "Jeux", "content": "Création de Contenu", "streaming": "Streaming", "workstation": "3D / Station", "ai": "IA / ML", "office": "Bureau / Quotidien"}, "ru": {"gaming": "Игры", "content": "Контент", "streaming": "Стриминг", "workstation": "3D / Рабочая станция", "ai": "ИИ / МО", "office": "Офис / Повседневный"}, "ja": {"gaming": "ゲーム", "content": "コンテンツ制作", "streaming": "配信", "workstation": "3D / ワークステーション", "ai": "AI / ML", "office": "オフィス / 日常"}, "de": {"gaming": "Gaming", "content": "Content-Erstellung", "streaming": "Streaming", "workstation": "3D / Workstation", "ai": "KI / ML", "office": "Büro / Alltag"}};
+const _UCT = {"en": {"gaming": "Max FPS", "content": "Video & Photo", "streaming": "Play & Broadcast", "workstation": "Render & CAD", "ai": "VRAM Hungry", "office": "Snappy & Cheap"}, "es": {"gaming": "Máx FPS", "content": "Vídeo y Foto", "streaming": "Jugar y Transmitir", "workstation": "Renderizado y CAD", "ai": "Hambriento de VRAM", "office": "Rápido y Barato"}, "zh": {"gaming": "最高帧率", "content": "视频与照片", "streaming": "边玩边播", "workstation": "渲染与CAD", "ai": "显存需求高", "office": "流畅又便宜"}, "hi": {"gaming": "अधिकतम FPS", "content": "वीडियो और फोटो", "streaming": "खेलें और प्रसारित करें", "workstation": "रेंडर और CAD", "ai": "अधिक VRAM", "office": "तेज़ और सस्ता"}, "ar": {"gaming": "أقصى إطارات", "content": "فيديو وصور", "streaming": "لعب وبث", "workstation": "تصيير وCAD", "ai": "نهم للذاكرة", "office": "سريع ورخيص"}, "pt": {"gaming": "Máx FPS", "content": "Vídeo e Foto", "streaming": "Jogar e Transmitir", "workstation": "Renderização e CAD", "ai": "Faminto por VRAM", "office": "Rápido e Barato"}, "fr": {"gaming": "FPS max", "content": "Vidéo & Photo", "streaming": "Jouer & Diffuser", "workstation": "Rendu & CAO", "ai": "Gourmand en VRAM", "office": "Rapide & Abordable"}, "ru": {"gaming": "Макс FPS", "content": "Видео и фото", "streaming": "Игра и трансляция", "workstation": "Рендер и CAD", "ai": "Нужен VRAM", "office": "Быстро и дёшево"}, "ja": {"gaming": "最大FPS", "content": "動画と写真", "streaming": "プレイ＆配信", "workstation": "レンダー＆CAD", "ai": "VRAM大食い", "office": "軽快＆安価"}, "de": {"gaming": "Max FPS", "content": "Video & Foto", "streaming": "Spielen & Senden", "workstation": "Rendern & CAD", "ai": "VRAM-hungrig", "office": "Flott & Günstig"}};
+const _CATL = {"en": {"cpu": "CPU", "gpu": "Graphics Card", "mobo": "Motherboard", "ram": "Memory", "storage": "Storage", "psu": "Power Supply", "case": "Case", "cooler": "CPU Cooler"}, "es": {"cpu": "CPU", "gpu": "Tarjeta Gráfica", "mobo": "Placa Base", "ram": "Memoria", "storage": "Almacenamiento", "psu": "Fuente", "case": "Caja", "cooler": "Disipador"}, "zh": {"cpu": "处理器", "gpu": "显卡", "mobo": "主板", "ram": "内存", "storage": "存储", "psu": "电源", "case": "机箱", "cooler": "散热器"}, "hi": {"cpu": "सीपीयू", "gpu": "ग्राफिक्स कार्ड", "mobo": "मदरबोर्ड", "ram": "मेमोरी", "storage": "स्टोरेज", "psu": "बिजली आपूर्ति", "case": "केस", "cooler": "कूलर"}, "ar": {"cpu": "معالج", "gpu": "بطاقة رسومات", "mobo": "اللوحة الأم", "ram": "الذاكرة", "storage": "التخزين", "psu": "مزود الطاقة", "case": "الصندوق", "cooler": "مبرد"}, "pt": {"cpu": "CPU", "gpu": "Placa de Vídeo", "mobo": "Placa-Mãe", "ram": "Memória", "storage": "Armazenamento", "psu": "Fonte", "case": "Gabinete", "cooler": "Cooler"}, "fr": {"cpu": "Processeur", "gpu": "Carte Graphique", "mobo": "Carte Mère", "ram": "Mémoire", "storage": "Stockage", "psu": "Alimentation", "case": "Boîtier", "cooler": "Refroidisseur"}, "ru": {"cpu": "Процессор", "gpu": "Видеокарта", "mobo": "Материнская плата", "ram": "Память", "storage": "Накопитель", "psu": "Блок питания", "case": "Корпус", "cooler": "Охлаждение"}, "ja": {"cpu": "CPU", "gpu": "グラフィックカード", "mobo": "マザーボード", "ram": "メモリ", "storage": "ストレージ", "psu": "電源", "case": "ケース", "cooler": "クーラー"}, "de": {"cpu": "Prozessor", "gpu": "Grafikkarte", "mobo": "Hauptplatine", "ram": "Arbeitsspeicher", "storage": "Speicher", "psu": "Netzteil", "case": "Gehäuse", "cooler": "Kühler"}};
+const _pick = (mp, k) => (mp[CUR_LANG] && mp[CUR_LANG][k]) || mp.en[k] || k;
+const tUC = (k) => _pick(_UCL, k);
+const tUCtag = (k) => _pick(_UCT, k);
+const tCat = (k) => _pick(_CATL, k);
 function t(key, vars) {
-  const d = I18N[CUR_LANG] || I18N.en;
-  let str = (d && d[key]) || I18N.en[key] || key;
+  const d = I18N[CUR_LANG] || I18N.en, x = I18N_X[CUR_LANG] || I18N_X.en;
+  let str = (d && d[key]) || (x && x[key]) || I18N.en[key] || I18N_X.en[key] || key;
   if (vars) for (const k in vars) str = str.split('{'+k+'}').join(vars[k]);
   return str;
 }
@@ -703,6 +712,8 @@ const CATALOG_COUNT = Object.values(CATALOG).reduce((s, a) => s + a.length, 0);
 // Attach product image + link to each part (refreshed live by /api/prices when available).
 for (const _c in CATALOG) for (const _p of CATALOG[_c]) { const _m = MEDIA[_p.id]; if (_m) { _p.img = _m.img; _p.url = _m.url; } }
 
+let PRICE_LIVE = false; // set true once live pricing has loaded
+const partOOS = (p) => PRICE_LIVE && p && p._live === false; // out of stock = no live price
 const fmt = (n) => "$" + (Number.isInteger(Number(n)) ? Number(n).toLocaleString() : Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
@@ -1209,15 +1220,15 @@ export default function RigForge() {
         for (const c of CATEGORY_ORDER) {
           for (const part of CATALOG[c]) {
             const entry = data.prices[part.id];
-            if (entry) {
-              const vals = Object.values(entry).filter((v) => typeof v === "number" && v > 0);
-              if (vals.length) { part.price = Math.min(...vals); n++; }
-            }
+            const vals = entry ? Object.values(entry).filter((v) => typeof v === "number" && v > 0) : [];
+            if (vals.length) { part.price = Math.min(...vals); part._live = true; n++; }
+            else { part._live = false; } // not in the latest live data => out of stock
             const m = data.media && data.media[part.id];
             if (m) { if (m.img) part.img = m.img; if (m.url) part.url = m.url; }
           }
         }
-        if (n) setPriceInfo({ updatedAt: data.updatedAt, count: n });
+        PRICE_LIVE = true; // live pricing loaded — enables out-of-stock display
+        setPriceInfo({ updatedAt: data.updatedAt, count: n });
       } catch (e) {
         /* offline / not deployed: keep built-in sample prices */
       }
@@ -1409,7 +1420,7 @@ function Home({ saved, loading, onNew, onOpen, onDelete, priceInfo }) {
           Tell us your use case and budget. We score every part, auto-assemble a balanced build,
           check full compatibility, and grade the result out of 100.
         </p>
-        <button className="rf-btn rf-btn-lg" onClick={onNew}><Plus size={18} /> Start a new build</button>
+        <button className="rf-btn rf-btn-lg" onClick={onNew}><Plus size={18} /> {t("startBuild")}</button>
         <div className="rf-price-status">
           <span className="rf-db-count"><Boxes size={13} /> {CATALOG_COUNT} {t("componentsDb")}</span>
           <span className="rf-dot-sep">·</span>
@@ -1423,15 +1434,15 @@ function Home({ saved, loading, onNew, onOpen, onDelete, priceInfo }) {
 
       <div className="rf-section-head">
         <h2>{t("myRigs")}</h2>
-        <span className="rf-muted">{saved.length} saved</span>
+        <span className="rf-muted">{saved.length} {t("savedWord")}</span>
       </div>
 
       {loading ? (
-        <div className="rf-muted rf-pad">Loading your rigs…</div>
+        <div className="rf-muted rf-pad">{t("loadingRigs")}</div>
       ) : saved.length === 0 ? (
         <div className="rf-empty">
           <Boxes size={30} className="rf-muted" />
-          <p className="rf-muted">No rigs yet. Build one and save it here.</p>
+          <p className="rf-muted">{t("noRigs")}</p>
         </div>
       ) : (
         <div className="rf-saved-grid">
@@ -1440,7 +1451,7 @@ function Home({ saved, loading, onNew, onOpen, onDelete, priceInfo }) {
             return (
               <div key={b.id} className="rf-saved-card rf-pop" style={{ animationDelay: i * 60 + "ms" }} onClick={() => onOpen(b)}>
                 <div className="rf-saved-top">
-                  <div className="rf-saved-uc"><UC.Icon size={15} /> {UC.label}</div>
+                  <div className="rf-saved-uc"><UC.Icon size={15} /> {tUC(b.useCase)}</div>
                   <button className="rf-icon-btn" onClick={(e) => { e.stopPropagation(); onDelete(b.id); }}>
                     <Trash2 size={15} />
                   </button>
@@ -1464,7 +1475,7 @@ function Home({ saved, loading, onNew, onOpen, onDelete, priceInfo }) {
                     if (!pt && !noGpu) return null;
                     return (
                       <div key={c} className="rf-saved-part">
-                        <span className="rf-saved-part-cat">{CAT_META[c].label}</span>
+                        <span className="rf-saved-part-cat">{tCat(c)}</span>
                         <span className="rf-saved-part-name">{pt ? pt.name : "Integrated graphics"}</span>
                       </div>
                     );
@@ -1493,8 +1504,8 @@ function Survey({ onPick }) {
         {Object.entries(USE_CASES).map(([k, uc], i) => (
           <button key={k} className="rf-uc-card rf-pop" style={{ animationDelay: i * 55 + "ms" }} onClick={() => onPick(k)}>
             <div className="rf-uc-icon"><uc.Icon size={24} /></div>
-            <div className="rf-uc-label">{uc.label}</div>
-            <div className="rf-uc-tag">{uc.tag}</div>
+            <div className="rf-uc-label">{tUC(k)}</div>
+            <div className="rf-uc-tag">{tUCtag(k)}</div>
             <div className="rf-uc-go"><ChevronRight size={16} /></div>
           </button>
         ))}
@@ -1512,7 +1523,7 @@ function BudgetStep({ useCase, budget, setBudget, onBack, onAuto, onManual }) {
   return (
     <div className="rf-fade rf-step">
       <div className="rf-step-head">
-        <div className="rf-eyebrow">STEP 2 OF 2 · {UC.label.toUpperCase()}</div>
+        <div className="rf-eyebrow">STEP 2 OF 2 · {tUC(useCase).toUpperCase()}</div>
         <h2>{t("budgetQ")}</h2>
         <p className="rf-muted">Drag to set your total spend. We reserve the essentials first, then spend the rest where it counts.</p>
       </div>
@@ -1537,11 +1548,11 @@ function BudgetStep({ useCase, budget, setBudget, onBack, onAuto, onManual }) {
 
       {/* live allocation preview */}
       <div className="rf-alloc">
-        <div className="rf-alloc-title">How your {fmt(budget)} splits for {UC.label}</div>
+        <div className="rf-alloc-title">How your {fmt(budget)} splits for {tUC(useCase)}</div>
         <div className="rf-alloc-bars">
           {CATEGORY_ORDER.filter((c) => UC.alloc[c] > 0).map((c) => (
             <div key={c} className="rf-alloc-row">
-              <span className="rf-alloc-lbl">{CAT_META[c].label}</span>
+              <span className="rf-alloc-lbl">{tCat(c)}</span>
               <div className="rf-alloc-track"><div className="rf-alloc-fill" style={{ width: UC.alloc[c] * 2.4 + "%" }} /></div>
               <span className="rf-alloc-val">{fmt((budget * UC.alloc[c]) / 100)}</span>
             </div>
@@ -1574,7 +1585,7 @@ function Results({ useCase, budget, parts, analysis, verdict, expanded, setExpan
     <div className="rf-fade">
       <div className="rf-results-head">
         <div>
-          <div className="rf-eyebrow"><UC.Icon size={13} /> {UC.label} · {fmt(budget)} budget</div>
+          <div className="rf-eyebrow"><UC.Icon size={13} /> {tUC(useCase)} · {fmt(budget)} {t("budget")}</div>
           <h2>{t("yourBuild")}</h2>
         </div>
         <div className="rf-results-actions">
@@ -1616,7 +1627,7 @@ function Results({ useCase, budget, parts, analysis, verdict, expanded, setExpan
           </strong>
           {!a.compat.pass && <ul>{a.compat.issues.map((m, i) => <li key={i}>{m}</li>)}</ul>}
           {a.compat.pass && !a.complete && (
-            <span className="rf-compat-sub">{a.missing.map((c) => CAT_META[c].label).join(", ")}</span>
+            <span className="rf-compat-sub">{a.missing.map((c) => tCat(c)).join(", ")}</span>
           )}
         </div>
       </div>
@@ -1643,7 +1654,7 @@ function Results({ useCase, budget, parts, analysis, verdict, expanded, setExpan
                   <div className="rf-part-icon"><Meta.Icon size={20} /></div>
                 )}
                 <div className="rf-part-info">
-                  <div className="rf-part-cat">{Meta.label}</div>
+                  <div className="rf-part-cat">{tCat(cat)}</div>
                   {part ? (
                     <div className="rf-part-name">{part.name}</div>
                   ) : skip ? (
@@ -1862,6 +1873,7 @@ function Picker({ cat, current, useCase, budget, parts, onClose, onPick }) {
   const VariantActions = ({ v }) => {
     const open = openId === v.id;
     const isCur = current && current.id === v.id;
+    const oos = partOOS(v);
     return (
       <>
         <div className="rf-pick-actions">
@@ -1869,7 +1881,11 @@ function Picker({ cat, current, useCase, budget, parts, onClose, onPick }) {
             {open ? <ChevronLeft size={13} style={{ transform: "rotate(90deg)" }} /> : <Sparkles size={13} />}
             {open ? t("hideInfo") : t("moreInfo")}
           </button>
-          <button className="rf-chip-btn primary" onClick={() => onPick(v)}>{isCur ? t("selected") : t("select")}</button>
+          {oos ? (
+            <button className="rf-chip-btn oos" disabled>{t("outOfStock")}</button>
+          ) : (
+            <button className="rf-chip-btn primary" onClick={() => onPick(v)}>{isCur ? t("selected") : t("select")}</button>
+          )}
         </div>
         {open && <InfoPanel cat={cat} part={v} band={band} status={v._status} useCase={useCase} compact incompatible={!v._compat} />}
       </>
@@ -1881,7 +1897,7 @@ function Picker({ cat, current, useCase, budget, parts, onClose, onPick }) {
       <div className="rf-drawer" onClick={(e) => e.stopPropagation()}>
         <div className="rf-drawer-head">
           <div>
-            <div className="rf-eyebrow"><Meta.Icon size={13} /> CHOOSE A {Meta.label.toUpperCase()}</div>
+            <div className="rf-eyebrow"><Meta.Icon size={13} /> {t("chooseA")} {tCat(cat).toUpperCase()}</div>
             <div className="rf-muted rf-sm">{CATALOG[cat].length} options · sorted by your match score · budget slice {fmt(band)}</div>
           </div>
           <button className="rf-icon-btn" onClick={onClose}><X size={18} /></button>
@@ -1893,7 +1909,7 @@ function Picker({ cat, current, useCase, budget, parts, onClose, onPick }) {
             const showDivider = gi > 0 && g._over && !models[gi - 1]._over;
             return (
               <React.Fragment key={g.model}>
-                {showDivider && <div className="rf-pick-divider"><span>{t("overBudgetCat", { x: Meta.label.toLowerCase() })}</span></div>}
+                {showDivider && <div className="rf-pick-divider"><span>{t("overBudgetCat", { x: tCat(cat).toLowerCase() })}</span></div>}
               <div className={"rf-pick" + (g.hasCurrent ? " current" : "") + (g._over ? " over" : "")}>
                 <div
                   className={"rf-pick-row" + (g.single ? "" : " rf-clickable")}
@@ -2396,6 +2412,7 @@ background:var(--c-panel);border:1px solid var(--c-border);border-radius:18px;pa
 font-family:'Sora';font-size:12.5px;padding:7px 12px;border-radius:9px;cursor:pointer;transition:.16s;}
 .rf-chip-btn:hover{border-color:var(--c-hover);}
 .rf-chip-btn.primary{color:var(--c-accent);border-color:rgba(46,230,207,0.3);}
+.rf-chip-btn.oos{background:var(--c-panel);color:var(--c-muted);border-color:var(--c-border);cursor:not-allowed;opacity:.7;}
 .rf-chip-btn.primary:hover{background:rgba(46,230,207,0.1);}
 
 .rf-info{padding:14px 16px 16px 72px;border-top:1px solid var(--c-border);}
