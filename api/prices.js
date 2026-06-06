@@ -13,7 +13,9 @@
 //
 // ENV VARS (Vercel -> Settings -> Environment Variables):
 //   BESTBUY_API_KEY   your Best Buy developer key
-//   APIFY_TOKEN       your Apify API token (Apify console -> Settings -> Integrations)
+//   APIFY_TOKEN          your Apify API token (Apify console -> Settings -> Integrations)
+//   AMAZON_APIFY_TOKEN   (optional) separate token for the Amazon actor's account
+//   NEWEGG_APIFY_TOKEN   (optional) separate token for the Newegg actor's account
 //   AMAZON_ACTOR_ID   e.g. "junglee~amazon-product-scraper"
 //   NEWEGG_ACTOR_ID   e.g. "kawsar~newegg-product-scraper"
 // Any source whose env vars are missing is simply skipped.
@@ -23,10 +25,22 @@ import { PART_QUERIES } from "../data/part-queries.js";
 
 const BESTBUY_KEY = process.env.BESTBUY_API_KEY;
 const APIFY_TOKEN = process.env.APIFY_TOKEN;
+// Optional per-store tokens (e.g. two different Apify accounts). Fall back to APIFY_TOKEN.
+const AMAZON_TOKEN = process.env.AMAZON_APIFY_TOKEN || process.env.APIFY_TOKEN;
+const NEWEGG_TOKEN = process.env.NEWEGG_APIFY_TOKEN || process.env.APIFY_TOKEN;
 const AMAZON_ACTOR = process.env.AMAZON_ACTOR_ID;
 const NEWEGG_ACTOR = process.env.NEWEGG_ACTOR_ID;
 
 const norm = (s) => (s || "").toLowerCase().replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+
+// Normalize a Newegg product URL to a stable key (item code if present, else path).
+function neggKey(u) {
+  if (!u) return "";
+  const s = String(u).toLowerCase();
+  const m = s.match(/\/p\/([a-z0-9][a-z0-9-]*)/) || s.match(/item=([a-z0-9][a-z0-9-]*)/);
+  if (m) return m[1];
+  return s.split("?")[0].replace(/^https?:\/\//, "").replace(/\/+$/, "");
+}
 
 // Reject implausibly-low prices (wrong/accessory listings, e.g. a $10 "motherboard").
 const FLOORS = { cpu: 40, gpu: 80, mobo: 50, ram: 20, storage: 25, psu: 25, case: 30, cooler: 10 };
@@ -66,13 +80,13 @@ async function bestBuyPrices() {
 // ---------------- Apify dataset (latest scheduled run) ----------------
 // Reads the most recent SUCCEEDED run's dataset for an actor and maps each
 // scraped item back to a part by matching the search query / product title.
-async function apifyPrices(actorId) {
+async function apifyPrices(actorId, { allowQueryMatch = false, token } = {}) {
   const out = {};
   const media = {};
-  if (!APIFY_TOKEN || !actorId) return { out, media };
+  if (!token || !actorId) return { out, media };
   try {
     const r = await fetch(
-      `https://api.apify.com/v2/acts/${actorId}/runs/last/dataset/items?token=${APIFY_TOKEN}&status=SUCCEEDED&clean=true&limit=5000`
+      `https://api.apify.com/v2/acts/${actorId}/runs/last/dataset/items?token=${token}&status=SUCCEEDED&clean=true&limit=5000`
     );
     if (!r.ok) return { out, media };
     const items = await r.json();
@@ -80,17 +94,24 @@ async function apifyPrices(actorId) {
     // build lookups: exact ASIN match first (most reliable), then query, then title
     const byAsin = {};
     const byQuery = {};
+    const byUrl = {}; // Newegg: match by exact product URL / item code
     for (const [id, info] of Object.entries(PART_QUERIES)) {
       if (info.asin) byAsin[String(info.asin).toUpperCase()] = id;
+      if (info.negUrl) byUrl[neggKey(info.negUrl)] = id;
       byQuery[norm(info.q)] = id;
     }
 
     // accessory keywords — reject mounting kits, brackets, "for X" listings, etc.
     const ACCESSORY = /\b(mounting\s*kit|bracket|adapter|adaptor|replacement|retention|backplate|stand(off)?|screw|cable|extension|sleeve|anti[-\s]?sag|riser|spare|for\s+)\b/i;
+    // used/refurbished — Newegg glues these onto the next word ("RefurbishedAMD",
+    // "Used - Like NewAMD"), so match as substrings (no word boundary).
+    const USED = /(renewed|refurbished|recertified|open[-\s]*box|pre[-\s]*owned|preowned)/i;
+    const USED_WORD = /\bused\b/i;
 
     for (const it of items) {
       // NOTE: field names vary by actor — adjust to match your chosen actor's output.
       const title = it.title || it.name || it.productTitle || "";
+      if (USED.test(title) || USED_WORD.test(title) || USED.test(it.brand || "")) continue; // never show used/refurbished
       const asin = (it.asin || it.ASIN || "").toString().toUpperCase();
       const query = it.searchQuery || it.keyword || it.query || it.input || "";
       let price = it.price ?? it.salePrice ?? it.finalPrice ?? it.currentPrice;
@@ -98,8 +119,22 @@ async function apifyPrices(actorId) {
       if (typeof price === "string") price = parseFloat(price.replace(/[^0-9.]/g, ""));
       if (typeof price !== "number" || !(price > 0)) continue;
 
-      // resolve which part this item is — EXACT ASIN ONLY (no fuzzy/used/wrong fallback)
-      const id = (asin && byAsin[asin]) || null;
+      // resolve which part this item is.
+      // Amazon: EXACT ASIN ONLY. Newegg (allowQueryMatch): EXACT URL/item code
+      // first, then the search term that produced the row, then title contains.
+      let id = (asin && byAsin[asin]) || null;
+      if (!id && allowQueryMatch) {
+        const uk = neggKey(it.url || it.link || "");
+        if (uk && byUrl[uk]) id = byUrl[uk];
+        if (!id) id = byQuery[norm(query)] || null;
+        if (!id) {
+          const nt = norm(title);
+          for (const [qn, pid] of Object.entries(byQuery)) {
+            if (nt && qn && nt.includes(qn)) { id = pid; break; }
+          }
+        }
+        if (id && ACCESSORY.test(title)) continue; // guard fuzzy matches
+      }
       if (!id) continue;
       if (price < floorFor(id)) continue; // drop junk/accessory mis-prices
 
@@ -121,15 +156,25 @@ export default async function handler(req, res) {
 
   const [bb, amz, neg] = await Promise.all([
     bestBuyPrices(),
-    apifyPrices(AMAZON_ACTOR),
-    apifyPrices(NEWEGG_ACTOR),
+    apifyPrices(AMAZON_ACTOR, { token: AMAZON_TOKEN }),
+    apifyPrices(NEWEGG_ACTOR, { allowQueryMatch: true, token: NEWEGG_TOKEN }),
   ]);
 
   for (const [id, v] of Object.entries(bb)) add(id, "bestbuy", v);
   for (const [id, v] of Object.entries(amz.out)) add(id, "amazon", v);
   for (const [id, v] of Object.entries(neg.out)) add(id, "newegg", v);
 
-  const media = { ...neg.media, ...amz.media }; // Amazon images preferred
+  // per-part image + link follow the CHEAPEST store so the link matches the price shown
+  const media = {};
+  const ids = new Set([...Object.keys(amz.media), ...Object.keys(neg.media)]);
+  for (const id of ids) {
+    const aP = amz.out[id], nP = neg.out[id];
+    let chosen = null;
+    if (typeof aP === "number" && typeof nP === "number") chosen = nP < aP ? neg.media[id] : amz.media[id];
+    else if (typeof nP === "number") chosen = neg.media[id];
+    else if (typeof aP === "number") chosen = amz.media[id];
+    media[id] = chosen || amz.media[id] || neg.media[id]; // fall back to whichever has an image
+  }
 
   res.setHeader("Cache-Control", "s-maxage=86400, stale-while-revalidate=43200");
   res.status(200).json({ updatedAt: new Date().toISOString(), prices, media });
