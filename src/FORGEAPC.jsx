@@ -994,6 +994,9 @@ function assembleBuild(useCaseKey, budget) {
   const target = Object.fromEntries(CATEGORY_ORDER.map((c) => [c, (budget * (alloc[c] || 0)) / 100]));
   const parts = {};
   let spent = 0;
+  // Auto-Forge only uses in-stock parts (those with a live price). If a whole
+  // category has nothing live, fall back to the full pool so a build still completes.
+  const inStock = (pool) => { const f = pool.filter((p) => !partOOS(p)); return f.length ? f : pool; };
 
   const pick = (cat, pool, band) => {
     const remaining = budget - spent;
@@ -1024,29 +1027,29 @@ function assembleBuild(useCaseKey, budget) {
     return chosen;
   };
 
-  const cpu = pick("cpu", CATALOG.cpu, target.cpu);
-  pick("mobo", CATALOG.mobo.filter((m) => m.socket === cpu.socket), target.mobo);
+  const cpu = pick("cpu", inStock(CATALOG.cpu), target.cpu);
+  pick("mobo", inStock(CATALOG.mobo.filter((m) => m.socket === cpu.socket)), target.mobo);
   const mobo = parts.mobo;
-  pick("ram", CATALOG.ram.filter((r) => r.ramType === mobo.ramType && r.cap <= mobo.maxRam), target.ram);
-  pick("cooler", CATALOG.cooler.filter((c) => c.sockets.includes(cpu.socket) && c.tdpRating >= cpu.tdp), target.cooler);
-  pick("storage", CATALOG.storage.filter((s) => (s.iface === "M.2" ? mobo.m2 >= 1 : true)), target.storage);
-  if (alloc.gpu > 0) pick("gpu", CATALOG.gpu, target.gpu);
+  pick("ram", inStock(CATALOG.ram.filter((r) => r.ramType === mobo.ramType && r.cap <= mobo.maxRam)), target.ram);
+  pick("cooler", inStock(CATALOG.cooler.filter((c) => c.sockets.includes(cpu.socket) && c.tdpRating >= cpu.tdp)), target.cooler);
+  pick("storage", inStock(CATALOG.storage.filter((s) => (s.iface === "M.2" ? mobo.m2 >= 1 : true))), target.storage);
+  if (alloc.gpu > 0) pick("gpu", inStock(CATALOG.gpu), target.gpu);
 
   // PSU sized to the build
   const need = requiredWatts(parts);
-  let psuPool = CATALOG.psu.filter((p) => p.watt >= need * 1.25);
-  if (psuPool.length === 0) psuPool = CATALOG.psu;
+  let psuPool = inStock(CATALOG.psu.filter((p) => p.watt >= need * 1.25));
+  if (psuPool.length === 0) psuPool = inStock(CATALOG.psu);
   pick("psu", psuPool, target.psu);
 
   // Case fitting the chosen mobo / gpu / air cooler
-  let casePool = CATALOG.case.filter(
+  let casePool = inStock(CATALOG.case.filter(
     (cs) =>
       cs.forms.includes(mobo.form) &&
       (!parts.gpu || parts.gpu.len <= cs.maxGpu) &&
       (parts.cooler.type !== "air" || parts.cooler.height <= cs.maxCool)
-  );
-  if (casePool.length === 0) casePool = CATALOG.case.filter((cs) => cs.forms.includes(mobo.form));
-  if (casePool.length === 0) casePool = CATALOG.case;
+  ));
+  if (casePool.length === 0) casePool = inStock(CATALOG.case.filter((cs) => cs.forms.includes(mobo.form)));
+  if (casePool.length === 0) casePool = inStock(CATALOG.case);
   pick("case", casePool, target.case);
 
   // ---- reallocate leftover budget to the highest build-impact upgrades ----
@@ -1061,7 +1064,7 @@ function assembleBuild(useCaseKey, budget) {
       const w = (alloc[cat] || 0) / 100; // how much this category matters for the use case
       if (w <= 0) continue;
       const maxp = ucMaxPerf(cat, useCaseKey) || 1;
-      for (const cand of CATALOG[cat]) {
+      for (const cand of inStock(CATALOG[cat])) {
         const extra = cand.price - cur.price;
         if (extra <= 0) continue;
         const rawGain = ucPerf(cat, cand, useCaseKey) - ucPerf(cat, cur, useCaseKey);
@@ -1167,6 +1170,7 @@ export default function RigForge() {
   const [useCase, setUseCase] = useState(null);
   const [budget, setBudget] = useState(1200);
   const [parts, setParts] = useState(null);
+  const [autoGen, setAutoGen] = useState(false); // true while showing an Auto-Forge build (regenerates on price changes)
   const [picker, setPicker] = useState(null); // category being swapped
   const [expanded, setExpanded] = useState({});
   const [saved, setSaved] = useState([]);
@@ -1266,18 +1270,69 @@ export default function RigForge() {
     [parts, analysis, useCase, budget]
   );
 
+  // AI overview: generate the verdict with the real model (via /api/chat), grounded
+  // in the actual parts + current live prices. The local verdict above shows instantly
+  // and is the fallback; the AI text replaces it when it arrives. Regenerates whenever
+  // the build or live prices change. Debounced + cancellable so we don't spam the API.
+  const [aiVerdict, setAiVerdict] = useState(null);
+  const [aiBusy, setAiBusy] = useState(false);
+  useEffect(() => {
+    setAiVerdict(null);
+    if (view !== "results" || !parts || !parts.cpu || !useCase || !analysis) { setAiBusy(false); return; }
+    let cancelled = false;
+    setAiBusy(true);
+    const summary = {
+      useCase: USE_CASES[useCase].label,
+      budget,
+      buildTotal: analysis.total,
+      performanceScore: analysis.score,
+      pricePerfScore: analysis.ppScore,
+      compatible: analysis.compat.pass,
+      parts: CATEGORY_ORDER.filter((c) => parts[c]).map((c) => ({
+        slot: c, name: parts[c].name,
+        price: partOOS(parts[c]) ? "out of stock" : parts[c].price,
+      })),
+    };
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            system: "You are a sharp, concise PC-building advisor. Given a build (parts, current prices, performance/value scores, budget and use case), write a 2-3 sentence verdict in plain prose: how well it fits the use case and budget, its main strength, and the weakest link or bottleneck if any. Be specific and honest, reference actual parts by name when useful. No markdown, no bullet lists, no preamble — just the verdict.",
+            messages: [{ role: "user", content: "Here is the build as JSON:\n" + JSON.stringify(summary, null, 1) + "\n\nWrite the verdict." }],
+          }),
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled && data && data.text) setAiVerdict(data.text.trim());
+      } catch (e) { /* keep local fallback verdict */ }
+      finally { if (!cancelled) setAiBusy(false); }
+    }, 600);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [view, parts, useCase, budget, analysis, priceInfo]);
+  const displayVerdict = aiVerdict || verdict;
+
   const flash = (msg) => { setToast(msg); setTimeout(() => setToast(null), 2200); };
 
   const startSurvey = () => { setUseCase(null); setView("survey"); };
   const chooseUseCase = (k) => { setUseCase(k); setView("budget"); };
-  const generateAuto = () => { setParts(assembleBuild(useCase, budget)); setExpanded({}); setView("results"); };
-  const startManual = () => { setParts({}); setExpanded({}); setView("results"); };
+  const generateAuto = () => { setAutoGen(true); setParts(assembleBuild(useCase, budget)); setExpanded({}); setView("results"); };
+  const startManual = () => { setAutoGen(false); setParts({}); setExpanded({}); setView("results"); };
+
+  // Auto-Forge is never cached: whenever live prices arrive/refresh (or budget/use-case
+  // change), rebuild on the spot from current prices, skipping out-of-stock parts.
+  // Stops as soon as the user manually edits the build, so their picks aren't overwritten.
+  useEffect(() => {
+    if (autoGen && useCase) setParts(assembleBuild(useCase, budget));
+  }, [priceInfo, autoGen, useCase, budget]);
 
   const swapPart = (cat, part) => {
+    setAutoGen(false);
     setParts((p) => ({ ...p, [cat]: part }));
     setPicker(null);
   };
-  const removePart = (cat) => setParts((p) => { const n = { ...p }; delete n[cat]; return n; });
+  const removePart = (cat) => { setAutoGen(false); setParts((p) => { const n = { ...p }; delete n[cat]; return n; }); };
 
   const saveBuild = async () => {
     const a = analyzeBuild(parts, useCase, budget);
@@ -1297,7 +1352,7 @@ export default function RigForge() {
     setView("home");
   };
   const deleteBuild = async (id) => { await sDel("build:" + id); await refreshSaved(); };
-  const openSaved = (b) => { setUseCase(b.useCase); setBudget(b.budget); setParts(b.parts); setView("results"); };
+  const openSaved = (b) => { setAutoGen(false); setUseCase(b.useCase); setBudget(b.budget); setParts(b.parts); setView("results"); };
 
   return (
     <div className={"rf-root" + (theme === "light" ? " rf-light" : "")} dir={lang === "ar" ? "rtl" : "ltr"}>
@@ -1363,7 +1418,7 @@ export default function RigForge() {
         )}
         {view === "results" && parts && analysis && (
           <Results
-            useCase={useCase} budget={budget} parts={parts} analysis={analysis} verdict={verdict}
+            useCase={useCase} budget={budget} parts={parts} analysis={analysis} verdict={displayVerdict} aiBusy={aiBusy} aiLive={!!aiVerdict}
             expanded={expanded} setExpanded={setExpanded}
             onSwap={(c) => setPicker(c)} onRemove={removePart}
             onRegen={generateAuto} onSave={() => setSavingOpen(true)}
@@ -1426,7 +1481,7 @@ function Home({ saved, loading, onNew, onOpen, onDelete, priceInfo }) {
           {priceInfo && (
             <>
               <span className="rf-dot-sep">·</span>
-              <span className="rf-live-dot" /> {t("livePrices")} · {t("updated")} {new Date(priceInfo.updatedAt).toLocaleDateString()}
+              <span className="rf-live-ind"><span className="rf-live-dot" /> {t("livePrices")}</span> · {t("updated")} {new Date(priceInfo.updatedAt).toLocaleDateString()}
             </>
           )}
         </div>
@@ -1577,7 +1632,7 @@ function BudgetStep({ useCase, budget, setBudget, onBack, onAuto, onManual }) {
 }
 
 /* ----------------------------- RESULTS ----------------------------- */
-function Results({ useCase, budget, parts, analysis, verdict, expanded, setExpanded, onSwap, onRemove, onRegen, onSave }) {
+function Results({ useCase, budget, parts, analysis, verdict, aiBusy, aiLive, expanded, setExpanded, onSwap, onRemove, onRegen, onSave }) {
   const UC = USE_CASES[useCase];
   const a = analysis;
   // Total counts only parts with a live price, so a hidden (out-of-stock) part never adds a made-up number.
@@ -1603,8 +1658,8 @@ function Results({ useCase, budget, parts, analysis, verdict, expanded, setExpan
           <Gauge value={a.ppScore} label={t("pricePerf")} accent={scoreColor(a.ppScore)} delay={120} />
         </div>
         <div className="rf-verdict">
-          <div className="rf-verdict-tag"><Sparkles size={13} /> AI verdict <span className="rf-hybrid">hybrid</span></div>
-          <p>{verdict}</p>
+          <div className="rf-verdict-tag"><Sparkles size={13} /> AI verdict <span className="rf-hybrid">{aiBusy ? "thinking…" : aiLive ? "live" : "hybrid"}</span></div>
+          <p className={aiBusy ? "rf-verdict-busy" : ""}>{verdict}</p>
           <div className="rf-total-row">
             <span className="rf-muted">Total</span>
             <span className={"rf-total" + (overBudget ? " over" : "")}>{fmt(shownTotal)}</span>
@@ -2168,7 +2223,10 @@ function Assistant({ open, onClose, useCase, budget, parts }) {
   return (
     <div className="rf-assistant">
       <div className="rf-asst-head">
-        <div className="rf-asst-title"><div className="rf-asst-avatar"><Bot size={16} /></div> AI Assistant</div>
+        <div className="rf-asst-title">
+          <div className="rf-asst-avatar"><Bot size={16} /></div>
+          <span>AI Assistant <span className="rf-asst-model">Opus 4.8</span></span>
+        </div>
         <button className="rf-icon-btn" onClick={onClose}><X size={18} /></button>
       </div>
 
@@ -2225,7 +2283,7 @@ function StyleBlock() {
 --c-border:rgba(255,255,255,0.09);--c-text:#e8edf4;--c-muted:#7c8798;
 --c-accent:#2ee6cf;--c-accent2:#7c5cff;--c-good:#46e0a0;--c-warn:#ffc24b;--c-bad:#ff5c72;
 --c-track:rgba(255,255,255,0.08);--c-hover:rgba(255,255,255,0.2);--c-grid:rgba(255,255,255,0.035);
---ease:cubic-bezier(.16,1,.3,1);--ease-spring:cubic-bezier(.34,1.35,.5,1);--ease-soft:cubic-bezier(.45,0,.15,1);
+--ease:cubic-bezier(.16,1,.3,1);--ease-spring:cubic-bezier(.22,1,.36,1);--ease-soft:cubic-bezier(.45,0,.15,1);
 position:relative;min-height:100vh;width:100%;background:var(--c-bg);color:var(--c-text);
 font-family:'Sora',system-ui,sans-serif;overflow-x:hidden;}
 .rf-root.rf-light{--c-bg:#eef1f6;--c-panel:rgba(15,28,50,0.04);--c-panel-2:rgba(15,28,50,0.08);
@@ -2280,7 +2338,7 @@ background:linear-gradient(135deg,var(--c-accent),#19b89f);box-shadow:0 0 18px r
 background:linear-gradient(135deg,var(--c-accent),#19b89f);color:#04110f;font-weight:600;
 font-family:'Sora';font-size:14px;padding:11px 18px;border-radius:11px;
 box-shadow:0 6px 22px rgba(46,230,207,0.28);transition:transform .25s var(--ease),box-shadow .25s var(--ease),filter .25s var(--ease);}
-.rf-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(46,230,207,0.42);filter:brightness(1.05);}
+.rf-btn:hover{transform:translateY(-1px);box-shadow:0 10px 30px rgba(46,230,207,0.42);filter:brightness(1.05);}
 .rf-btn:active{transform:translateY(0);}
 .rf-btn-lg{font-size:15.5px;padding:14px 26px;border-radius:13px;}
 .rf-ghost{display:inline-flex;align-items:center;gap:6px;background:var(--c-panel);border:1px solid var(--c-border);
@@ -2301,15 +2359,17 @@ h3{font-family:'Chakra Petch';font-weight:600;font-size:18px;margin:0 0 6px;}
 .rf-price-status{display:flex;align-items:center;gap:8px;margin-top:16px;font-size:12px;color:var(--c-muted);font-family:'JetBrains Mono';letter-spacing:0.3px;flex-wrap:wrap;}
 .rf-db-count{display:inline-flex;align-items:center;gap:6px;color:var(--c-accent);}
 .rf-dot-sep{opacity:0.5;}
-.rf-live-dot{width:8px;height:8px;border-radius:50%;background:var(--c-good);box-shadow:0 0 8px var(--c-good);animation:rfPulseDot 1.8s ease-in-out infinite;}
-@keyframes rfPulseDot{0%,100%{opacity:1}50%{opacity:0.35}}
+.rf-live-dot{width:8px;height:8px;border-radius:50%;background:var(--c-good);box-shadow:0 0 7px var(--c-good);animation:rfPulseDot 2.8s ease-in-out infinite;}
+.rf-live-ind{animation:rfBreathe 2.8s ease-in-out infinite;}
+@keyframes rfPulseDot{0%,100%{opacity:1;box-shadow:0 0 7px var(--c-good)}50%{opacity:0.6;box-shadow:0 0 3px var(--c-good)}}
+@keyframes rfBreathe{0%,100%{opacity:1}50%{opacity:0.76}}
 .rf-section-head{display:flex;align-items:baseline;justify-content:space-between;margin:38px 0 16px;border-top:1px solid var(--c-border);padding-top:24px;}
 .rf-empty{display:flex;flex-direction:column;align-items:center;gap:12px;padding:46px;border:1px dashed var(--c-border);border-radius:16px;text-align:center;}
 
 /* SAVED */
 .rf-saved-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px;}
 .rf-saved-card{background:var(--c-panel);border:1px solid var(--c-border);border-radius:16px;padding:20px;cursor:pointer;transition:transform .2s,border-color .2s,background .2s;}
-.rf-saved-card:hover{transform:translateY(-3px);border-color:rgba(46,230,207,0.4);background:var(--c-panel-2);}
+.rf-saved-card:hover{transform:translateY(-2px);border-color:rgba(46,230,207,0.4);background:var(--c-panel-2);}
 .rf-saved-parts{margin-top:15px;padding-top:14px;border-top:1px solid var(--c-border);display:flex;flex-direction:column;gap:6px;}
 .rf-saved-part{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:12.5px;}
 .rf-saved-part-cat{color:var(--c-muted);font-family:'JetBrains Mono';font-size:10px;letter-spacing:0.5px;text-transform:uppercase;flex-shrink:0;}
@@ -2332,7 +2392,7 @@ h3{font-family:'Chakra Petch';font-weight:600;font-size:18px;margin:0 0 6px;}
 .rf-uc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;}
 .rf-uc-card{position:relative;text-align:left;background:var(--c-panel);border:1px solid var(--c-border);border-radius:16px;
 padding:22px;cursor:pointer;transition:transform .2s,border-color .2s,background .2s;color:var(--c-text);overflow:hidden;}
-.rf-uc-card:hover{transform:translateY(-4px);border-color:rgba(46,230,207,0.45);background:var(--c-panel-2);}
+.rf-uc-card:hover{transform:translateY(-2px);border-color:rgba(46,230,207,0.45);background:var(--c-panel-2);}
 .rf-uc-icon{width:48px;height:48px;border-radius:13px;display:grid;place-items:center;color:var(--c-accent);
 background:rgba(46,230,207,0.1);border:1px solid rgba(46,230,207,0.2);margin-bottom:14px;}
 .rf-uc-label{font-family:'Chakra Petch';font-weight:600;font-size:17px;}
@@ -2347,7 +2407,7 @@ color:var(--c-accent);text-shadow:0 0 30px rgba(46,230,207,0.4);letter-spacing:-
 .rf-slider{-webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:6px;outline:none;cursor:pointer;}
 .rf-slider::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;
 background:var(--c-accent);border:3px solid #04110f;box-shadow:0 0 16px rgba(46,230,207,0.8);cursor:grab;transition:transform .15s;}
-.rf-slider::-webkit-slider-thumb:hover{transform:scale(1.15);}
+.rf-slider::-webkit-slider-thumb:hover{transform:scale(1.08);}
 .rf-slider::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--c-accent);border:3px solid #04110f;box-shadow:0 0 16px rgba(46,230,207,0.8);cursor:grab;}
 .rf-slider-ends{display:flex;justify-content:space-between;margin-top:9px;font-size:12px;color:var(--c-muted);font-family:'JetBrains Mono';}
 .rf-presets{display:flex;gap:9px;justify-content:center;margin:22px 0;flex-wrap:wrap;}
@@ -2379,6 +2439,7 @@ background:var(--c-panel);border:1px solid var(--c-border);border-radius:18px;pa
 .rf-verdict-tag{display:inline-flex;align-items:center;gap:7px;font-family:'JetBrains Mono';font-size:11px;letter-spacing:1px;color:var(--c-accent2);margin-bottom:9px;}
 .rf-hybrid{font-size:9px;background:rgba(124,92,255,0.16);border:1px solid rgba(124,92,255,0.3);color:var(--c-accent2);padding:1px 6px;border-radius:20px;letter-spacing:1px;}
 .rf-verdict p{margin:0 0 16px;font-size:14.5px;line-height:1.6;color:var(--c-text);}
+.rf-verdict-busy{opacity:.62;transition:opacity .4s var(--ease);}
 .rf-total-row{display:flex;align-items:center;gap:12px;font-size:13px;}
 .rf-total{font-family:'JetBrains Mono';font-weight:700;font-size:18px;}
 .rf-total.over{color:var(--c-bad);}
@@ -2399,11 +2460,11 @@ background:var(--c-panel);border:1px solid var(--c-border);border-radius:18px;pa
 .rf-part-icon{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;color:var(--c-accent);background:rgba(46,230,207,0.08);border:1px solid rgba(46,230,207,0.16);flex-shrink:0;}
 .rf-part-img-link{flex-shrink:0;display:block;}
 .rf-part-img{width:42px;height:42px;border-radius:11px;object-fit:contain;background:#fff;border:1px solid var(--c-border);padding:2px;cursor:pointer;transition:transform .12s ease;}
-.rf-part-img:hover{transform:scale(1.06);}
+.rf-part-img:hover{transform:scale(1.03);}
 .rf-pick-img-link{flex-shrink:0;display:block;}
 .rf-pick-img{width:34px;height:34px;border-radius:8px;object-fit:contain;background:#fff;border:1px solid var(--c-border);padding:2px;cursor:pointer;transition:transform .12s ease;}
 .rf-pick-img.sm{width:28px;height:28px;border-radius:7px;}
-.rf-pick-img:hover{transform:scale(1.08);}
+.rf-pick-img:hover{transform:scale(1.04);}
 .rf-part-info{flex:1;min-width:0;}
 .rf-part-cat{font-size:11px;letter-spacing:1px;color:var(--c-muted);text-transform:uppercase;font-family:'JetBrains Mono';}
 .rf-part-name{font-family:'Chakra Petch';font-weight:600;font-size:16px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -2490,7 +2551,7 @@ padding:1px 7px;border-radius:20px;font-family:'JetBrains Mono';letter-spacing:0
 
 /* MODAL */
 .rf-modal-wrap{position:fixed;inset:0;z-index:50;background:rgba(2,4,8,0.7);backdrop-filter:blur(4px);display:grid;place-items:center;animation:rfFade .28s var(--ease);padding:20px;}
-.rf-modal{width:min(420px,100%);background:#0c1119;border:1px solid var(--c-border);border-radius:18px;padding:26px;animation:rfPop .4s var(--ease-spring);will-change:transform,opacity;}
+.rf-modal{width:min(420px,100%);background:#0c1119;border:1px solid var(--c-border);border-radius:18px;padding:26px;animation:rfPop .52s var(--ease);will-change:transform,opacity;}
 .rf-input{width:100%;background:var(--c-panel);border:1px solid var(--c-border);color:var(--c-text);font-family:'Sora';
 font-size:15px;padding:12px 14px;border-radius:11px;margin:14px 0 18px;outline:none;transition:.16s;}
 .rf-input:focus{border-color:var(--c-accent);box-shadow:0 0 0 3px rgba(46,230,207,0.12);}
@@ -2499,17 +2560,17 @@ font-size:15px;padding:12px 14px;border-radius:11px;margin:14px 0 18px;outline:n
 /* TOAST */
 .rf-toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:8px;
 background:#0d1620;border:1px solid rgba(70,224,160,0.4);color:var(--c-good);padding:12px 20px;border-radius:12px;
-font-size:14px;box-shadow:0 10px 40px rgba(0,0,0,0.5);animation:rfToast .45s var(--ease-spring);}
+font-size:14px;box-shadow:0 10px 40px rgba(0,0,0,0.5);animation:rfToast .5s var(--ease);}
 
 /* ANIMATIONS */
 @keyframes rfFade{from{opacity:0}to{opacity:1}}
-@keyframes rfUp{from{opacity:0;transform:translateY(16px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
-@keyframes rfPop{from{opacity:0;transform:scale(.94) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes rfUp{from{opacity:0;transform:translateY(11px)}to{opacity:1;transform:translateY(0)}}
+@keyframes rfPop{from{opacity:0;transform:scale(.99) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
 @keyframes rfSlideR{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}
 @keyframes rfSlideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes rfToast{from{opacity:0;transform:translateX(-50%) translateY(14px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 .rf-fade{animation:rfFade .45s var(--ease);}
-.rf-pop{animation:rfUp .6s var(--ease) backwards;will-change:transform,opacity;}
+.rf-pop{animation:rfUp .72s var(--ease) backwards;will-change:transform,opacity;}
 .rf-slidein{animation:rfSlideDown .28s cubic-bezier(.2,.8,.2,1);}
 
 /* FORGE MODE BUTTONS */
@@ -2520,10 +2581,10 @@ transition:transform .16s,box-shadow .16s,filter .16s,background .16s,border-col
 .rf-forge-btn:active{transform:translateY(-1px) scale(.99);}
 .rf-forge-btn.primary{border:none;background:linear-gradient(135deg,var(--c-accent),#19b89f);color:#04110f;
 box-shadow:0 5px 16px rgba(46,230,207,0.26);}
-.rf-forge-btn.primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(46,230,207,0.4);filter:brightness(1.05);}
+.rf-forge-btn.primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(46,230,207,0.4);filter:brightness(1.05);}
 .rf-forge-btn.outline{background:var(--c-panel);border:1.5px solid rgba(124,92,255,0.45);color:var(--c-text);}
 .rf-forge-btn.outline svg{color:var(--c-accent2);}
-.rf-forge-btn.outline:hover{transform:translateY(-2px);border-color:var(--c-accent2);background:var(--c-panel-2);box-shadow:0 8px 24px rgba(124,92,255,0.2);}
+.rf-forge-btn.outline:hover{transform:translateY(-1px);border-color:var(--c-accent2);background:var(--c-panel-2);box-shadow:0 8px 24px rgba(124,92,255,0.2);}
 .rf-step-actions.center{justify-content:center;}
 .rf-compat.warn{background:rgba(255,194,75,0.08);border:1px solid rgba(255,194,75,0.3);color:var(--c-warn);}
 .rf-compat-sub{display:block;margin-top:5px;font-size:12.5px;color:var(--c-warn);}
@@ -2539,6 +2600,7 @@ background:#0b0f16;border-left:1px solid var(--c-border);display:flex;flex-direc
 box-shadow:-12px 0 40px rgba(0,0,0,0.5);animation:rfSlideR .42s var(--ease);will-change:transform,opacity;}
 .rf-asst-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--c-border);}
 .rf-asst-title{display:flex;align-items:center;gap:10px;font-family:'Chakra Petch';font-weight:600;font-size:16px;}
+.rf-asst-model{display:inline-block;font-family:'JetBrains Mono';font-weight:500;font-size:10.5px;letter-spacing:.3px;color:var(--c-accent);background:rgba(46,230,207,0.1);border:1px solid rgba(46,230,207,0.25);padding:1px 7px;border-radius:20px;margin-left:6px;vertical-align:middle;}
 .rf-asst-avatar{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;color:#fff;
 background:linear-gradient(135deg,var(--c-accent2),#5b3fd6);flex-shrink:0;}
 .rf-asst-avatar.sm{width:24px;height:24px;border-radius:7px;}
@@ -2593,10 +2655,10 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .rf-slider:focus-visible{outline:none;}
 
 /* consistent, springy easing across interactive surfaces */
-.rf-saved-card,.rf-uc-card,.rf-part,.rf-pick,.rf-variant{transition:transform .28s var(--ease),border-color .28s var(--ease),background .28s var(--ease),box-shadow .28s var(--ease),opacity .28s var(--ease);}
+.rf-saved-card,.rf-uc-card,.rf-part,.rf-pick,.rf-variant{transition:transform .45s var(--ease),border-color .45s var(--ease),background .45s var(--ease),box-shadow .45s var(--ease),opacity .45s var(--ease);}
 .rf-saved-card:hover,.rf-uc-card:hover{box-shadow:0 14px 32px rgba(0,0,0,0.28);}
 .rf-part:hover{box-shadow:0 6px 20px rgba(0,0,0,0.18);}
-.rf-chip-btn,.rf-ghost,.rf-preset,.rf-asst-chip,.rf-theme-opt,.rf-icon-btn{transition:transform .2s var(--ease),background .2s var(--ease),border-color .2s var(--ease),color .2s var(--ease),box-shadow .2s var(--ease);}
+.rf-chip-btn,.rf-ghost,.rf-preset,.rf-asst-chip,.rf-theme-opt,.rf-icon-btn{transition:transform .32s var(--ease),background .32s var(--ease),border-color .32s var(--ease),color .32s var(--ease),box-shadow .32s var(--ease);}
 .rf-chip-btn:active,.rf-ghost:active,.rf-preset:active,.rf-asst-chip:active{transform:translateY(1px);}
 .rf-fab:active{transform:translateY(0) scale(.97);}
 .rf-asst-send:not(:disabled):hover{filter:brightness(1.08);transform:translateY(-1px);}
