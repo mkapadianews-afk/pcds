@@ -85,9 +85,11 @@ async function apifyPrices(actorId, { allowQueryMatch = false, token } = {}) {
   const media = {};
   if (!token || !actorId) return { out, media };
   try {
-    const r = await fetch(
-      `https://api.apify.com/v2/acts/${actorId}/runs/last/dataset/items?token=${token}&status=SUCCEEDED&clean=true&limit=5000`
-    );
+    // Works whether the ID is an ACTOR id or a TASK id: try actor runs first,
+    // then fall back to task runs. A scheduled task run also counts as an actor run.
+    const q = `runs/last/dataset/items?token=${token}&status=SUCCEEDED&clean=true&limit=5000`;
+    let r = await fetch(`https://api.apify.com/v2/acts/${actorId}/${q}`);
+    if (!r.ok) r = await fetch(`https://api.apify.com/v2/actor-tasks/${actorId}/${q}`);
     if (!r.ok) return { out, media };
     const items = await r.json();
 
