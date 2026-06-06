@@ -12,9 +12,13 @@
 // ---------------------------------------------------------------------------
 
 const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
-const MODELS = process.env.ANTHROPIC_MODEL
-  ? [process.env.ANTHROPIC_MODEL]
-  : ["claude-haiku-4-5", "claude-3-5-haiku-latest"]; // cheap + fast; first that the account has wins
+// Always use Haiku (cheap + fast). An ANTHROPIC_MODEL override is only honored if it is
+// itself a Haiku model, so the agent can never fall back to Sonnet/Opus by accident.
+const ENV_MODEL = process.env.ANTHROPIC_MODEL;
+const MODELS =
+  ENV_MODEL && ENV_MODEL.toLowerCase().includes("haiku")
+    ? [ENV_MODEL]
+    : ["claude-haiku-4-5", "claude-3-5-haiku-latest"]; // first the account has wins
 
 export default async function handler(req, res) {
   if (req.method !== "POST") { res.status(405).json({ error: "POST only" }); return; }
@@ -38,7 +42,7 @@ export default async function handler(req, res) {
       const data = await r.json();
       if (!r.ok) { lastErr = (data && data.error && data.error.message) || ("status " + r.status); continue; }
       const text = (data.content || []).filter((b) => b.type === "text").map((b) => b.text).join("\n").trim();
-      if (text) { res.status(200).json({ text }); return; }
+      if (text) { res.status(200).json({ text, model }); return; }
       lastErr = "empty response";
     } catch (e) {
       lastErr = String(e);
