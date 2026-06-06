@@ -1231,7 +1231,7 @@ export default function RigForge() {
             if (m) { if (m.img) part.img = m.img; if (m.url) part.url = m.url; }
           }
         }
-        PRICE_LIVE = true; // live pricing loaded — enables out-of-stock display
+        PRICE_LIVE = n > 0; // only go "live" if we actually got real prices; empty feed => keep baseline, nothing marked out of stock
         setPriceInfo({ updatedAt: data.updatedAt, count: n });
       } catch (e) {
         /* offline / not deployed: keep built-in sample prices */
@@ -1418,7 +1418,7 @@ export default function RigForge() {
         )}
         {view === "results" && parts && analysis && (
           <Results
-            useCase={useCase} budget={budget} parts={parts} analysis={analysis} verdict={displayVerdict} aiBusy={aiBusy} aiLive={!!aiVerdict}
+            useCase={useCase} budget={budget} parts={parts} analysis={analysis} verdict={aiVerdict} aiBusy={aiBusy} aiLive={!!aiVerdict}
             expanded={expanded} setExpanded={setExpanded}
             onSwap={(c) => setPicker(c)} onRemove={removePart}
             onRegen={generateAuto} onSave={() => setSavingOpen(true)}
@@ -1658,8 +1658,10 @@ function Results({ useCase, budget, parts, analysis, verdict, aiBusy, aiLive, ex
           <Gauge value={a.ppScore} label={t("pricePerf")} accent={scoreColor(a.ppScore)} delay={120} />
         </div>
         <div className="rf-verdict">
-          <div className="rf-verdict-tag"><Sparkles size={13} /> AI verdict <span className="rf-hybrid">{aiBusy ? "thinking…" : aiLive ? "live" : "hybrid"}</span></div>
-          <p className={aiBusy ? "rf-verdict-busy" : ""}>{verdict}</p>
+          <div className="rf-verdict-tag"><Sparkles size={13} /> AI verdict <span className="rf-hybrid">Opus 4.8</span>{aiBusy && <span className="rf-verdict-state"> · thinking…</span>}</div>
+          <p className={aiBusy && !verdict ? "rf-verdict-busy" : ""}>
+            {verdict ? verdict : aiBusy ? "Analyzing your build with current prices…" : "AI overview is unavailable right now — make sure the AI key is set, or try again in a moment."}
+          </p>
           <div className="rf-total-row">
             <span className="rf-muted">Total</span>
             <span className={"rf-total" + (overBudget ? " over" : "")}>{fmt(shownTotal)}</span>
