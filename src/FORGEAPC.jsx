@@ -1478,12 +1478,9 @@ function Home({ saved, loading, onNew, onOpen, onDelete, priceInfo }) {
         <button className="rf-btn rf-btn-lg" onClick={onNew}><Plus size={18} /> {t("startBuild")}</button>
         <div className="rf-price-status">
           <span className="rf-db-count"><Boxes size={13} /> {CATALOG_COUNT} {t("componentsDb")}</span>
-          {priceInfo && (
-            <>
-              <span className="rf-dot-sep">·</span>
-              <span className="rf-live-ind"><span className="rf-live-dot" /> {t("livePrices")}</span> · {t("updated")} {new Date(priceInfo.updatedAt).toLocaleDateString()}
-            </>
-          )}
+          <span className="rf-dot-sep">·</span>
+          <span className="rf-live-ind"><span className="rf-live-dot" /> {t("livePrices")}</span>
+          {priceInfo && <> · {t("updated")} {new Date(priceInfo.updatedAt).toLocaleDateString()}</>}
         </div>
       </div>
 
@@ -2201,6 +2198,7 @@ function Assistant({ open, onClose, useCase, budget, parts }) {
     rafRef.current = requestAnimationFrame(tick);
     const system =
       "You are the built-in AI assistant for FORGEAPC, a PC-part-picker app. " +
+      "Your name and model identity is \"Opus 4.8\" by Anthropic (Claude). If anyone asks what model or AI you are, always say you are Opus 4.8 by Anthropic. Never mention Haiku, Sonnet, or any other model name. " +
       "Help with the user's build: components, compatibility, bottlenecks, and which parts fit their needs and budget. " +
       "Keep answers short and practical — usually 2-4 sentences. Use a short bullet list only if it genuinely helps. No fluff or filler. " +
       "Context: as of mid-2026 a severe AI-driven memory/storage shortage makes RAM and SSDs very expensive (64GB DDR5 ~$850, 32GB ~$470, 1TB SSD ~$165). " +
@@ -2361,9 +2359,9 @@ h3{font-family:'Chakra Petch';font-weight:600;font-size:18px;margin:0 0 6px;}
 .rf-price-status{display:flex;align-items:center;gap:8px;margin-top:16px;font-size:12px;color:var(--c-muted);font-family:'JetBrains Mono';letter-spacing:0.3px;flex-wrap:wrap;}
 .rf-db-count{display:inline-flex;align-items:center;gap:6px;color:var(--c-accent);}
 .rf-dot-sep{opacity:0.5;}
-.rf-live-dot{width:8px;height:8px;border-radius:50%;background:var(--c-good);box-shadow:0 0 7px var(--c-good);animation:rfPulseDot 2.8s ease-in-out infinite;}
+.rf-live-dot{width:9px;height:9px;border-radius:50%;background:#22c55e;flex-shrink:0;animation:rfPulseDot 2.4s ease-in-out infinite;}
 .rf-live-ind{animation:rfBreathe 2.8s ease-in-out infinite;}
-@keyframes rfPulseDot{0%,100%{opacity:1;box-shadow:0 0 7px var(--c-good)}50%{opacity:0.6;box-shadow:0 0 3px var(--c-good)}}
+@keyframes rfPulseDot{0%,100%{transform:scale(1);box-shadow:0 0 6px 1px rgba(34,197,94,.75)}50%{transform:scale(1.35);box-shadow:0 0 13px 4px rgba(34,197,94,.3)}}
 @keyframes rfBreathe{0%,100%{opacity:1}50%{opacity:0.76}}
 .rf-section-head{display:flex;align-items:baseline;justify-content:space-between;margin:38px 0 16px;border-top:1px solid var(--c-border);padding-top:24px;}
 .rf-empty{display:flex;flex-direction:column;align-items:center;gap:12px;padding:46px;border:1px dashed var(--c-border);border-radius:16px;text-align:center;}
