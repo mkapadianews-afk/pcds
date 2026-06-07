@@ -1,1 +1,5 @@
-{}
+{
+  "rewrites": [
+    { "source": "/match-coverage", "destination": "/match-coverage.html" }
+  ]
+}
