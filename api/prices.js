@@ -166,16 +166,22 @@ export default async function handler(req, res) {
   for (const [id, v] of Object.entries(amz.out)) add(id, "amazon", v);
   for (const [id, v] of Object.entries(neg.out)) add(id, "newegg", v);
 
-  // per-part image + link follow the CHEAPEST store so the link matches the price shown
+  // Per-part media is returned PER SOURCE ({ amazon, newegg }) so the client can
+  // show the image + link of whichever store the displayed price came from.
+  // Links are guaranteed from the baked catalog (ASIN / Newegg URL) even when a
+  // scrape didn't return a url; images come from the scrape when available.
   const media = {};
-  const ids = new Set([...Object.keys(amz.media), ...Object.keys(neg.media)]);
+  const ids = new Set([
+    ...Object.keys(amz.media), ...Object.keys(neg.media),
+    ...Object.keys(amz.out), ...Object.keys(neg.out),
+  ]);
   for (const id of ids) {
-    const aP = amz.out[id], nP = neg.out[id];
-    let chosen = null;
-    if (typeof aP === "number" && typeof nP === "number") chosen = nP < aP ? neg.media[id] : amz.media[id];
-    else if (typeof nP === "number") chosen = neg.media[id];
-    else if (typeof aP === "number") chosen = amz.media[id];
-    media[id] = chosen || amz.media[id] || neg.media[id]; // fall back to whichever has an image
+    const info = PART_QUERIES[id] || {};
+    const aUrl = (amz.media[id] && amz.media[id].url) || (info.asin ? `https://www.amazon.com/dp/${info.asin}` : "");
+    const nUrl = (neg.media[id] && neg.media[id].url) || info.negUrl || "";
+    const amazon = (aUrl || (amz.media[id] && amz.media[id].img)) ? { img: (amz.media[id] && amz.media[id].img) || "", url: aUrl } : null;
+    const newegg = (nUrl || (neg.media[id] && neg.media[id].img)) ? { img: (neg.media[id] && neg.media[id].img) || "", url: nUrl } : null;
+    if (amazon || newegg) media[id] = { amazon, newegg };
   }
 
   res.setHeader("Cache-Control", "s-maxage=86400, stale-while-revalidate=43200");
