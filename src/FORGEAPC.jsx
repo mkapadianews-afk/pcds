@@ -46,52 +46,52 @@ const CATALOG = {
      Older parts (RX 580, GTX 1080 Ti, i3-10100, etc.) included for budget builds; Best Buy may not
      stock these new, so their live price can fall back to the sample value. */
   cpu: [
-    {id:"cpu1",brand:"AMD",name:"Ryzen 5 4500",model:"Ryzen 5 4500",variantLabel:"AMD",price:80,perf:44,socket:"AM4",tdp:65,cores:6,igpu:false},
-    {id:"cpu2",brand:"AMD",name:"Ryzen 5 5500",model:"Ryzen 5 5500",variantLabel:"AMD",price:95,perf:46,socket:"AM4",tdp:65,cores:6,igpu:false},
-    {id:"cpu3",brand:"AMD",name:"Ryzen 5 5600",model:"Ryzen 5 5600",variantLabel:"AMD",price:100,perf:50,socket:"AM4",tdp:65,cores:6,igpu:false},
-    {id:"cpu4",brand:"AMD",name:"Ryzen 5 5600G",model:"Ryzen 5 5600G",variantLabel:"AMD",price:140,perf:56,socket:"AM4",tdp:65,cores:6,igpu:true},
-    {id:"cpu5",brand:"AMD",name:"Ryzen 5 5600X",model:"Ryzen 5 5600X",variantLabel:"AMD",price:120,perf:54,socket:"AM4",tdp:65,cores:6,igpu:false},
-    {id:"cpu6",brand:"AMD",name:"Ryzen 7 5700X",model:"Ryzen 7 5700X",variantLabel:"AMD",price:160,perf:64,socket:"AM4",tdp:65,cores:8,igpu:false},
-    {id:"cpu7",brand:"AMD",name:"Ryzen 7 5700X3D",model:"Ryzen 7 5700X3D",variantLabel:"AMD",price:230,perf:72,socket:"AM4",tdp:105,cores:8,igpu:false},
-    {id:"cpu8",brand:"AMD",name:"Ryzen 9 5900X",model:"Ryzen 9 5900X",variantLabel:"AMD",price:260,perf:76,socket:"AM4",tdp:105,cores:12,igpu:false},
-    {id:"cpu9",brand:"Intel",name:"Core i3-10100",model:"Core i3-10100",variantLabel:"Intel",price:100,perf:40,socket:"LGA1200",tdp:65,cores:4,igpu:true},
-    {id:"cpu10",brand:"Intel",name:"Core i3-10105",model:"Core i3-10105",variantLabel:"Intel",price:110,perf:42,socket:"LGA1200",tdp:65,cores:4,igpu:true},
-    {id:"cpu11",brand:"Intel",name:"Core i5-10400F",model:"Core i5-10400F",variantLabel:"Intel",price:130,perf:52,socket:"LGA1200",tdp:65,cores:6,igpu:false},
-    {id:"cpu12",brand:"Intel",name:"Core i5-11400F",model:"Core i5-11400F",variantLabel:"Intel",price:150,perf:58,socket:"LGA1200",tdp:65,cores:6,igpu:false},
-    {id:"cpu13",brand:"Intel",name:"Core i3-14100F",model:"Core i3-14100F",variantLabel:"Intel",price:110,perf:44,socket:"LGA1700",tdp:58,cores:4,igpu:false},
-    {id:"cpu14",brand:"Intel",name:"Core i5-12400F",model:"Core i5-12400F",variantLabel:"Intel",price:110,perf:52,socket:"LGA1700",tdp:65,cores:6,igpu:false},
-    {id:"cpu15",brand:"Intel",name:"Core i5-13400F",model:"Core i5-13400F",variantLabel:"Intel",price:150,perf:58,socket:"LGA1700",tdp:65,cores:10,igpu:false},
-    {id:"cpu16",brand:"Intel",name:"Core i5-14400F",model:"Core i5-14400F",variantLabel:"Intel",price:160,perf:60,socket:"LGA1700",tdp:65,cores:10,igpu:false},
-    {id:"cpu17",brand:"Intel",name:"Core i5-14600K",model:"Core i5-14600K",variantLabel:"Intel",price:230,perf:72,socket:"LGA1700",tdp:125,cores:14,igpu:true},
-    {id:"cpu18",brand:"Intel",name:"Core i7-14700K",model:"Core i7-14700K",variantLabel:"Intel",price:330,perf:82,socket:"LGA1700",tdp:125,cores:20,igpu:true},
-    {id:"cpu19",brand:"Intel",name:"Core i9-14900K",model:"Core i9-14900K",variantLabel:"Intel",price:450,perf:86,socket:"LGA1700",tdp:125,cores:24,igpu:true},
-    {id:"cpu20",brand:"AMD",name:"Ryzen 5 7500F",model:"Ryzen 5 7500F",variantLabel:"AMD",price:170,perf:62,socket:"AM5",tdp:65,cores:6,igpu:false},
-    {id:"cpu21",brand:"AMD",name:"Ryzen 5 7600",model:"Ryzen 5 7600",variantLabel:"AMD",price:200,perf:66,socket:"AM5",tdp:65,cores:6,igpu:true},
-    {id:"cpu22",brand:"AMD",name:"Ryzen 5 7600X",model:"Ryzen 5 7600X",variantLabel:"AMD",price:230,perf:70,socket:"AM5",tdp:105,cores:6,igpu:true},
-    {id:"cpu23",brand:"AMD",name:"Ryzen 7 7700",model:"Ryzen 7 7700",variantLabel:"AMD",price:300,perf:78,socket:"AM5",tdp:65,cores:8,igpu:true},
-    {id:"cpu24",brand:"AMD",name:"Ryzen 7 7800X3D",model:"Ryzen 7 7800X3D",variantLabel:"AMD",price:360,perf:90,socket:"AM5",tdp:120,cores:8,igpu:true},
-    {id:"cpu25",brand:"AMD",name:"Ryzen 9 7900X",model:"Ryzen 9 7900X",variantLabel:"AMD",price:380,perf:84,socket:"AM5",tdp:170,cores:12,igpu:true},
-    {id:"cpu26",brand:"AMD",name:"Ryzen 9 7950X3D",model:"Ryzen 9 7950X3D",variantLabel:"AMD",price:560,perf:95,socket:"AM5",tdp:120,cores:16,igpu:true},
-    {id:"cpu27",brand:"AMD",name:"Ryzen 5 9600X",model:"Ryzen 5 9600X",variantLabel:"AMD",price:250,perf:72,socket:"AM5",tdp:65,cores:6,igpu:true},
-    {id:"cpu28",brand:"AMD",name:"Ryzen 7 9700X",model:"Ryzen 7 9700X",variantLabel:"AMD",price:330,perf:82,socket:"AM5",tdp:65,cores:8,igpu:true},
-    {id:"cpu29",brand:"AMD",name:"Ryzen 7 9800X3D",model:"Ryzen 7 9800X3D",variantLabel:"AMD",price:460,perf:96,socket:"AM5",tdp:120,cores:8,igpu:true},
-    {id:"cpu30",brand:"AMD",name:"Ryzen 9 9900X",model:"Ryzen 9 9900X",variantLabel:"AMD",price:400,perf:86,socket:"AM5",tdp:120,cores:12,igpu:true},
-    {id:"cpu31",brand:"AMD",name:"Ryzen 9 9950X",model:"Ryzen 9 9950X",variantLabel:"AMD",price:600,perf:92,socket:"AM5",tdp:170,cores:16,igpu:true},
-    {id:"cpu32",brand:"AMD",name:"Ryzen 9 9950X3D",model:"Ryzen 9 9950X3D",variantLabel:"AMD",price:700,perf:99,socket:"AM5",tdp:170,cores:16,igpu:true},
-    {id:"cpu33",brand:"Intel",name:"Core Ultra 5 245K",model:"Core Ultra 5 245K",variantLabel:"Intel",price:300,perf:80,socket:"LGA1851",tdp:125,cores:14,igpu:true},
-    {id:"cpu34",brand:"Intel",name:"Core Ultra 7 265K",model:"Core Ultra 7 265K",variantLabel:"Intel",price:400,perf:84,socket:"LGA1851",tdp:125,cores:20,igpu:true},
-    {id:"cpu35",brand:"Intel",name:"Core Ultra 9 285K",model:"Core Ultra 9 285K",variantLabel:"Intel",price:600,perf:88,socket:"LGA1851",tdp:125,cores:24,igpu:true},
-    {id:"cpu36",brand:"AMD",name:"Ryzen 9 9900X3D",model:"Ryzen 9 9900X3D",variantLabel:"AMD",price:500,perf:93,socket:"AM5",tdp:120,cores:12,igpu:true},
-    {id:"cpu37",brand:"AMD",name:"Ryzen 5 7600X3D",model:"Ryzen 5 7600X3D",variantLabel:"AMD",price:280,perf:76,socket:"AM5",tdp:65,cores:6,igpu:true},
-    {id:"cpu38",brand:"Intel",name:"Core i5-14500",model:"Core i5-14500",variantLabel:"Intel",price:220,perf:64,socket:"LGA1700",tdp:65,cores:14,igpu:true},
-    {id:"cpu39",brand:"Intel",name:"Core i5-14400",model:"Core i5-14400",variantLabel:"Intel",price:200,perf:60,socket:"LGA1700",tdp:65,cores:10,igpu:true},
-    {id:"cpu40",brand:"Intel",name:"Core i5-12500",model:"Core i5-12500",variantLabel:"Intel",price:180,perf:54,socket:"LGA1700",tdp:65,cores:6,igpu:true},
-    {id:"cpu41",brand:"Intel",name:"Core i5-12600",model:"Core i5-12600",variantLabel:"Intel",price:200,perf:56,socket:"LGA1700",tdp:65,cores:6,igpu:true},
-    {id:"cpu42",brand:"Intel",name:"Core i5-14600KF",model:"Core i5-14600KF",variantLabel:"Intel",price:220,perf:72,socket:"LGA1700",tdp:125,cores:14,igpu:false},
-    {id:"cpu43",brand:"Intel",name:"Core i9-14900KF",model:"Core i9-14900KF",variantLabel:"Intel",price:440,perf:86,socket:"LGA1700",tdp:125,cores:24,igpu:false},
-    {id:"cpu44",brand:"Intel",name:"Core i3-12100F",model:"Core i3-12100F",variantLabel:"Intel",price:90,perf:44,socket:"LGA1700",tdp:58,cores:4,igpu:false},
-    {id:"cpu45",brand:"Intel",name:"Core i3-13100F",model:"Core i3-13100F",variantLabel:"Intel",price:100,perf:46,socket:"LGA1700",tdp:58,cores:4,igpu:false},
-    {id:"cpu46",brand:"AMD",name:"Ryzen 9 9950X3D2",model:"Ryzen 9 9950X3D2",variantLabel:"AMD",price:850,perf:100,socket:"AM5",tdp:200,cores:16,igpu:true},
+    {id:"cpu1",brand:"AMD",name:"Ryzen 5 4500",model:"Ryzen 5 4500",variantLabel:"AMD",price:78,perf:44,socket:"AM4",tdp:65,cores:6,igpu:false},
+    {id:"cpu2",brand:"AMD",name:"Ryzen 5 5500",model:"Ryzen 5 5500",variantLabel:"AMD",price:84,perf:46,socket:"AM4",tdp:65,cores:6,igpu:false},
+    {id:"cpu3",brand:"AMD",name:"Ryzen 5 5600",model:"Ryzen 5 5600",variantLabel:"AMD",price:105,perf:50,socket:"AM4",tdp:65,cores:6,igpu:false},
+    {id:"cpu4",brand:"AMD",name:"Ryzen 5 5600G",model:"Ryzen 5 5600G",variantLabel:"AMD",price:155,perf:56,socket:"AM4",tdp:65,cores:6,igpu:true},
+    {id:"cpu5",brand:"AMD",name:"Ryzen 5 5600X",model:"Ryzen 5 5600X",variantLabel:"AMD",price:115,perf:54,socket:"AM4",tdp:65,cores:6,igpu:false},
+    {id:"cpu6",brand:"AMD",name:"Ryzen 7 5700X",model:"Ryzen 7 5700X",variantLabel:"AMD",price:140,perf:64,socket:"AM4",tdp:65,cores:8,igpu:false},
+    {id:"cpu7",brand:"AMD",name:"Ryzen 7 5700X3D",model:"Ryzen 7 5700X3D",variantLabel:"AMD",price:195,perf:72,socket:"AM4",tdp:105,cores:8,igpu:false},
+    {id:"cpu8",brand:"AMD",name:"Ryzen 9 5900X",model:"Ryzen 9 5900X",variantLabel:"AMD",price:195,perf:76,socket:"AM4",tdp:105,cores:12,igpu:false},
+    {id:"cpu9",brand:"Intel",name:"Core i3-10100",model:"Core i3-10100",variantLabel:"Intel",price:70,perf:40,socket:"LGA1200",tdp:65,cores:4,igpu:true},
+    {id:"cpu10",brand:"Intel",name:"Core i3-10105",model:"Core i3-10105",variantLabel:"Intel",price:80,perf:42,socket:"LGA1200",tdp:65,cores:4,igpu:true},
+    {id:"cpu11",brand:"Intel",name:"Core i5-10400F",model:"Core i5-10400F",variantLabel:"Intel",price:95,perf:52,socket:"LGA1200",tdp:65,cores:6,igpu:false},
+    {id:"cpu12",brand:"Intel",name:"Core i5-11400F",model:"Core i5-11400F",variantLabel:"Intel",price:110,perf:58,socket:"LGA1200",tdp:65,cores:6,igpu:false},
+    {id:"cpu13",brand:"Intel",name:"Core i3-14100F",model:"Core i3-14100F",variantLabel:"Intel",price:100,perf:44,socket:"LGA1700",tdp:58,cores:4,igpu:false},
+    {id:"cpu14",brand:"Intel",name:"Core i5-12400F",model:"Core i5-12400F",variantLabel:"Intel",price:100,perf:52,socket:"LGA1700",tdp:65,cores:6,igpu:false},
+    {id:"cpu15",brand:"Intel",name:"Core i5-13400F",model:"Core i5-13400F",variantLabel:"Intel",price:130,perf:58,socket:"LGA1700",tdp:65,cores:10,igpu:false},
+    {id:"cpu16",brand:"Intel",name:"Core i5-14400F",model:"Core i5-14400F",variantLabel:"Intel",price:150,perf:60,socket:"LGA1700",tdp:65,cores:10,igpu:false},
+    {id:"cpu17",brand:"Intel",name:"Core i5-14600K",model:"Core i5-14600K",variantLabel:"Intel",price:210,perf:72,socket:"LGA1700",tdp:125,cores:14,igpu:true},
+    {id:"cpu18",brand:"Intel",name:"Core i7-14700K",model:"Core i7-14700K",variantLabel:"Intel",price:290,perf:82,socket:"LGA1700",tdp:125,cores:20,igpu:true},
+    {id:"cpu19",brand:"Intel",name:"Core i9-14900K",model:"Core i9-14900K",variantLabel:"Intel",price:380,perf:86,socket:"LGA1700",tdp:125,cores:24,igpu:true},
+    {id:"cpu20",brand:"AMD",name:"Ryzen 5 7500F",model:"Ryzen 5 7500F",variantLabel:"AMD",price:155,perf:62,socket:"AM5",tdp:65,cores:6,igpu:false},
+    {id:"cpu21",brand:"AMD",name:"Ryzen 5 7600",model:"Ryzen 5 7600",variantLabel:"AMD",price:180,perf:66,socket:"AM5",tdp:65,cores:6,igpu:true},
+    {id:"cpu22",brand:"AMD",name:"Ryzen 5 7600X",model:"Ryzen 5 7600X",variantLabel:"AMD",price:167,perf:70,socket:"AM5",tdp:105,cores:6,igpu:true},
+    {id:"cpu23",brand:"AMD",name:"Ryzen 7 7700",model:"Ryzen 7 7700",variantLabel:"AMD",price:240,perf:78,socket:"AM5",tdp:65,cores:8,igpu:true},
+    {id:"cpu24",brand:"AMD",name:"Ryzen 7 7800X3D",model:"Ryzen 7 7800X3D",variantLabel:"AMD",price:305,perf:90,socket:"AM5",tdp:120,cores:8,igpu:true},
+    {id:"cpu25",brand:"AMD",name:"Ryzen 9 7900X",model:"Ryzen 9 7900X",variantLabel:"AMD",price:300,perf:84,socket:"AM5",tdp:170,cores:12,igpu:true},
+    {id:"cpu26",brand:"AMD",name:"Ryzen 9 7950X3D",model:"Ryzen 9 7950X3D",variantLabel:"AMD",price:500,perf:95,socket:"AM5",tdp:120,cores:16,igpu:true},
+    {id:"cpu27",brand:"AMD",name:"Ryzen 5 9600X",model:"Ryzen 5 9600X",variantLabel:"AMD",price:176,perf:72,socket:"AM5",tdp:65,cores:6,igpu:true},
+    {id:"cpu28",brand:"AMD",name:"Ryzen 7 9700X",model:"Ryzen 7 9700X",variantLabel:"AMD",price:290,perf:82,socket:"AM5",tdp:65,cores:8,igpu:true},
+    {id:"cpu29",brand:"AMD",name:"Ryzen 7 9800X3D",model:"Ryzen 7 9800X3D",variantLabel:"AMD",price:433,perf:96,socket:"AM5",tdp:120,cores:8,igpu:true},
+    {id:"cpu30",brand:"AMD",name:"Ryzen 9 9900X",model:"Ryzen 9 9900X",variantLabel:"AMD",price:350,perf:86,socket:"AM5",tdp:120,cores:12,igpu:true},
+    {id:"cpu31",brand:"AMD",name:"Ryzen 9 9950X",model:"Ryzen 9 9950X",variantLabel:"AMD",price:540,perf:92,socket:"AM5",tdp:170,cores:16,igpu:true},
+    {id:"cpu32",brand:"AMD",name:"Ryzen 9 9950X3D",model:"Ryzen 9 9950X3D",variantLabel:"AMD",price:620,perf:99,socket:"AM5",tdp:170,cores:16,igpu:true},
+    {id:"cpu33",brand:"Intel",name:"Core Ultra 5 245K",model:"Core Ultra 5 245K",variantLabel:"Intel",price:185,perf:80,socket:"LGA1851",tdp:125,cores:14,igpu:true},
+    {id:"cpu34",brand:"Intel",name:"Core Ultra 7 265K",model:"Core Ultra 7 265K",variantLabel:"Intel",price:315,perf:84,socket:"LGA1851",tdp:125,cores:20,igpu:true},
+    {id:"cpu35",brand:"Intel",name:"Core Ultra 9 285K",model:"Core Ultra 9 285K",variantLabel:"Intel",price:540,perf:88,socket:"LGA1851",tdp:125,cores:24,igpu:true},
+    {id:"cpu36",brand:"AMD",name:"Ryzen 9 9900X3D",model:"Ryzen 9 9900X3D",variantLabel:"AMD",price:470,perf:93,socket:"AM5",tdp:120,cores:12,igpu:true},
+    {id:"cpu37",brand:"AMD",name:"Ryzen 5 7600X3D",model:"Ryzen 5 7600X3D",variantLabel:"AMD",price:246,perf:76,socket:"AM5",tdp:65,cores:6,igpu:true},
+    {id:"cpu38",brand:"Intel",name:"Core i5-14500",model:"Core i5-14500",variantLabel:"Intel",price:190,perf:64,socket:"LGA1700",tdp:65,cores:14,igpu:true},
+    {id:"cpu39",brand:"Intel",name:"Core i5-14400",model:"Core i5-14400",variantLabel:"Intel",price:180,perf:60,socket:"LGA1700",tdp:65,cores:10,igpu:true},
+    {id:"cpu40",brand:"Intel",name:"Core i5-12500",model:"Core i5-12500",variantLabel:"Intel",price:150,perf:54,socket:"LGA1700",tdp:65,cores:6,igpu:true},
+    {id:"cpu41",brand:"Intel",name:"Core i5-12600",model:"Core i5-12600",variantLabel:"Intel",price:165,perf:56,socket:"LGA1700",tdp:65,cores:6,igpu:true},
+    {id:"cpu42",brand:"Intel",name:"Core i5-14600KF",model:"Core i5-14600KF",variantLabel:"Intel",price:200,perf:72,socket:"LGA1700",tdp:125,cores:14,igpu:false},
+    {id:"cpu43",brand:"Intel",name:"Core i9-14900KF",model:"Core i9-14900KF",variantLabel:"Intel",price:370,perf:86,socket:"LGA1700",tdp:125,cores:24,igpu:false},
+    {id:"cpu44",brand:"Intel",name:"Core i3-12100F",model:"Core i3-12100F",variantLabel:"Intel",price:80,perf:44,socket:"LGA1700",tdp:58,cores:4,igpu:false},
+    {id:"cpu45",brand:"Intel",name:"Core i3-13100F",model:"Core i3-13100F",variantLabel:"Intel",price:90,perf:46,socket:"LGA1700",tdp:58,cores:4,igpu:false},
+    {id:"cpu46",brand:"AMD",name:"Ryzen 9 9950X3D2",model:"Ryzen 9 9950X3D2",variantLabel:"AMD",price:950,perf:100,socket:"AM5",tdp:200,cores:16,igpu:true},
   ],
   gpu: [
     {id:"gpu_1",name:"Intel Limited Edition Intel Arc B570",brand:"Intel",model:"Intel Arc B570",variantLabel:"Intel Limited Edition",price:220,perf:24,vram:10,tdp:150,len:250},
@@ -140,49 +140,49 @@ const CATALOG = {
     {id:"gpu_44",name:"Sapphire RX 6800 XT",brand:"Sapphire",model:"RX 6800 XT",variantLabel:"Sapphire",price:480,perf:41,vram:16,tdp:300,len:290},
     {id:"gpu_45",name:"XFX RX 6800 XT",brand:"XFX",model:"RX 6800 XT",variantLabel:"XFX",price:495,perf:41,vram:16,tdp:300,len:295},
     {id:"gpu_46",name:"PowerColor RX 6800 XT",brand:"PowerColor",model:"RX 6800 XT",variantLabel:"PowerColor",price:505,perf:41,vram:16,tdp:300,len:300},
-    {id:"gpu_47",name:"PNY Verto RTX 4060",brand:"PNY",model:"RTX 4060",variantLabel:"PNY Verto",price:290,perf:29,vram:8,tdp:115,len:245},
-    {id:"gpu_48",name:"Zotac Twin Edge RTX 4060",brand:"Zotac",model:"RTX 4060",variantLabel:"Zotac Twin Edge",price:295,perf:29,vram:8,tdp:115,len:250},
-    {id:"gpu_49",name:"Gigabyte Windforce RTX 4060",brand:"Gigabyte",model:"RTX 4060",variantLabel:"Gigabyte Windforce",price:300,perf:29,vram:8,tdp:115,len:260},
-    {id:"gpu_50",name:"MSI Ventus 2X RTX 4060",brand:"MSI",model:"RTX 4060",variantLabel:"MSI Ventus 2X",price:305,perf:29,vram:8,tdp:115,len:255},
-    {id:"gpu_51",name:"ASUS Dual RTX 4060",brand:"ASUS",model:"RTX 4060",variantLabel:"ASUS Dual",price:305,perf:29,vram:8,tdp:115,len:257},
-    {id:"gpu_52",name:"Gigabyte Eagle RTX 4060",brand:"Gigabyte",model:"RTX 4060",variantLabel:"Gigabyte Eagle",price:310,perf:29,vram:8,tdp:115,len:260},
-    {id:"gpu_53",name:"MSI Ventus 3X RTX 4060",brand:"MSI",model:"RTX 4060",variantLabel:"MSI Ventus 3X",price:315,perf:29,vram:8,tdp:115,len:265},
-    {id:"gpu_54",name:"Gigabyte Gaming OC RTX 4060",brand:"Gigabyte",model:"RTX 4060",variantLabel:"Gigabyte Gaming OC",price:320,perf:29,vram:8,tdp:115,len:270},
-    {id:"gpu_55",name:"PNY Verto RTX 4060 Ti 8GB",brand:"PNY",model:"RTX 4060 Ti 8GB",variantLabel:"PNY Verto",price:370,perf:32,vram:8,tdp:160,len:245},
-    {id:"gpu_56",name:"Zotac Twin Edge RTX 4060 Ti 8GB",brand:"Zotac",model:"RTX 4060 Ti 8GB",variantLabel:"Zotac Twin Edge",price:375,perf:32,vram:8,tdp:160,len:250},
-    {id:"gpu_57",name:"Gigabyte Windforce RTX 4060 Ti 8GB",brand:"Gigabyte",model:"RTX 4060 Ti 8GB",variantLabel:"Gigabyte Windforce",price:385,perf:32,vram:8,tdp:160,len:260},
-    {id:"gpu_58",name:"MSI Ventus 2X RTX 4060 Ti 8GB",brand:"MSI",model:"RTX 4060 Ti 8GB",variantLabel:"MSI Ventus 2X",price:390,perf:32,vram:8,tdp:160,len:255},
-    {id:"gpu_59",name:"ASUS Dual RTX 4060 Ti 8GB",brand:"ASUS",model:"RTX 4060 Ti 8GB",variantLabel:"ASUS Dual",price:390,perf:32,vram:8,tdp:160,len:257},
-    {id:"gpu_60",name:"Gigabyte Eagle RTX 4060 Ti 8GB",brand:"Gigabyte",model:"RTX 4060 Ti 8GB",variantLabel:"Gigabyte Eagle",price:395,perf:32,vram:8,tdp:160,len:260},
-    {id:"gpu_61",name:"MSI Ventus 3X RTX 4060 Ti 8GB",brand:"MSI",model:"RTX 4060 Ti 8GB",variantLabel:"MSI Ventus 3X",price:400,perf:32,vram:8,tdp:160,len:265},
-    {id:"gpu_62",name:"PNY Verto RTX 4060 Ti 16GB",brand:"PNY",model:"RTX 4060 Ti 16GB",variantLabel:"PNY Verto",price:430,perf:33,vram:16,tdp:165,len:250},
-    {id:"gpu_63",name:"Zotac Twin Edge RTX 4060 Ti 16GB",brand:"Zotac",model:"RTX 4060 Ti 16GB",variantLabel:"Zotac Twin Edge",price:440,perf:33,vram:16,tdp:165,len:255},
-    {id:"gpu_64",name:"Gigabyte Windforce RTX 4060 Ti 16GB",brand:"Gigabyte",model:"RTX 4060 Ti 16GB",variantLabel:"Gigabyte Windforce",price:445,perf:33,vram:16,tdp:165,len:265},
-    {id:"gpu_65",name:"MSI Ventus 2X RTX 4060 Ti 16GB",brand:"MSI",model:"RTX 4060 Ti 16GB",variantLabel:"MSI Ventus 2X",price:450,perf:33,vram:16,tdp:165,len:260},
-    {id:"gpu_66",name:"ASUS Dual RTX 4060 Ti 16GB",brand:"ASUS",model:"RTX 4060 Ti 16GB",variantLabel:"ASUS Dual",price:455,perf:33,vram:16,tdp:165,len:262},
-    {id:"gpu_67",name:"Gigabyte Eagle RTX 4060 Ti 16GB",brand:"Gigabyte",model:"RTX 4060 Ti 16GB",variantLabel:"Gigabyte Eagle",price:460,perf:33,vram:16,tdp:165,len:265},
-    {id:"gpu_68",name:"MSI Ventus 3X RTX 4060 Ti 16GB",brand:"MSI",model:"RTX 4060 Ti 16GB",variantLabel:"MSI Ventus 3X",price:465,perf:33,vram:16,tdp:165,len:270},
-    {id:"gpu_69",name:"PNY Verto RTX 4070 Super",brand:"PNY",model:"RTX 4070 Super",variantLabel:"PNY Verto",price:600,perf:47,vram:12,tdp:220,len:285},
-    {id:"gpu_70",name:"Zotac Twin Edge RTX 4070 Super",brand:"Zotac",model:"RTX 4070 Super",variantLabel:"Zotac Twin Edge",price:610,perf:47,vram:12,tdp:220,len:290},
-    {id:"gpu_71",name:"Gigabyte Windforce RTX 4070 Super",brand:"Gigabyte",model:"RTX 4070 Super",variantLabel:"Gigabyte Windforce",price:625,perf:47,vram:12,tdp:220,len:300},
-    {id:"gpu_72",name:"MSI Ventus 2X RTX 4070 Super",brand:"MSI",model:"RTX 4070 Super",variantLabel:"MSI Ventus 2X",price:630,perf:47,vram:12,tdp:220,len:295},
-    {id:"gpu_73",name:"ASUS Dual RTX 4070 Super",brand:"ASUS",model:"RTX 4070 Super",variantLabel:"ASUS Dual",price:635,perf:47,vram:12,tdp:220,len:297},
-    {id:"gpu_74",name:"Gigabyte Eagle RTX 4070 Super",brand:"Gigabyte",model:"RTX 4070 Super",variantLabel:"Gigabyte Eagle",price:640,perf:47,vram:12,tdp:220,len:300},
-    {id:"gpu_75",name:"MSI Ventus 3X RTX 4070 Super",brand:"MSI",model:"RTX 4070 Super",variantLabel:"MSI Ventus 3X",price:650,perf:47,vram:12,tdp:220,len:305},
-    {id:"gpu_76",name:"Gigabyte Gaming OC RTX 4070 Super",brand:"Gigabyte",model:"RTX 4070 Super",variantLabel:"Gigabyte Gaming OC",price:660,perf:47,vram:12,tdp:220,len:310},
-    {id:"gpu_77",name:"PNY Verto RTX 4070 Ti Super",brand:"PNY",model:"RTX 4070 Ti Super",variantLabel:"PNY Verto",price:800,perf:56,vram:16,tdp:285,len:305},
-    {id:"gpu_78",name:"Zotac Twin Edge RTX 4070 Ti Super",brand:"Zotac",model:"RTX 4070 Ti Super",variantLabel:"Zotac Twin Edge",price:815,perf:56,vram:16,tdp:285,len:310},
-    {id:"gpu_79",name:"Gigabyte Windforce RTX 4070 Ti Super",brand:"Gigabyte",model:"RTX 4070 Ti Super",variantLabel:"Gigabyte Windforce",price:830,perf:56,vram:16,tdp:285,len:320},
-    {id:"gpu_80",name:"MSI Ventus 2X RTX 4070 Ti Super",brand:"MSI",model:"RTX 4070 Ti Super",variantLabel:"MSI Ventus 2X",price:840,perf:56,vram:16,tdp:285,len:315},
-    {id:"gpu_81",name:"ASUS Dual RTX 4070 Ti Super",brand:"ASUS",model:"RTX 4070 Ti Super",variantLabel:"ASUS Dual",price:850,perf:56,vram:16,tdp:285,len:317},
-    {id:"gpu_82",name:"Gigabyte Eagle RTX 4070 Ti Super",brand:"Gigabyte",model:"RTX 4070 Ti Super",variantLabel:"Gigabyte Eagle",price:855,perf:56,vram:16,tdp:285,len:320},
-    {id:"gpu_83",name:"MSI Ventus 3X RTX 4070 Ti Super",brand:"MSI",model:"RTX 4070 Ti Super",variantLabel:"MSI Ventus 3X",price:865,perf:56,vram:16,tdp:285,len:325},
-    {id:"gpu_84",name:"PNY Verto RTX 5050",brand:"PNY",model:"RTX 5050",variantLabel:"PNY Verto",price:250,perf:22,vram:8,tdp:130,len:244},
-    {id:"gpu_85",name:"Zotac Twin Edge RTX 5050",brand:"Zotac",model:"RTX 5050",variantLabel:"Zotac Twin Edge",price:255,perf:22,vram:8,tdp:130,len:249},
-    {id:"gpu_86",name:"Gigabyte Windforce RTX 5050",brand:"Gigabyte",model:"RTX 5050",variantLabel:"Gigabyte Windforce",price:260,perf:22,vram:8,tdp:130,len:259},
-    {id:"gpu_87",name:"MSI Ventus 2X RTX 5050",brand:"MSI",model:"RTX 5050",variantLabel:"MSI Ventus 2X",price:265,perf:22,vram:8,tdp:130,len:254},
-    {id:"gpu_88",name:"ASUS Dual RTX 5050",brand:"ASUS",model:"RTX 5050",variantLabel:"ASUS Dual",price:265,perf:22,vram:8,tdp:130,len:256},
-    {id:"gpu_89",name:"Gigabyte Eagle RTX 5050",brand:"Gigabyte",model:"RTX 5050",variantLabel:"Gigabyte Eagle",price:270,perf:22,vram:8,tdp:130,len:259},
+    {id:"gpu_47",name:"PNY Verto RTX 4060",brand:"PNY",model:"RTX 4060",variantLabel:"PNY Verto",price:250,perf:29,vram:8,tdp:115,len:245},
+    {id:"gpu_48",name:"Zotac Twin Edge RTX 4060",brand:"Zotac",model:"RTX 4060",variantLabel:"Zotac Twin Edge",price:255,perf:29,vram:8,tdp:115,len:250},
+    {id:"gpu_49",name:"Gigabyte Windforce RTX 4060",brand:"Gigabyte",model:"RTX 4060",variantLabel:"Gigabyte Windforce",price:260,perf:29,vram:8,tdp:115,len:260},
+    {id:"gpu_50",name:"MSI Ventus 2X RTX 4060",brand:"MSI",model:"RTX 4060",variantLabel:"MSI Ventus 2X",price:265,perf:29,vram:8,tdp:115,len:255},
+    {id:"gpu_51",name:"ASUS Dual RTX 4060",brand:"ASUS",model:"RTX 4060",variantLabel:"ASUS Dual",price:265,perf:29,vram:8,tdp:115,len:257},
+    {id:"gpu_52",name:"Gigabyte Eagle RTX 4060",brand:"Gigabyte",model:"RTX 4060",variantLabel:"Gigabyte Eagle",price:270,perf:29,vram:8,tdp:115,len:260},
+    {id:"gpu_53",name:"MSI Ventus 3X RTX 4060",brand:"MSI",model:"RTX 4060",variantLabel:"MSI Ventus 3X",price:275,perf:29,vram:8,tdp:115,len:265},
+    {id:"gpu_54",name:"Gigabyte Gaming OC RTX 4060",brand:"Gigabyte",model:"RTX 4060",variantLabel:"Gigabyte Gaming OC",price:280,perf:29,vram:8,tdp:115,len:270},
+    {id:"gpu_55",name:"PNY Verto RTX 4060 Ti 8GB",brand:"PNY",model:"RTX 4060 Ti 8GB",variantLabel:"PNY Verto",price:335,perf:32,vram:8,tdp:160,len:245},
+    {id:"gpu_56",name:"Zotac Twin Edge RTX 4060 Ti 8GB",brand:"Zotac",model:"RTX 4060 Ti 8GB",variantLabel:"Zotac Twin Edge",price:340,perf:32,vram:8,tdp:160,len:250},
+    {id:"gpu_57",name:"Gigabyte Windforce RTX 4060 Ti 8GB",brand:"Gigabyte",model:"RTX 4060 Ti 8GB",variantLabel:"Gigabyte Windforce",price:350,perf:32,vram:8,tdp:160,len:260},
+    {id:"gpu_58",name:"MSI Ventus 2X RTX 4060 Ti 8GB",brand:"MSI",model:"RTX 4060 Ti 8GB",variantLabel:"MSI Ventus 2X",price:355,perf:32,vram:8,tdp:160,len:255},
+    {id:"gpu_59",name:"ASUS Dual RTX 4060 Ti 8GB",brand:"ASUS",model:"RTX 4060 Ti 8GB",variantLabel:"ASUS Dual",price:355,perf:32,vram:8,tdp:160,len:257},
+    {id:"gpu_60",name:"Gigabyte Eagle RTX 4060 Ti 8GB",brand:"Gigabyte",model:"RTX 4060 Ti 8GB",variantLabel:"Gigabyte Eagle",price:360,perf:32,vram:8,tdp:160,len:260},
+    {id:"gpu_61",name:"MSI Ventus 3X RTX 4060 Ti 8GB",brand:"MSI",model:"RTX 4060 Ti 8GB",variantLabel:"MSI Ventus 3X",price:365,perf:32,vram:8,tdp:160,len:265},
+    {id:"gpu_62",name:"PNY Verto RTX 4060 Ti 16GB",brand:"PNY",model:"RTX 4060 Ti 16GB",variantLabel:"PNY Verto",price:375,perf:33,vram:16,tdp:165,len:250},
+    {id:"gpu_63",name:"Zotac Twin Edge RTX 4060 Ti 16GB",brand:"Zotac",model:"RTX 4060 Ti 16GB",variantLabel:"Zotac Twin Edge",price:385,perf:33,vram:16,tdp:165,len:255},
+    {id:"gpu_64",name:"Gigabyte Windforce RTX 4060 Ti 16GB",brand:"Gigabyte",model:"RTX 4060 Ti 16GB",variantLabel:"Gigabyte Windforce",price:385,perf:33,vram:16,tdp:165,len:265},
+    {id:"gpu_65",name:"MSI Ventus 2X RTX 4060 Ti 16GB",brand:"MSI",model:"RTX 4060 Ti 16GB",variantLabel:"MSI Ventus 2X",price:390,perf:33,vram:16,tdp:165,len:260},
+    {id:"gpu_66",name:"ASUS Dual RTX 4060 Ti 16GB",brand:"ASUS",model:"RTX 4060 Ti 16GB",variantLabel:"ASUS Dual",price:395,perf:33,vram:16,tdp:165,len:262},
+    {id:"gpu_67",name:"Gigabyte Eagle RTX 4060 Ti 16GB",brand:"Gigabyte",model:"RTX 4060 Ti 16GB",variantLabel:"Gigabyte Eagle",price:400,perf:33,vram:16,tdp:165,len:265},
+    {id:"gpu_68",name:"MSI Ventus 3X RTX 4060 Ti 16GB",brand:"MSI",model:"RTX 4060 Ti 16GB",variantLabel:"MSI Ventus 3X",price:405,perf:33,vram:16,tdp:165,len:270},
+    {id:"gpu_69",name:"PNY Verto RTX 4070 Super",brand:"PNY",model:"RTX 4070 Super",variantLabel:"PNY Verto",price:500,perf:47,vram:12,tdp:220,len:285},
+    {id:"gpu_70",name:"Zotac Twin Edge RTX 4070 Super",brand:"Zotac",model:"RTX 4070 Super",variantLabel:"Zotac Twin Edge",price:505,perf:47,vram:12,tdp:220,len:290},
+    {id:"gpu_71",name:"Gigabyte Windforce RTX 4070 Super",brand:"Gigabyte",model:"RTX 4070 Super",variantLabel:"Gigabyte Windforce",price:520,perf:47,vram:12,tdp:220,len:300},
+    {id:"gpu_72",name:"MSI Ventus 2X RTX 4070 Super",brand:"MSI",model:"RTX 4070 Super",variantLabel:"MSI Ventus 2X",price:525,perf:47,vram:12,tdp:220,len:295},
+    {id:"gpu_73",name:"ASUS Dual RTX 4070 Super",brand:"ASUS",model:"RTX 4070 Super",variantLabel:"ASUS Dual",price:525,perf:47,vram:12,tdp:220,len:297},
+    {id:"gpu_74",name:"Gigabyte Eagle RTX 4070 Super",brand:"Gigabyte",model:"RTX 4070 Super",variantLabel:"Gigabyte Eagle",price:530,perf:47,vram:12,tdp:220,len:300},
+    {id:"gpu_75",name:"MSI Ventus 3X RTX 4070 Super",brand:"MSI",model:"RTX 4070 Super",variantLabel:"MSI Ventus 3X",price:540,perf:47,vram:12,tdp:220,len:305},
+    {id:"gpu_76",name:"Gigabyte Gaming OC RTX 4070 Super",brand:"Gigabyte",model:"RTX 4070 Super",variantLabel:"Gigabyte Gaming OC",price:550,perf:47,vram:12,tdp:220,len:310},
+    {id:"gpu_77",name:"PNY Verto RTX 4070 Ti Super",brand:"PNY",model:"RTX 4070 Ti Super",variantLabel:"PNY Verto",price:705,perf:56,vram:16,tdp:285,len:305},
+    {id:"gpu_78",name:"Zotac Twin Edge RTX 4070 Ti Super",brand:"Zotac",model:"RTX 4070 Ti Super",variantLabel:"Zotac Twin Edge",price:715,perf:56,vram:16,tdp:285,len:310},
+    {id:"gpu_79",name:"Gigabyte Windforce RTX 4070 Ti Super",brand:"Gigabyte",model:"RTX 4070 Ti Super",variantLabel:"Gigabyte Windforce",price:730,perf:56,vram:16,tdp:285,len:320},
+    {id:"gpu_80",name:"MSI Ventus 2X RTX 4070 Ti Super",brand:"MSI",model:"RTX 4070 Ti Super",variantLabel:"MSI Ventus 2X",price:740,perf:56,vram:16,tdp:285,len:315},
+    {id:"gpu_81",name:"ASUS Dual RTX 4070 Ti Super",brand:"ASUS",model:"RTX 4070 Ti Super",variantLabel:"ASUS Dual",price:750,perf:56,vram:16,tdp:285,len:317},
+    {id:"gpu_82",name:"Gigabyte Eagle RTX 4070 Ti Super",brand:"Gigabyte",model:"RTX 4070 Ti Super",variantLabel:"Gigabyte Eagle",price:750,perf:56,vram:16,tdp:285,len:320},
+    {id:"gpu_83",name:"MSI Ventus 3X RTX 4070 Ti Super",brand:"MSI",model:"RTX 4070 Ti Super",variantLabel:"MSI Ventus 3X",price:760,perf:56,vram:16,tdp:285,len:325},
+    {id:"gpu_84",name:"PNY Verto RTX 5050",brand:"PNY",model:"RTX 5050",variantLabel:"PNY Verto",price:255,perf:22,vram:8,tdp:130,len:244},
+    {id:"gpu_85",name:"Zotac Twin Edge RTX 5050",brand:"Zotac",model:"RTX 5050",variantLabel:"Zotac Twin Edge",price:260,perf:22,vram:8,tdp:130,len:249},
+    {id:"gpu_86",name:"Gigabyte Windforce RTX 5050",brand:"Gigabyte",model:"RTX 5050",variantLabel:"Gigabyte Windforce",price:265,perf:22,vram:8,tdp:130,len:259},
+    {id:"gpu_87",name:"MSI Ventus 2X RTX 5050",brand:"MSI",model:"RTX 5050",variantLabel:"MSI Ventus 2X",price:270,perf:22,vram:8,tdp:130,len:254},
+    {id:"gpu_88",name:"ASUS Dual RTX 5050",brand:"ASUS",model:"RTX 5050",variantLabel:"ASUS Dual",price:270,perf:22,vram:8,tdp:130,len:256},
+    {id:"gpu_89",name:"Gigabyte Eagle RTX 5050",brand:"Gigabyte",model:"RTX 5050",variantLabel:"Gigabyte Eagle",price:275,perf:22,vram:8,tdp:130,len:259},
     {id:"gpu_90",name:"PNY Verto RTX 5060",brand:"PNY",model:"RTX 5060",variantLabel:"PNY Verto",price:300,perf:30,vram:8,tdp:145,len:245},
     {id:"gpu_91",name:"Zotac Twin Edge RTX 5060",brand:"Zotac",model:"RTX 5060",variantLabel:"Zotac Twin Edge",price:305,perf:30,vram:8,tdp:145,len:250},
     {id:"gpu_92",name:"Gigabyte Windforce RTX 5060",brand:"Gigabyte",model:"RTX 5060",variantLabel:"Gigabyte Windforce",price:310,perf:30,vram:8,tdp:145,len:260},
@@ -193,180 +193,180 @@ const CATALOG = {
     {id:"gpu_97",name:"Gigabyte Gaming OC RTX 5060",brand:"Gigabyte",model:"RTX 5060",variantLabel:"Gigabyte Gaming OC",price:330,perf:30,vram:8,tdp:145,len:270},
     {id:"gpu_98",name:"Zotac Trinity RTX 5060",brand:"Zotac",model:"RTX 5060",variantLabel:"Zotac Trinity",price:335,perf:30,vram:8,tdp:145,len:270},
     {id:"gpu_99",name:"MSI Gaming Trio RTX 5060",brand:"MSI",model:"RTX 5060",variantLabel:"MSI Gaming Trio",price:340,perf:30,vram:8,tdp:145,len:275},
-    {id:"gpu_100",name:"PNY Verto RTX 5060 Ti 8GB",brand:"PNY",model:"RTX 5060 Ti 8GB",variantLabel:"PNY Verto",price:380,perf:33,vram:8,tdp:180,len:245},
-    {id:"gpu_101",name:"Zotac Twin Edge RTX 5060 Ti 8GB",brand:"Zotac",model:"RTX 5060 Ti 8GB",variantLabel:"Zotac Twin Edge",price:390,perf:33,vram:8,tdp:180,len:250},
-    {id:"gpu_102",name:"Gigabyte Windforce RTX 5060 Ti 8GB",brand:"Gigabyte",model:"RTX 5060 Ti 8GB",variantLabel:"Gigabyte Windforce",price:395,perf:33,vram:8,tdp:180,len:260},
-    {id:"gpu_103",name:"MSI Ventus 2X RTX 5060 Ti 8GB",brand:"MSI",model:"RTX 5060 Ti 8GB",variantLabel:"MSI Ventus 2X",price:400,perf:33,vram:8,tdp:180,len:255},
-    {id:"gpu_104",name:"ASUS Dual RTX 5060 Ti 8GB",brand:"ASUS",model:"RTX 5060 Ti 8GB",variantLabel:"ASUS Dual",price:405,perf:33,vram:8,tdp:180,len:257},
-    {id:"gpu_105",name:"Gigabyte Eagle RTX 5060 Ti 8GB",brand:"Gigabyte",model:"RTX 5060 Ti 8GB",variantLabel:"Gigabyte Eagle",price:405,perf:33,vram:8,tdp:180,len:260},
-    {id:"gpu_106",name:"MSI Ventus 3X RTX 5060 Ti 8GB",brand:"MSI",model:"RTX 5060 Ti 8GB",variantLabel:"MSI Ventus 3X",price:410,perf:33,vram:8,tdp:180,len:265},
-    {id:"gpu_107",name:"Gigabyte Gaming OC RTX 5060 Ti 8GB",brand:"Gigabyte",model:"RTX 5060 Ti 8GB",variantLabel:"Gigabyte Gaming OC",price:420,perf:33,vram:8,tdp:180,len:270},
-    {id:"gpu_108",name:"PNY Verto RTX 5060 Ti 16GB",brand:"PNY",model:"RTX 5060 Ti 16GB",variantLabel:"PNY Verto",price:430,perf:35,vram:16,tdp:180,len:250},
-    {id:"gpu_109",name:"Zotac Twin Edge RTX 5060 Ti 16GB",brand:"Zotac",model:"RTX 5060 Ti 16GB",variantLabel:"Zotac Twin Edge",price:440,perf:35,vram:16,tdp:180,len:255},
-    {id:"gpu_110",name:"Gigabyte Windforce RTX 5060 Ti 16GB",brand:"Gigabyte",model:"RTX 5060 Ti 16GB",variantLabel:"Gigabyte Windforce",price:445,perf:35,vram:16,tdp:180,len:265},
-    {id:"gpu_111",name:"MSI Ventus 2X RTX 5060 Ti 16GB",brand:"MSI",model:"RTX 5060 Ti 16GB",variantLabel:"MSI Ventus 2X",price:450,perf:35,vram:16,tdp:180,len:260},
-    {id:"gpu_112",name:"ASUS Dual RTX 5060 Ti 16GB",brand:"ASUS",model:"RTX 5060 Ti 16GB",variantLabel:"ASUS Dual",price:455,perf:35,vram:16,tdp:180,len:262},
-    {id:"gpu_113",name:"Gigabyte Eagle RTX 5060 Ti 16GB",brand:"Gigabyte",model:"RTX 5060 Ti 16GB",variantLabel:"Gigabyte Eagle",price:460,perf:35,vram:16,tdp:180,len:265},
-    {id:"gpu_114",name:"MSI Ventus 3X RTX 5060 Ti 16GB",brand:"MSI",model:"RTX 5060 Ti 16GB",variantLabel:"MSI Ventus 3X",price:465,perf:35,vram:16,tdp:180,len:270},
-    {id:"gpu_115",name:"Gigabyte Gaming OC RTX 5060 Ti 16GB",brand:"Gigabyte",model:"RTX 5060 Ti 16GB",variantLabel:"Gigabyte Gaming OC",price:475,perf:35,vram:16,tdp:180,len:275},
-    {id:"gpu_116",name:"Zotac Trinity RTX 5060 Ti 16GB",brand:"Zotac",model:"RTX 5060 Ti 16GB",variantLabel:"Zotac Trinity",price:475,perf:35,vram:16,tdp:180,len:275},
-    {id:"gpu_117",name:"MSI Gaming Trio RTX 5060 Ti 16GB",brand:"MSI",model:"RTX 5060 Ti 16GB",variantLabel:"MSI Gaming Trio",price:485,perf:35,vram:16,tdp:180,len:280},
-    {id:"gpu_118",name:"PNY Verto RTX 5070",brand:"PNY",model:"RTX 5070",variantLabel:"PNY Verto",price:635,perf:43,vram:12,tdp:250,len:280},
-    {id:"gpu_119",name:"Zotac Twin Edge RTX 5070",brand:"Zotac",model:"RTX 5070",variantLabel:"Zotac Twin Edge",price:650,perf:43,vram:12,tdp:250,len:285},
-    {id:"gpu_120",name:"Gigabyte Windforce RTX 5070",brand:"Gigabyte",model:"RTX 5070",variantLabel:"Gigabyte Windforce",price:660,perf:43,vram:12,tdp:250,len:295},
-    {id:"gpu_121",name:"MSI Ventus 2X RTX 5070",brand:"MSI",model:"RTX 5070",variantLabel:"MSI Ventus 2X",price:665,perf:43,vram:12,tdp:250,len:290},
-    {id:"gpu_122",name:"ASUS Dual RTX 5070",brand:"ASUS",model:"RTX 5070",variantLabel:"ASUS Dual",price:675,perf:43,vram:12,tdp:250,len:292},
-    {id:"gpu_123",name:"Gigabyte Eagle RTX 5070",brand:"Gigabyte",model:"RTX 5070",variantLabel:"Gigabyte Eagle",price:680,perf:43,vram:12,tdp:250,len:295},
-    {id:"gpu_124",name:"MSI Ventus 3X RTX 5070",brand:"MSI",model:"RTX 5070",variantLabel:"MSI Ventus 3X",price:685,perf:43,vram:12,tdp:250,len:300},
-    {id:"gpu_125",name:"Gigabyte Gaming OC RTX 5070",brand:"Gigabyte",model:"RTX 5070",variantLabel:"Gigabyte Gaming OC",price:700,perf:43,vram:12,tdp:250,len:305},
-    {id:"gpu_126",name:"Zotac Trinity RTX 5070",brand:"Zotac",model:"RTX 5070",variantLabel:"Zotac Trinity",price:705,perf:43,vram:12,tdp:250,len:305},
-    {id:"gpu_127",name:"MSI Gaming Trio RTX 5070",brand:"MSI",model:"RTX 5070",variantLabel:"MSI Gaming Trio",price:720,perf:43,vram:12,tdp:250,len:310},
-    {id:"gpu_128",name:"ASUS TUF OC RTX 5070",brand:"ASUS",model:"RTX 5070",variantLabel:"ASUS TUF OC",price:730,perf:43,vram:12,tdp:250,len:315},
-    {id:"gpu_129",name:"ASUS ROG Strix RTX 5070",brand:"ASUS",model:"RTX 5070",variantLabel:"ASUS ROG Strix",price:775,perf:43,vram:12,tdp:250,len:320},
-    {id:"gpu_130",name:"PNY Verto RTX 5070 Ti",brand:"PNY",model:"RTX 5070 Ti",variantLabel:"PNY Verto",price:1000,perf:57,vram:16,tdp:300,len:300},
-    {id:"gpu_131",name:"Zotac Twin Edge RTX 5070 Ti",brand:"Zotac",model:"RTX 5070 Ti",variantLabel:"Zotac Twin Edge",price:1020,perf:57,vram:16,tdp:300,len:305},
-    {id:"gpu_132",name:"Gigabyte Windforce RTX 5070 Ti",brand:"Gigabyte",model:"RTX 5070 Ti",variantLabel:"Gigabyte Windforce",price:1040,perf:57,vram:16,tdp:300,len:315},
-    {id:"gpu_133",name:"MSI Ventus 2X RTX 5070 Ti",brand:"MSI",model:"RTX 5070 Ti",variantLabel:"MSI Ventus 2X",price:1050,perf:57,vram:16,tdp:300,len:310},
-    {id:"gpu_134",name:"ASUS Dual RTX 5070 Ti",brand:"ASUS",model:"RTX 5070 Ti",variantLabel:"ASUS Dual",price:1060,perf:57,vram:16,tdp:300,len:312},
-    {id:"gpu_135",name:"Gigabyte Eagle RTX 5070 Ti",brand:"Gigabyte",model:"RTX 5070 Ti",variantLabel:"Gigabyte Eagle",price:1070,perf:57,vram:16,tdp:300,len:315},
-    {id:"gpu_136",name:"MSI Ventus 3X RTX 5070 Ti",brand:"MSI",model:"RTX 5070 Ti",variantLabel:"MSI Ventus 3X",price:1080,perf:57,vram:16,tdp:300,len:320},
-    {id:"gpu_137",name:"Gigabyte Gaming OC RTX 5070 Ti",brand:"Gigabyte",model:"RTX 5070 Ti",variantLabel:"Gigabyte Gaming OC",price:1100,perf:57,vram:16,tdp:300,len:325},
-    {id:"gpu_138",name:"Zotac Trinity RTX 5070 Ti",brand:"Zotac",model:"RTX 5070 Ti",variantLabel:"Zotac Trinity",price:1110,perf:57,vram:16,tdp:300,len:325},
-    {id:"gpu_139",name:"MSI Gaming Trio RTX 5070 Ti",brand:"MSI",model:"RTX 5070 Ti",variantLabel:"MSI Gaming Trio",price:1130,perf:57,vram:16,tdp:300,len:330},
-    {id:"gpu_140",name:"PNY Verto RTX 5080",brand:"PNY",model:"RTX 5080",variantLabel:"PNY Verto",price:1250,perf:72,vram:16,tdp:360,len:330},
-    {id:"gpu_141",name:"Zotac Twin Edge RTX 5080",brand:"Zotac",model:"RTX 5080",variantLabel:"Zotac Twin Edge",price:1275,perf:72,vram:16,tdp:360,len:335},
-    {id:"gpu_142",name:"Gigabyte Windforce RTX 5080",brand:"Gigabyte",model:"RTX 5080",variantLabel:"Gigabyte Windforce",price:1300,perf:72,vram:16,tdp:360,len:345},
-    {id:"gpu_143",name:"MSI Ventus 2X RTX 5080",brand:"MSI",model:"RTX 5080",variantLabel:"MSI Ventus 2X",price:1315,perf:72,vram:16,tdp:360,len:340},
-    {id:"gpu_144",name:"ASUS Dual RTX 5080",brand:"ASUS",model:"RTX 5080",variantLabel:"ASUS Dual",price:1325,perf:72,vram:16,tdp:360,len:342},
-    {id:"gpu_145",name:"Gigabyte Eagle RTX 5080",brand:"Gigabyte",model:"RTX 5080",variantLabel:"Gigabyte Eagle",price:1340,perf:72,vram:16,tdp:360,len:345},
-    {id:"gpu_146",name:"MSI Ventus 3X RTX 5080",brand:"MSI",model:"RTX 5080",variantLabel:"MSI Ventus 3X",price:1350,perf:72,vram:16,tdp:360,len:350},
-    {id:"gpu_147",name:"Gigabyte Gaming OC RTX 5080",brand:"Gigabyte",model:"RTX 5080",variantLabel:"Gigabyte Gaming OC",price:1375,perf:72,vram:16,tdp:360,len:355},
-    {id:"gpu_148",name:"Zotac Trinity RTX 5080",brand:"Zotac",model:"RTX 5080",variantLabel:"Zotac Trinity",price:1390,perf:72,vram:16,tdp:360,len:355},
-    {id:"gpu_149",name:"PNY Verto RTX 5090",brand:"PNY",model:"RTX 5090",variantLabel:"PNY Verto",price:3000,perf:100,vram:32,tdp:575,len:358},
-    {id:"gpu_150",name:"Zotac Twin Edge RTX 5090",brand:"Zotac",model:"RTX 5090",variantLabel:"Zotac Twin Edge",price:3060,perf:100,vram:32,tdp:575,len:363},
-    {id:"gpu_151",name:"Gigabyte Windforce RTX 5090",brand:"Gigabyte",model:"RTX 5090",variantLabel:"Gigabyte Windforce",price:3120,perf:100,vram:32,tdp:575,len:373},
-    {id:"gpu_152",name:"MSI Ventus 2X RTX 5090",brand:"MSI",model:"RTX 5090",variantLabel:"MSI Ventus 2X",price:3150,perf:100,vram:32,tdp:575,len:368},
-    {id:"gpu_153",name:"ASUS Dual RTX 5090",brand:"ASUS",model:"RTX 5090",variantLabel:"ASUS Dual",price:3180,perf:100,vram:32,tdp:575,len:370},
-    {id:"gpu_154",name:"Gigabyte Eagle RTX 5090",brand:"Gigabyte",model:"RTX 5090",variantLabel:"Gigabyte Eagle",price:3210,perf:100,vram:32,tdp:575,len:373},
-    {id:"gpu_155",name:"PowerColor Reaper RX 7600",brand:"PowerColor",model:"RX 7600",variantLabel:"PowerColor Reaper",price:270,perf:27,vram:8,tdp:165,len:245},
-    {id:"gpu_156",name:"XFX Swift RX 7600",brand:"XFX",model:"RX 7600",variantLabel:"XFX Swift",price:275,perf:27,vram:8,tdp:165,len:250},
-    {id:"gpu_157",name:"ASRock Challenger RX 7600",brand:"ASRock",model:"RX 7600",variantLabel:"ASRock Challenger",price:280,perf:27,vram:8,tdp:165,len:253},
-    {id:"gpu_158",name:"Acer Nitro RX 7600",brand:"Acer",model:"RX 7600",variantLabel:"Acer Nitro",price:285,perf:27,vram:8,tdp:165,len:255},
-    {id:"gpu_159",name:"Gigabyte Gaming OC RX 7600",brand:"Gigabyte",model:"RX 7600",variantLabel:"Gigabyte Gaming OC",price:285,perf:27,vram:8,tdp:165,len:260},
-    {id:"gpu_160",name:"Sapphire Pulse RX 7600",brand:"Sapphire",model:"RX 7600",variantLabel:"Sapphire Pulse",price:290,perf:27,vram:8,tdp:165,len:257},
-    {id:"gpu_161",name:"PowerColor Reaper RX 7600 XT",brand:"PowerColor",model:"RX 7600 XT",variantLabel:"PowerColor Reaper",price:330,perf:28,vram:16,tdp:190,len:250},
-    {id:"gpu_162",name:"XFX Swift RX 7600 XT",brand:"XFX",model:"RX 7600 XT",variantLabel:"XFX Swift",price:335,perf:28,vram:16,tdp:190,len:255},
-    {id:"gpu_163",name:"ASRock Challenger RX 7600 XT",brand:"ASRock",model:"RX 7600 XT",variantLabel:"ASRock Challenger",price:345,perf:28,vram:16,tdp:190,len:258},
-    {id:"gpu_164",name:"Acer Nitro RX 7600 XT",brand:"Acer",model:"RX 7600 XT",variantLabel:"Acer Nitro",price:345,perf:28,vram:16,tdp:190,len:260},
-    {id:"gpu_165",name:"Gigabyte Gaming OC RX 7600 XT",brand:"Gigabyte",model:"RX 7600 XT",variantLabel:"Gigabyte Gaming OC",price:350,perf:28,vram:16,tdp:190,len:265},
-    {id:"gpu_166",name:"Sapphire Pulse RX 7600 XT",brand:"Sapphire",model:"RX 7600 XT",variantLabel:"Sapphire Pulse",price:355,perf:28,vram:16,tdp:190,len:262},
-    {id:"gpu_167",name:"PowerColor Reaper RX 7700 XT",brand:"PowerColor",model:"RX 7700 XT",variantLabel:"PowerColor Reaper",price:430,perf:37,vram:12,tdp:245,len:280},
-    {id:"gpu_168",name:"XFX Swift RX 7700 XT",brand:"XFX",model:"RX 7700 XT",variantLabel:"XFX Swift",price:440,perf:37,vram:12,tdp:245,len:285},
-    {id:"gpu_169",name:"ASRock Challenger RX 7700 XT",brand:"ASRock",model:"RX 7700 XT",variantLabel:"ASRock Challenger",price:445,perf:37,vram:12,tdp:245,len:288},
-    {id:"gpu_170",name:"Acer Nitro RX 7700 XT",brand:"Acer",model:"RX 7700 XT",variantLabel:"Acer Nitro",price:450,perf:37,vram:12,tdp:245,len:290},
-    {id:"gpu_171",name:"Gigabyte Gaming OC RX 7700 XT",brand:"Gigabyte",model:"RX 7700 XT",variantLabel:"Gigabyte Gaming OC",price:455,perf:37,vram:12,tdp:245,len:295},
-    {id:"gpu_172",name:"Sapphire Pulse RX 7700 XT",brand:"Sapphire",model:"RX 7700 XT",variantLabel:"Sapphire Pulse",price:460,perf:37,vram:12,tdp:245,len:292},
-    {id:"gpu_173",name:"PowerColor Hellhound RX 7700 XT",brand:"PowerColor",model:"RX 7700 XT",variantLabel:"PowerColor Hellhound",price:475,perf:37,vram:12,tdp:245,len:300},
-    {id:"gpu_174",name:"PowerColor Reaper RX 7800 XT",brand:"PowerColor",model:"RX 7800 XT",variantLabel:"PowerColor Reaper",price:500,perf:42,vram:16,tdp:263,len:285},
-    {id:"gpu_175",name:"XFX Swift RX 7800 XT",brand:"XFX",model:"RX 7800 XT",variantLabel:"XFX Swift",price:510,perf:42,vram:16,tdp:263,len:290},
-    {id:"gpu_176",name:"ASRock Challenger RX 7800 XT",brand:"ASRock",model:"RX 7800 XT",variantLabel:"ASRock Challenger",price:520,perf:42,vram:16,tdp:263,len:293},
-    {id:"gpu_177",name:"Acer Nitro RX 7800 XT",brand:"Acer",model:"RX 7800 XT",variantLabel:"Acer Nitro",price:525,perf:42,vram:16,tdp:263,len:295},
-    {id:"gpu_178",name:"Gigabyte Gaming OC RX 7800 XT",brand:"Gigabyte",model:"RX 7800 XT",variantLabel:"Gigabyte Gaming OC",price:530,perf:42,vram:16,tdp:263,len:300},
-    {id:"gpu_179",name:"Sapphire Pulse RX 7800 XT",brand:"Sapphire",model:"RX 7800 XT",variantLabel:"Sapphire Pulse",price:535,perf:42,vram:16,tdp:263,len:297},
-    {id:"gpu_180",name:"PowerColor Hellhound RX 7800 XT",brand:"PowerColor",model:"RX 7800 XT",variantLabel:"PowerColor Hellhound",price:550,perf:42,vram:16,tdp:263,len:305},
-    {id:"gpu_181",name:"XFX Merc 310 RX 7800 XT",brand:"XFX",model:"RX 7800 XT",variantLabel:"XFX Merc 310",price:570,perf:42,vram:16,tdp:263,len:315},
-    {id:"gpu_182",name:"PowerColor Reaper RX 7900 GRE",brand:"PowerColor",model:"RX 7900 GRE",variantLabel:"PowerColor Reaper",price:550,perf:45,vram:16,tdp:260,len:285},
-    {id:"gpu_183",name:"XFX Swift RX 7900 GRE",brand:"XFX",model:"RX 7900 GRE",variantLabel:"XFX Swift",price:560,perf:45,vram:16,tdp:260,len:290},
-    {id:"gpu_184",name:"ASRock Challenger RX 7900 GRE",brand:"ASRock",model:"RX 7900 GRE",variantLabel:"ASRock Challenger",price:570,perf:45,vram:16,tdp:260,len:293},
-    {id:"gpu_185",name:"Acer Nitro RX 7900 GRE",brand:"Acer",model:"RX 7900 GRE",variantLabel:"Acer Nitro",price:580,perf:45,vram:16,tdp:260,len:295},
-    {id:"gpu_186",name:"Gigabyte Gaming OC RX 7900 GRE",brand:"Gigabyte",model:"RX 7900 GRE",variantLabel:"Gigabyte Gaming OC",price:585,perf:45,vram:16,tdp:260,len:300},
-    {id:"gpu_187",name:"Sapphire Pulse RX 7900 GRE",brand:"Sapphire",model:"RX 7900 GRE",variantLabel:"Sapphire Pulse",price:590,perf:45,vram:16,tdp:260,len:297},
-    {id:"gpu_188",name:"PowerColor Reaper RX 7900 XT",brand:"PowerColor",model:"RX 7900 XT",variantLabel:"PowerColor Reaper",price:680,perf:48,vram:20,tdp:315,len:300},
-    {id:"gpu_189",name:"XFX Swift RX 7900 XT",brand:"XFX",model:"RX 7900 XT",variantLabel:"XFX Swift",price:695,perf:48,vram:20,tdp:315,len:305},
-    {id:"gpu_190",name:"ASRock Challenger RX 7900 XT",brand:"ASRock",model:"RX 7900 XT",variantLabel:"ASRock Challenger",price:705,perf:48,vram:20,tdp:315,len:308},
-    {id:"gpu_191",name:"Acer Nitro RX 7900 XT",brand:"Acer",model:"RX 7900 XT",variantLabel:"Acer Nitro",price:715,perf:48,vram:20,tdp:315,len:310},
-    {id:"gpu_192",name:"Gigabyte Gaming OC RX 7900 XT",brand:"Gigabyte",model:"RX 7900 XT",variantLabel:"Gigabyte Gaming OC",price:720,perf:48,vram:20,tdp:315,len:315},
-    {id:"gpu_193",name:"Sapphire Pulse RX 7900 XT",brand:"Sapphire",model:"RX 7900 XT",variantLabel:"Sapphire Pulse",price:730,perf:48,vram:20,tdp:315,len:312},
-    {id:"gpu_194",name:"PowerColor Hellhound RX 7900 XT",brand:"PowerColor",model:"RX 7900 XT",variantLabel:"PowerColor Hellhound",price:750,perf:48,vram:20,tdp:315,len:320},
-    {id:"gpu_195",name:"PowerColor Reaper RX 7900 XTX",brand:"PowerColor",model:"RX 7900 XTX",variantLabel:"PowerColor Reaper",price:900,perf:58,vram:24,tdp:355,len:320},
-    {id:"gpu_196",name:"XFX Swift RX 7900 XTX",brand:"XFX",model:"RX 7900 XTX",variantLabel:"XFX Swift",price:920,perf:58,vram:24,tdp:355,len:325},
-    {id:"gpu_197",name:"ASRock Challenger RX 7900 XTX",brand:"ASRock",model:"RX 7900 XTX",variantLabel:"ASRock Challenger",price:935,perf:58,vram:24,tdp:355,len:328},
-    {id:"gpu_198",name:"Acer Nitro RX 7900 XTX",brand:"Acer",model:"RX 7900 XTX",variantLabel:"Acer Nitro",price:945,perf:58,vram:24,tdp:355,len:330},
-    {id:"gpu_199",name:"Gigabyte Gaming OC RX 7900 XTX",brand:"Gigabyte",model:"RX 7900 XTX",variantLabel:"Gigabyte Gaming OC",price:955,perf:58,vram:24,tdp:355,len:335},
-    {id:"gpu_200",name:"Sapphire Pulse RX 7900 XTX",brand:"Sapphire",model:"RX 7900 XTX",variantLabel:"Sapphire Pulse",price:965,perf:58,vram:24,tdp:355,len:332},
-    {id:"gpu_201",name:"PowerColor Hellhound RX 7900 XTX",brand:"PowerColor",model:"RX 7900 XTX",variantLabel:"PowerColor Hellhound",price:990,perf:58,vram:24,tdp:355,len:340},
-    {id:"gpu_202",name:"PowerColor Reaper RX 9060 XT 8GB",brand:"PowerColor",model:"RX 9060 XT 8GB",variantLabel:"PowerColor Reaper",price:330,perf:35,vram:8,tdp:150,len:240},
-    {id:"gpu_203",name:"XFX Swift RX 9060 XT 8GB",brand:"XFX",model:"RX 9060 XT 8GB",variantLabel:"XFX Swift",price:335,perf:35,vram:8,tdp:150,len:245},
-    {id:"gpu_204",name:"ASRock Challenger RX 9060 XT 8GB",brand:"ASRock",model:"RX 9060 XT 8GB",variantLabel:"ASRock Challenger",price:345,perf:35,vram:8,tdp:150,len:248},
-    {id:"gpu_205",name:"Acer Nitro RX 9060 XT 8GB",brand:"Acer",model:"RX 9060 XT 8GB",variantLabel:"Acer Nitro",price:345,perf:35,vram:8,tdp:150,len:250},
-    {id:"gpu_206",name:"Gigabyte Gaming OC RX 9060 XT 8GB",brand:"Gigabyte",model:"RX 9060 XT 8GB",variantLabel:"Gigabyte Gaming OC",price:350,perf:35,vram:8,tdp:150,len:255},
-    {id:"gpu_207",name:"Sapphire Pulse RX 9060 XT 8GB",brand:"Sapphire",model:"RX 9060 XT 8GB",variantLabel:"Sapphire Pulse",price:355,perf:35,vram:8,tdp:150,len:252},
-    {id:"gpu_208",name:"PowerColor Reaper RX 9060 XT 16GB",brand:"PowerColor",model:"RX 9060 XT 16GB",variantLabel:"PowerColor Reaper",price:360,perf:37,vram:16,tdp:160,len:245},
-    {id:"gpu_209",name:"XFX Swift RX 9060 XT 16GB",brand:"XFX",model:"RX 9060 XT 16GB",variantLabel:"XFX Swift",price:365,perf:37,vram:16,tdp:160,len:250},
-    {id:"gpu_210",name:"ASRock Challenger RX 9060 XT 16GB",brand:"ASRock",model:"RX 9060 XT 16GB",variantLabel:"ASRock Challenger",price:375,perf:37,vram:16,tdp:160,len:253},
-    {id:"gpu_211",name:"Acer Nitro RX 9060 XT 16GB",brand:"Acer",model:"RX 9060 XT 16GB",variantLabel:"Acer Nitro",price:380,perf:37,vram:16,tdp:160,len:255},
-    {id:"gpu_212",name:"Gigabyte Gaming OC RX 9060 XT 16GB",brand:"Gigabyte",model:"RX 9060 XT 16GB",variantLabel:"Gigabyte Gaming OC",price:380,perf:37,vram:16,tdp:160,len:260},
-    {id:"gpu_213",name:"Sapphire Pulse RX 9060 XT 16GB",brand:"Sapphire",model:"RX 9060 XT 16GB",variantLabel:"Sapphire Pulse",price:385,perf:37,vram:16,tdp:160,len:257},
-    {id:"gpu_214",name:"PowerColor Hellhound RX 9060 XT 16GB",brand:"PowerColor",model:"RX 9060 XT 16GB",variantLabel:"PowerColor Hellhound",price:395,perf:37,vram:16,tdp:160,len:265},
-    {id:"gpu_215",name:"XFX Merc 310 RX 9060 XT 16GB",brand:"XFX",model:"RX 9060 XT 16GB",variantLabel:"XFX Merc 310",price:410,perf:37,vram:16,tdp:160,len:275},
-    {id:"gpu_216",name:"ASUS TUF OC RX 9060 XT 16GB",brand:"ASUS",model:"RX 9060 XT 16GB",variantLabel:"ASUS TUF OC",price:415,perf:37,vram:16,tdp:160,len:275},
-    {id:"gpu_217",name:"PowerColor Reaper RX 9070",brand:"PowerColor",model:"RX 9070",variantLabel:"PowerColor Reaper",price:600,perf:49,vram:16,tdp:220,len:280},
-    {id:"gpu_218",name:"XFX Swift RX 9070",brand:"XFX",model:"RX 9070",variantLabel:"XFX Swift",price:610,perf:49,vram:16,tdp:220,len:285},
-    {id:"gpu_219",name:"ASRock Challenger RX 9070",brand:"ASRock",model:"RX 9070",variantLabel:"ASRock Challenger",price:625,perf:49,vram:16,tdp:220,len:288},
-    {id:"gpu_220",name:"Acer Nitro RX 9070",brand:"Acer",model:"RX 9070",variantLabel:"Acer Nitro",price:630,perf:49,vram:16,tdp:220,len:290},
-    {id:"gpu_221",name:"Gigabyte Gaming OC RX 9070",brand:"Gigabyte",model:"RX 9070",variantLabel:"Gigabyte Gaming OC",price:635,perf:49,vram:16,tdp:220,len:295},
-    {id:"gpu_222",name:"Sapphire Pulse RX 9070",brand:"Sapphire",model:"RX 9070",variantLabel:"Sapphire Pulse",price:640,perf:49,vram:16,tdp:220,len:292},
-    {id:"gpu_223",name:"PowerColor Hellhound RX 9070",brand:"PowerColor",model:"RX 9070",variantLabel:"PowerColor Hellhound",price:660,perf:49,vram:16,tdp:220,len:300},
-    {id:"gpu_224",name:"XFX Merc 310 RX 9070",brand:"XFX",model:"RX 9070",variantLabel:"XFX Merc 310",price:685,perf:49,vram:16,tdp:220,len:310},
-    {id:"gpu_225",name:"ASUS TUF OC RX 9070",brand:"ASUS",model:"RX 9070",variantLabel:"ASUS TUF OC",price:690,perf:49,vram:16,tdp:220,len:310},
-    {id:"gpu_226",name:"PowerColor Reaper RX 9070 XT",brand:"PowerColor",model:"RX 9070 XT",variantLabel:"PowerColor Reaper",price:710,perf:54,vram:16,tdp:304,len:290},
-    {id:"gpu_227",name:"XFX Swift RX 9070 XT",brand:"XFX",model:"RX 9070 XT",variantLabel:"XFX Swift",price:725,perf:54,vram:16,tdp:304,len:295},
-    {id:"gpu_228",name:"ASRock Challenger RX 9070 XT",brand:"ASRock",model:"RX 9070 XT",variantLabel:"ASRock Challenger",price:740,perf:54,vram:16,tdp:304,len:298},
-    {id:"gpu_229",name:"Acer Nitro RX 9070 XT",brand:"Acer",model:"RX 9070 XT",variantLabel:"Acer Nitro",price:745,perf:54,vram:16,tdp:304,len:300},
-    {id:"gpu_230",name:"Gigabyte Gaming OC RX 9070 XT",brand:"Gigabyte",model:"RX 9070 XT",variantLabel:"Gigabyte Gaming OC",price:755,perf:54,vram:16,tdp:304,len:305},
-    {id:"gpu_231",name:"Sapphire Pulse RX 9070 XT",brand:"Sapphire",model:"RX 9070 XT",variantLabel:"Sapphire Pulse",price:760,perf:54,vram:16,tdp:304,len:302},
-    {id:"gpu_232",name:"PowerColor Hellhound RX 9070 XT",brand:"PowerColor",model:"RX 9070 XT",variantLabel:"PowerColor Hellhound",price:780,perf:54,vram:16,tdp:304,len:310},
-    {id:"gpu_233",name:"XFX Merc 310 RX 9070 XT",brand:"XFX",model:"RX 9070 XT",variantLabel:"XFX Merc 310",price:810,perf:54,vram:16,tdp:304,len:320},
-    {id:"gpu_234",name:"ASUS TUF OC RX 9070 XT",brand:"ASUS",model:"RX 9070 XT",variantLabel:"ASUS TUF OC",price:815,perf:54,vram:16,tdp:304,len:320},
-    {id:"gpu_235",name:"PowerColor Red Devil RX 9070 XT",brand:"PowerColor",model:"RX 9070 XT",variantLabel:"PowerColor Red Devil",price:830,perf:54,vram:16,tdp:304,len:322},
-    {id:"gpu_236",name:"Sapphire Nitro+ RX 9070 XT",brand:"Sapphire",model:"RX 9070 XT",variantLabel:"Sapphire Nitro+",price:845,perf:54,vram:16,tdp:304,len:325},
-    {id:"gpu_237",name:"ASRock Taichi RX 9070 XT",brand:"ASRock",model:"RX 9070 XT",variantLabel:"ASRock Taichi",price:860,perf:54,vram:16,tdp:304,len:325},
-    {id:"gpu_238",name:"Founders Edition RTX 4090",brand:"Founders",model:"RTX 4090",variantLabel:"Founders Edition",price:1700,perf:80,vram:24,tdp:450,len:304},
-    {id:"gpu_239",name:"ASUS TUF RTX 4090",brand:"ASUS",model:"RTX 4090",variantLabel:"ASUS TUF",price:1800,perf:80,vram:24,tdp:450,len:348},
-    {id:"gpu_240",name:"MSI Suprim X RTX 4090",brand:"MSI",model:"RTX 4090",variantLabel:"MSI Suprim X",price:1850,perf:80,vram:24,tdp:450,len:358},
-    {id:"gpu_241",name:"Founders Edition RTX 4080 Super",brand:"Founders",model:"RTX 4080 Super",variantLabel:"Founders Edition",price:1000,perf:64,vram:16,tdp:320,len:304},
-    {id:"gpu_242",name:"Gigabyte Gaming OC RTX 4080 Super",brand:"Gigabyte",model:"RTX 4080 Super",variantLabel:"Gigabyte Gaming OC",price:1050,perf:64,vram:16,tdp:320,len:340},
-    {id:"gpu_243",name:"MSI Ventus 3X RTX 4080 Super",brand:"MSI",model:"RTX 4080 Super",variantLabel:"MSI Ventus 3X",price:1020,perf:64,vram:16,tdp:320,len:338},
-    {id:"gpu_244",name:"ASUS TUF RTX 4070 Ti",brand:"ASUS",model:"RTX 4070 Ti",variantLabel:"ASUS TUF",price:800,perf:52,vram:12,tdp:285,len:305},
-    {id:"gpu_245",name:"Gigabyte Gaming OC RTX 4070 Ti",brand:"Gigabyte",model:"RTX 4070 Ti",variantLabel:"Gigabyte Gaming OC",price:790,perf:52,vram:12,tdp:285,len:336},
-    {id:"gpu_246",name:"MSI Ventus 3X RTX 4070 Ti",brand:"MSI",model:"RTX 4070 Ti",variantLabel:"MSI Ventus 3X",price:780,perf:52,vram:12,tdp:285,len:338},
-    {id:"gpu_247",name:"Founders Edition RTX 4070",brand:"Founders",model:"RTX 4070",variantLabel:"Founders Edition",price:550,perf:42,vram:12,tdp:200,len:244},
-    {id:"gpu_248",name:"Gigabyte Windforce RTX 4070",brand:"Gigabyte",model:"RTX 4070",variantLabel:"Gigabyte Windforce",price:560,perf:42,vram:12,tdp:200,len:261},
-    {id:"gpu_249",name:"MSI Ventus 2X RTX 4070",brand:"MSI",model:"RTX 4070",variantLabel:"MSI Ventus 2X",price:555,perf:42,vram:12,tdp:200,len:250},
-    {id:"gpu_250",name:"ASUS Dual RTX 3050",brand:"ASUS",model:"RTX 3050",variantLabel:"ASUS Dual",price:230,perf:17,vram:8,tdp:130,len:200},
-    {id:"gpu_251",name:"MSI Ventus 2X RTX 3050",brand:"MSI",model:"RTX 3050",variantLabel:"MSI Ventus 2X",price:220,perf:17,vram:8,tdp:130,len:200},
-    {id:"gpu_252",name:"Gigabyte Eagle RTX 3050",brand:"Gigabyte",model:"RTX 3050",variantLabel:"Gigabyte Eagle",price:225,perf:17,vram:8,tdp:130,len:212},
-    {id:"gpu_253",name:"Sapphire Pulse RX 9070 GRE",brand:"Sapphire",model:"RX 9070 GRE",variantLabel:"Sapphire Pulse",price:550,perf:44,vram:12,tdp:220,len:280},
-    {id:"gpu_254",name:"PowerColor Reaper RX 9070 GRE",brand:"PowerColor",model:"RX 9070 GRE",variantLabel:"PowerColor Reaper",price:545,perf:44,vram:12,tdp:220,len:270},
-    {id:"gpu_255",name:"ASRock Challenger RX 9070 GRE",brand:"ASRock",model:"RX 9070 GRE",variantLabel:"ASRock Challenger",price:540,perf:44,vram:12,tdp:220,len:270},
-    {id:"gpu_256",name:"Sapphire Pulse RX 6700 XT",brand:"Sapphire",model:"RX 6700 XT",variantLabel:"Sapphire Pulse",price:320,perf:33,vram:12,tdp:230,len:280},
-    {id:"gpu_257",name:"PowerColor Hellhound RX 6700 XT",brand:"PowerColor",model:"RX 6700 XT",variantLabel:"PowerColor Hellhound",price:330,perf:33,vram:12,tdp:230,len:320},
-    {id:"gpu_258",name:"XFX Speedster RX 6700 XT",brand:"XFX",model:"RX 6700 XT",variantLabel:"XFX Speedster",price:315,perf:33,vram:12,tdp:230,len:300},
-    {id:"gpu_259",name:"Sapphire Pulse RX 6650 XT",brand:"Sapphire",model:"RX 6650 XT",variantLabel:"Sapphire Pulse",price:240,perf:28,vram:8,tdp:180,len:240},
-    {id:"gpu_260",name:"ASRock Challenger RX 6650 XT",brand:"ASRock",model:"RX 6650 XT",variantLabel:"ASRock Challenger",price:235,perf:28,vram:8,tdp:180,len:245},
-    {id:"gpu_261",name:"XFX Speedster RX 6650 XT",brand:"XFX",model:"RX 6650 XT",variantLabel:"XFX Speedster",price:230,perf:28,vram:8,tdp:180,len:240},
-    {id:"gpu_262",name:"Sapphire Pulse RX 6800",brand:"Sapphire",model:"RX 6800",variantLabel:"Sapphire Pulse",price:380,perf:38,vram:16,tdp:250,len:267},
-    {id:"gpu_263",name:"XFX Speedster RX 6800",brand:"XFX",model:"RX 6800",variantLabel:"XFX Speedster",price:375,perf:38,vram:16,tdp:250,len:320},
-    {id:"gpu_264",name:"ASRock Challenger RX 6800",brand:"ASRock",model:"RX 6800",variantLabel:"ASRock Challenger",price:370,perf:38,vram:16,tdp:250,len:267},
-    {id:"gpu_265",name:"Sapphire Nitro+ RX 6900 XT",brand:"Sapphire",model:"RX 6900 XT",variantLabel:"Sapphire Nitro+",price:520,perf:43,vram:16,tdp:300,len:310},
-    {id:"gpu_266",name:"PowerColor Red Devil RX 6900 XT",brand:"PowerColor",model:"RX 6900 XT",variantLabel:"PowerColor Red Devil",price:530,perf:43,vram:16,tdp:300,len:320},
-    {id:"gpu_267",name:"ASRock Phantom Gaming RX 6900 XT",brand:"ASRock",model:"RX 6900 XT",variantLabel:"ASRock Phantom Gaming",price:515,perf:43,vram:16,tdp:300,len:300},
-    {id:"gpu_268",name:"Sapphire Nitro+ RX 6950 XT",brand:"Sapphire",model:"RX 6950 XT",variantLabel:"Sapphire Nitro+",price:600,perf:46,vram:16,tdp:335,len:320},
-    {id:"gpu_269",name:"PowerColor Red Devil RX 6950 XT",brand:"PowerColor",model:"RX 6950 XT",variantLabel:"PowerColor Red Devil",price:610,perf:46,vram:16,tdp:335,len:324},
-    {id:"gpu_270",name:"XFX Speedster RX 6950 XT",brand:"XFX",model:"RX 6950 XT",variantLabel:"XFX Speedster",price:590,perf:46,vram:16,tdp:335,len:340},
-    {id:"gpu_271",name:"Intel Limited Edition Intel Arc A750",brand:"Intel",model:"Intel Arc A750",variantLabel:"Intel Limited Edition",price:190,perf:24,vram:8,tdp:225,len:270},
-    {id:"gpu_272",name:"ASRock Challenger Intel Arc A750",brand:"ASRock",model:"Intel Arc A750",variantLabel:"ASRock Challenger",price:200,perf:24,vram:8,tdp:225,len:270},
-    {id:"gpu_273",name:"Sparkle Orc Intel Arc A750",brand:"Sparkle",model:"Intel Arc A750",variantLabel:"Sparkle Orc",price:195,perf:24,vram:8,tdp:225,len:260},
+    {id:"gpu_100",name:"PNY Verto RTX 5060 Ti 8GB",brand:"PNY",model:"RTX 5060 Ti 8GB",variantLabel:"PNY Verto",price:370,perf:33,vram:8,tdp:180,len:245},
+    {id:"gpu_101",name:"Zotac Twin Edge RTX 5060 Ti 8GB",brand:"Zotac",model:"RTX 5060 Ti 8GB",variantLabel:"Zotac Twin Edge",price:380,perf:33,vram:8,tdp:180,len:250},
+    {id:"gpu_102",name:"Gigabyte Windforce RTX 5060 Ti 8GB",brand:"Gigabyte",model:"RTX 5060 Ti 8GB",variantLabel:"Gigabyte Windforce",price:385,perf:33,vram:8,tdp:180,len:260},
+    {id:"gpu_103",name:"MSI Ventus 2X RTX 5060 Ti 8GB",brand:"MSI",model:"RTX 5060 Ti 8GB",variantLabel:"MSI Ventus 2X",price:390,perf:33,vram:8,tdp:180,len:255},
+    {id:"gpu_104",name:"ASUS Dual RTX 5060 Ti 8GB",brand:"ASUS",model:"RTX 5060 Ti 8GB",variantLabel:"ASUS Dual",price:395,perf:33,vram:8,tdp:180,len:257},
+    {id:"gpu_105",name:"Gigabyte Eagle RTX 5060 Ti 8GB",brand:"Gigabyte",model:"RTX 5060 Ti 8GB",variantLabel:"Gigabyte Eagle",price:395,perf:33,vram:8,tdp:180,len:260},
+    {id:"gpu_106",name:"MSI Ventus 3X RTX 5060 Ti 8GB",brand:"MSI",model:"RTX 5060 Ti 8GB",variantLabel:"MSI Ventus 3X",price:400,perf:33,vram:8,tdp:180,len:265},
+    {id:"gpu_107",name:"Gigabyte Gaming OC RTX 5060 Ti 8GB",brand:"Gigabyte",model:"RTX 5060 Ti 8GB",variantLabel:"Gigabyte Gaming OC",price:405,perf:33,vram:8,tdp:180,len:270},
+    {id:"gpu_108",name:"PNY Verto RTX 5060 Ti 16GB",brand:"PNY",model:"RTX 5060 Ti 16GB",variantLabel:"PNY Verto",price:555,perf:35,vram:16,tdp:180,len:250},
+    {id:"gpu_109",name:"Zotac Twin Edge RTX 5060 Ti 16GB",brand:"Zotac",model:"RTX 5060 Ti 16GB",variantLabel:"Zotac Twin Edge",price:570,perf:35,vram:16,tdp:180,len:255},
+    {id:"gpu_110",name:"Gigabyte Windforce RTX 5060 Ti 16GB",brand:"Gigabyte",model:"RTX 5060 Ti 16GB",variantLabel:"Gigabyte Windforce",price:575,perf:35,vram:16,tdp:180,len:265},
+    {id:"gpu_111",name:"MSI Ventus 2X RTX 5060 Ti 16GB",brand:"MSI",model:"RTX 5060 Ti 16GB",variantLabel:"MSI Ventus 2X",price:580,perf:35,vram:16,tdp:180,len:260},
+    {id:"gpu_112",name:"ASUS Dual RTX 5060 Ti 16GB",brand:"ASUS",model:"RTX 5060 Ti 16GB",variantLabel:"ASUS Dual",price:585,perf:35,vram:16,tdp:180,len:262},
+    {id:"gpu_113",name:"Gigabyte Eagle RTX 5060 Ti 16GB",brand:"Gigabyte",model:"RTX 5060 Ti 16GB",variantLabel:"Gigabyte Eagle",price:595,perf:35,vram:16,tdp:180,len:265},
+    {id:"gpu_114",name:"MSI Ventus 3X RTX 5060 Ti 16GB",brand:"MSI",model:"RTX 5060 Ti 16GB",variantLabel:"MSI Ventus 3X",price:600,perf:35,vram:16,tdp:180,len:270},
+    {id:"gpu_115",name:"Gigabyte Gaming OC RTX 5060 Ti 16GB",brand:"Gigabyte",model:"RTX 5060 Ti 16GB",variantLabel:"Gigabyte Gaming OC",price:615,perf:35,vram:16,tdp:180,len:275},
+    {id:"gpu_116",name:"Zotac Trinity RTX 5060 Ti 16GB",brand:"Zotac",model:"RTX 5060 Ti 16GB",variantLabel:"Zotac Trinity",price:615,perf:35,vram:16,tdp:180,len:275},
+    {id:"gpu_117",name:"MSI Gaming Trio RTX 5060 Ti 16GB",brand:"MSI",model:"RTX 5060 Ti 16GB",variantLabel:"MSI Gaming Trio",price:625,perf:35,vram:16,tdp:180,len:280},
+    {id:"gpu_118",name:"PNY Verto RTX 5070",brand:"PNY",model:"RTX 5070",variantLabel:"PNY Verto",price:615,perf:43,vram:12,tdp:250,len:280},
+    {id:"gpu_119",name:"Zotac Twin Edge RTX 5070",brand:"Zotac",model:"RTX 5070",variantLabel:"Zotac Twin Edge",price:630,perf:43,vram:12,tdp:250,len:285},
+    {id:"gpu_120",name:"Gigabyte Windforce RTX 5070",brand:"Gigabyte",model:"RTX 5070",variantLabel:"Gigabyte Windforce",price:640,perf:43,vram:12,tdp:250,len:295},
+    {id:"gpu_121",name:"MSI Ventus 2X RTX 5070",brand:"MSI",model:"RTX 5070",variantLabel:"MSI Ventus 2X",price:645,perf:43,vram:12,tdp:250,len:290},
+    {id:"gpu_122",name:"ASUS Dual RTX 5070",brand:"ASUS",model:"RTX 5070",variantLabel:"ASUS Dual",price:655,perf:43,vram:12,tdp:250,len:292},
+    {id:"gpu_123",name:"Gigabyte Eagle RTX 5070",brand:"Gigabyte",model:"RTX 5070",variantLabel:"Gigabyte Eagle",price:660,perf:43,vram:12,tdp:250,len:295},
+    {id:"gpu_124",name:"MSI Ventus 3X RTX 5070",brand:"MSI",model:"RTX 5070",variantLabel:"MSI Ventus 3X",price:665,perf:43,vram:12,tdp:250,len:300},
+    {id:"gpu_125",name:"Gigabyte Gaming OC RTX 5070",brand:"Gigabyte",model:"RTX 5070",variantLabel:"Gigabyte Gaming OC",price:680,perf:43,vram:12,tdp:250,len:305},
+    {id:"gpu_126",name:"Zotac Trinity RTX 5070",brand:"Zotac",model:"RTX 5070",variantLabel:"Zotac Trinity",price:685,perf:43,vram:12,tdp:250,len:305},
+    {id:"gpu_127",name:"MSI Gaming Trio RTX 5070",brand:"MSI",model:"RTX 5070",variantLabel:"MSI Gaming Trio",price:700,perf:43,vram:12,tdp:250,len:310},
+    {id:"gpu_128",name:"ASUS TUF OC RTX 5070",brand:"ASUS",model:"RTX 5070",variantLabel:"ASUS TUF OC",price:710,perf:43,vram:12,tdp:250,len:315},
+    {id:"gpu_129",name:"ASUS ROG Strix RTX 5070",brand:"ASUS",model:"RTX 5070",variantLabel:"ASUS ROG Strix",price:750,perf:43,vram:12,tdp:250,len:320},
+    {id:"gpu_130",name:"PNY Verto RTX 5070 Ti",brand:"PNY",model:"RTX 5070 Ti",variantLabel:"PNY Verto",price:940,perf:57,vram:16,tdp:300,len:300},
+    {id:"gpu_131",name:"Zotac Twin Edge RTX 5070 Ti",brand:"Zotac",model:"RTX 5070 Ti",variantLabel:"Zotac Twin Edge",price:960,perf:57,vram:16,tdp:300,len:305},
+    {id:"gpu_132",name:"Gigabyte Windforce RTX 5070 Ti",brand:"Gigabyte",model:"RTX 5070 Ti",variantLabel:"Gigabyte Windforce",price:980,perf:57,vram:16,tdp:300,len:315},
+    {id:"gpu_133",name:"MSI Ventus 2X RTX 5070 Ti",brand:"MSI",model:"RTX 5070 Ti",variantLabel:"MSI Ventus 2X",price:985,perf:57,vram:16,tdp:300,len:310},
+    {id:"gpu_134",name:"ASUS Dual RTX 5070 Ti",brand:"ASUS",model:"RTX 5070 Ti",variantLabel:"ASUS Dual",price:995,perf:57,vram:16,tdp:300,len:312},
+    {id:"gpu_135",name:"Gigabyte Eagle RTX 5070 Ti",brand:"Gigabyte",model:"RTX 5070 Ti",variantLabel:"Gigabyte Eagle",price:1005,perf:57,vram:16,tdp:300,len:315},
+    {id:"gpu_136",name:"MSI Ventus 3X RTX 5070 Ti",brand:"MSI",model:"RTX 5070 Ti",variantLabel:"MSI Ventus 3X",price:1015,perf:57,vram:16,tdp:300,len:320},
+    {id:"gpu_137",name:"Gigabyte Gaming OC RTX 5070 Ti",brand:"Gigabyte",model:"RTX 5070 Ti",variantLabel:"Gigabyte Gaming OC",price:1035,perf:57,vram:16,tdp:300,len:325},
+    {id:"gpu_138",name:"Zotac Trinity RTX 5070 Ti",brand:"Zotac",model:"RTX 5070 Ti",variantLabel:"Zotac Trinity",price:1045,perf:57,vram:16,tdp:300,len:325},
+    {id:"gpu_139",name:"MSI Gaming Trio RTX 5070 Ti",brand:"MSI",model:"RTX 5070 Ti",variantLabel:"MSI Gaming Trio",price:1060,perf:57,vram:16,tdp:300,len:330},
+    {id:"gpu_140",name:"PNY Verto RTX 5080",brand:"PNY",model:"RTX 5080",variantLabel:"PNY Verto",price:1090,perf:72,vram:16,tdp:360,len:330},
+    {id:"gpu_141",name:"Zotac Twin Edge RTX 5080",brand:"Zotac",model:"RTX 5080",variantLabel:"Zotac Twin Edge",price:1110,perf:72,vram:16,tdp:360,len:335},
+    {id:"gpu_142",name:"Gigabyte Windforce RTX 5080",brand:"Gigabyte",model:"RTX 5080",variantLabel:"Gigabyte Windforce",price:1130,perf:72,vram:16,tdp:360,len:345},
+    {id:"gpu_143",name:"MSI Ventus 2X RTX 5080",brand:"MSI",model:"RTX 5080",variantLabel:"MSI Ventus 2X",price:1145,perf:72,vram:16,tdp:360,len:340},
+    {id:"gpu_144",name:"ASUS Dual RTX 5080",brand:"ASUS",model:"RTX 5080",variantLabel:"ASUS Dual",price:1155,perf:72,vram:16,tdp:360,len:342},
+    {id:"gpu_145",name:"Gigabyte Eagle RTX 5080",brand:"Gigabyte",model:"RTX 5080",variantLabel:"Gigabyte Eagle",price:1165,perf:72,vram:16,tdp:360,len:345},
+    {id:"gpu_146",name:"MSI Ventus 3X RTX 5080",brand:"MSI",model:"RTX 5080",variantLabel:"MSI Ventus 3X",price:1175,perf:72,vram:16,tdp:360,len:350},
+    {id:"gpu_147",name:"Gigabyte Gaming OC RTX 5080",brand:"Gigabyte",model:"RTX 5080",variantLabel:"Gigabyte Gaming OC",price:1195,perf:72,vram:16,tdp:360,len:355},
+    {id:"gpu_148",name:"Zotac Trinity RTX 5080",brand:"Zotac",model:"RTX 5080",variantLabel:"Zotac Trinity",price:1210,perf:72,vram:16,tdp:360,len:355},
+    {id:"gpu_149",name:"PNY Verto RTX 5090",brand:"PNY",model:"RTX 5090",variantLabel:"PNY Verto",price:2430,perf:100,vram:32,tdp:575,len:358},
+    {id:"gpu_150",name:"Zotac Twin Edge RTX 5090",brand:"Zotac",model:"RTX 5090",variantLabel:"Zotac Twin Edge",price:2480,perf:100,vram:32,tdp:575,len:363},
+    {id:"gpu_151",name:"Gigabyte Windforce RTX 5090",brand:"Gigabyte",model:"RTX 5090",variantLabel:"Gigabyte Windforce",price:2525,perf:100,vram:32,tdp:575,len:373},
+    {id:"gpu_152",name:"MSI Ventus 2X RTX 5090",brand:"MSI",model:"RTX 5090",variantLabel:"MSI Ventus 2X",price:2550,perf:100,vram:32,tdp:575,len:368},
+    {id:"gpu_153",name:"ASUS Dual RTX 5090",brand:"ASUS",model:"RTX 5090",variantLabel:"ASUS Dual",price:2575,perf:100,vram:32,tdp:575,len:370},
+    {id:"gpu_154",name:"Gigabyte Eagle RTX 5090",brand:"Gigabyte",model:"RTX 5090",variantLabel:"Gigabyte Eagle",price:2600,perf:100,vram:32,tdp:575,len:373},
+    {id:"gpu_155",name:"PowerColor Reaper RX 7600",brand:"PowerColor",model:"RX 7600",variantLabel:"PowerColor Reaper",price:225,perf:27,vram:8,tdp:165,len:245},
+    {id:"gpu_156",name:"XFX Swift RX 7600",brand:"XFX",model:"RX 7600",variantLabel:"XFX Swift",price:230,perf:27,vram:8,tdp:165,len:250},
+    {id:"gpu_157",name:"ASRock Challenger RX 7600",brand:"ASRock",model:"RX 7600",variantLabel:"ASRock Challenger",price:230,perf:27,vram:8,tdp:165,len:253},
+    {id:"gpu_158",name:"Acer Nitro RX 7600",brand:"Acer",model:"RX 7600",variantLabel:"Acer Nitro",price:235,perf:27,vram:8,tdp:165,len:255},
+    {id:"gpu_159",name:"Gigabyte Gaming OC RX 7600",brand:"Gigabyte",model:"RX 7600",variantLabel:"Gigabyte Gaming OC",price:235,perf:27,vram:8,tdp:165,len:260},
+    {id:"gpu_160",name:"Sapphire Pulse RX 7600",brand:"Sapphire",model:"RX 7600",variantLabel:"Sapphire Pulse",price:240,perf:27,vram:8,tdp:165,len:257},
+    {id:"gpu_161",name:"PowerColor Reaper RX 7600 XT",brand:"PowerColor",model:"RX 7600 XT",variantLabel:"PowerColor Reaper",price:285,perf:28,vram:16,tdp:190,len:250},
+    {id:"gpu_162",name:"XFX Swift RX 7600 XT",brand:"XFX",model:"RX 7600 XT",variantLabel:"XFX Swift",price:290,perf:28,vram:16,tdp:190,len:255},
+    {id:"gpu_163",name:"ASRock Challenger RX 7600 XT",brand:"ASRock",model:"RX 7600 XT",variantLabel:"ASRock Challenger",price:300,perf:28,vram:16,tdp:190,len:258},
+    {id:"gpu_164",name:"Acer Nitro RX 7600 XT",brand:"Acer",model:"RX 7600 XT",variantLabel:"Acer Nitro",price:300,perf:28,vram:16,tdp:190,len:260},
+    {id:"gpu_165",name:"Gigabyte Gaming OC RX 7600 XT",brand:"Gigabyte",model:"RX 7600 XT",variantLabel:"Gigabyte Gaming OC",price:305,perf:28,vram:16,tdp:190,len:265},
+    {id:"gpu_166",name:"Sapphire Pulse RX 7600 XT",brand:"Sapphire",model:"RX 7600 XT",variantLabel:"Sapphire Pulse",price:310,perf:28,vram:16,tdp:190,len:262},
+    {id:"gpu_167",name:"PowerColor Reaper RX 7700 XT",brand:"PowerColor",model:"RX 7700 XT",variantLabel:"PowerColor Reaper",price:355,perf:37,vram:12,tdp:245,len:280},
+    {id:"gpu_168",name:"XFX Swift RX 7700 XT",brand:"XFX",model:"RX 7700 XT",variantLabel:"XFX Swift",price:365,perf:37,vram:12,tdp:245,len:285},
+    {id:"gpu_169",name:"ASRock Challenger RX 7700 XT",brand:"ASRock",model:"RX 7700 XT",variantLabel:"ASRock Challenger",price:370,perf:37,vram:12,tdp:245,len:288},
+    {id:"gpu_170",name:"Acer Nitro RX 7700 XT",brand:"Acer",model:"RX 7700 XT",variantLabel:"Acer Nitro",price:375,perf:37,vram:12,tdp:245,len:290},
+    {id:"gpu_171",name:"Gigabyte Gaming OC RX 7700 XT",brand:"Gigabyte",model:"RX 7700 XT",variantLabel:"Gigabyte Gaming OC",price:380,perf:37,vram:12,tdp:245,len:295},
+    {id:"gpu_172",name:"Sapphire Pulse RX 7700 XT",brand:"Sapphire",model:"RX 7700 XT",variantLabel:"Sapphire Pulse",price:380,perf:37,vram:12,tdp:245,len:292},
+    {id:"gpu_173",name:"PowerColor Hellhound RX 7700 XT",brand:"PowerColor",model:"RX 7700 XT",variantLabel:"PowerColor Hellhound",price:395,perf:37,vram:12,tdp:245,len:300},
+    {id:"gpu_174",name:"PowerColor Reaper RX 7800 XT",brand:"PowerColor",model:"RX 7800 XT",variantLabel:"PowerColor Reaper",price:395,perf:42,vram:16,tdp:263,len:285},
+    {id:"gpu_175",name:"XFX Swift RX 7800 XT",brand:"XFX",model:"RX 7800 XT",variantLabel:"XFX Swift",price:405,perf:42,vram:16,tdp:263,len:290},
+    {id:"gpu_176",name:"ASRock Challenger RX 7800 XT",brand:"ASRock",model:"RX 7800 XT",variantLabel:"ASRock Challenger",price:410,perf:42,vram:16,tdp:263,len:293},
+    {id:"gpu_177",name:"Acer Nitro RX 7800 XT",brand:"Acer",model:"RX 7800 XT",variantLabel:"Acer Nitro",price:415,perf:42,vram:16,tdp:263,len:295},
+    {id:"gpu_178",name:"Gigabyte Gaming OC RX 7800 XT",brand:"Gigabyte",model:"RX 7800 XT",variantLabel:"Gigabyte Gaming OC",price:420,perf:42,vram:16,tdp:263,len:300},
+    {id:"gpu_179",name:"Sapphire Pulse RX 7800 XT",brand:"Sapphire",model:"RX 7800 XT",variantLabel:"Sapphire Pulse",price:425,perf:42,vram:16,tdp:263,len:297},
+    {id:"gpu_180",name:"PowerColor Hellhound RX 7800 XT",brand:"PowerColor",model:"RX 7800 XT",variantLabel:"PowerColor Hellhound",price:435,perf:42,vram:16,tdp:263,len:305},
+    {id:"gpu_181",name:"XFX Merc 310 RX 7800 XT",brand:"XFX",model:"RX 7800 XT",variantLabel:"XFX Merc 310",price:450,perf:42,vram:16,tdp:263,len:315},
+    {id:"gpu_182",name:"PowerColor Reaper RX 7900 GRE",brand:"PowerColor",model:"RX 7900 GRE",variantLabel:"PowerColor Reaper",price:455,perf:45,vram:16,tdp:260,len:285},
+    {id:"gpu_183",name:"XFX Swift RX 7900 GRE",brand:"XFX",model:"RX 7900 GRE",variantLabel:"XFX Swift",price:465,perf:45,vram:16,tdp:260,len:290},
+    {id:"gpu_184",name:"ASRock Challenger RX 7900 GRE",brand:"ASRock",model:"RX 7900 GRE",variantLabel:"ASRock Challenger",price:475,perf:45,vram:16,tdp:260,len:293},
+    {id:"gpu_185",name:"Acer Nitro RX 7900 GRE",brand:"Acer",model:"RX 7900 GRE",variantLabel:"Acer Nitro",price:480,perf:45,vram:16,tdp:260,len:295},
+    {id:"gpu_186",name:"Gigabyte Gaming OC RX 7900 GRE",brand:"Gigabyte",model:"RX 7900 GRE",variantLabel:"Gigabyte Gaming OC",price:485,perf:45,vram:16,tdp:260,len:300},
+    {id:"gpu_187",name:"Sapphire Pulse RX 7900 GRE",brand:"Sapphire",model:"RX 7900 GRE",variantLabel:"Sapphire Pulse",price:490,perf:45,vram:16,tdp:260,len:297},
+    {id:"gpu_188",name:"PowerColor Reaper RX 7900 XT",brand:"PowerColor",model:"RX 7900 XT",variantLabel:"PowerColor Reaper",price:560,perf:48,vram:20,tdp:315,len:300},
+    {id:"gpu_189",name:"XFX Swift RX 7900 XT",brand:"XFX",model:"RX 7900 XT",variantLabel:"XFX Swift",price:570,perf:48,vram:20,tdp:315,len:305},
+    {id:"gpu_190",name:"ASRock Challenger RX 7900 XT",brand:"ASRock",model:"RX 7900 XT",variantLabel:"ASRock Challenger",price:580,perf:48,vram:20,tdp:315,len:308},
+    {id:"gpu_191",name:"Acer Nitro RX 7900 XT",brand:"Acer",model:"RX 7900 XT",variantLabel:"Acer Nitro",price:585,perf:48,vram:20,tdp:315,len:310},
+    {id:"gpu_192",name:"Gigabyte Gaming OC RX 7900 XT",brand:"Gigabyte",model:"RX 7900 XT",variantLabel:"Gigabyte Gaming OC",price:590,perf:48,vram:20,tdp:315,len:315},
+    {id:"gpu_193",name:"Sapphire Pulse RX 7900 XT",brand:"Sapphire",model:"RX 7900 XT",variantLabel:"Sapphire Pulse",price:600,perf:48,vram:20,tdp:315,len:312},
+    {id:"gpu_194",name:"PowerColor Hellhound RX 7900 XT",brand:"PowerColor",model:"RX 7900 XT",variantLabel:"PowerColor Hellhound",price:615,perf:48,vram:20,tdp:315,len:320},
+    {id:"gpu_195",name:"PowerColor Reaper RX 7900 XTX",brand:"PowerColor",model:"RX 7900 XTX",variantLabel:"PowerColor Reaper",price:695,perf:58,vram:24,tdp:355,len:320},
+    {id:"gpu_196",name:"XFX Swift RX 7900 XTX",brand:"XFX",model:"RX 7900 XTX",variantLabel:"XFX Swift",price:710,perf:58,vram:24,tdp:355,len:325},
+    {id:"gpu_197",name:"ASRock Challenger RX 7900 XTX",brand:"ASRock",model:"RX 7900 XTX",variantLabel:"ASRock Challenger",price:720,perf:58,vram:24,tdp:355,len:328},
+    {id:"gpu_198",name:"Acer Nitro RX 7900 XTX",brand:"Acer",model:"RX 7900 XTX",variantLabel:"Acer Nitro",price:730,perf:58,vram:24,tdp:355,len:330},
+    {id:"gpu_199",name:"Gigabyte Gaming OC RX 7900 XTX",brand:"Gigabyte",model:"RX 7900 XTX",variantLabel:"Gigabyte Gaming OC",price:735,perf:58,vram:24,tdp:355,len:335},
+    {id:"gpu_200",name:"Sapphire Pulse RX 7900 XTX",brand:"Sapphire",model:"RX 7900 XTX",variantLabel:"Sapphire Pulse",price:745,perf:58,vram:24,tdp:355,len:332},
+    {id:"gpu_201",name:"PowerColor Hellhound RX 7900 XTX",brand:"PowerColor",model:"RX 7900 XTX",variantLabel:"PowerColor Hellhound",price:760,perf:58,vram:24,tdp:355,len:340},
+    {id:"gpu_202",name:"PowerColor Reaper RX 9060 XT 8GB",brand:"PowerColor",model:"RX 9060 XT 8GB",variantLabel:"PowerColor Reaper",price:320,perf:35,vram:8,tdp:150,len:240},
+    {id:"gpu_203",name:"XFX Swift RX 9060 XT 8GB",brand:"XFX",model:"RX 9060 XT 8GB",variantLabel:"XFX Swift",price:325,perf:35,vram:8,tdp:150,len:245},
+    {id:"gpu_204",name:"ASRock Challenger RX 9060 XT 8GB",brand:"ASRock",model:"RX 9060 XT 8GB",variantLabel:"ASRock Challenger",price:335,perf:35,vram:8,tdp:150,len:248},
+    {id:"gpu_205",name:"Acer Nitro RX 9060 XT 8GB",brand:"Acer",model:"RX 9060 XT 8GB",variantLabel:"Acer Nitro",price:335,perf:35,vram:8,tdp:150,len:250},
+    {id:"gpu_206",name:"Gigabyte Gaming OC RX 9060 XT 8GB",brand:"Gigabyte",model:"RX 9060 XT 8GB",variantLabel:"Gigabyte Gaming OC",price:340,perf:35,vram:8,tdp:150,len:255},
+    {id:"gpu_207",name:"Sapphire Pulse RX 9060 XT 8GB",brand:"Sapphire",model:"RX 9060 XT 8GB",variantLabel:"Sapphire Pulse",price:345,perf:35,vram:8,tdp:150,len:252},
+    {id:"gpu_208",name:"PowerColor Reaper RX 9060 XT 16GB",brand:"PowerColor",model:"RX 9060 XT 16GB",variantLabel:"PowerColor Reaper",price:350,perf:37,vram:16,tdp:160,len:245},
+    {id:"gpu_209",name:"XFX Swift RX 9060 XT 16GB",brand:"XFX",model:"RX 9060 XT 16GB",variantLabel:"XFX Swift",price:355,perf:37,vram:16,tdp:160,len:250},
+    {id:"gpu_210",name:"ASRock Challenger RX 9060 XT 16GB",brand:"ASRock",model:"RX 9060 XT 16GB",variantLabel:"ASRock Challenger",price:365,perf:37,vram:16,tdp:160,len:253},
+    {id:"gpu_211",name:"Acer Nitro RX 9060 XT 16GB",brand:"Acer",model:"RX 9060 XT 16GB",variantLabel:"Acer Nitro",price:370,perf:37,vram:16,tdp:160,len:255},
+    {id:"gpu_212",name:"Gigabyte Gaming OC RX 9060 XT 16GB",brand:"Gigabyte",model:"RX 9060 XT 16GB",variantLabel:"Gigabyte Gaming OC",price:370,perf:37,vram:16,tdp:160,len:260},
+    {id:"gpu_213",name:"Sapphire Pulse RX 9060 XT 16GB",brand:"Sapphire",model:"RX 9060 XT 16GB",variantLabel:"Sapphire Pulse",price:375,perf:37,vram:16,tdp:160,len:257},
+    {id:"gpu_214",name:"PowerColor Hellhound RX 9060 XT 16GB",brand:"PowerColor",model:"RX 9060 XT 16GB",variantLabel:"PowerColor Hellhound",price:385,perf:37,vram:16,tdp:160,len:265},
+    {id:"gpu_215",name:"XFX Merc 310 RX 9060 XT 16GB",brand:"XFX",model:"RX 9060 XT 16GB",variantLabel:"XFX Merc 310",price:400,perf:37,vram:16,tdp:160,len:275},
+    {id:"gpu_216",name:"ASUS TUF OC RX 9060 XT 16GB",brand:"ASUS",model:"RX 9060 XT 16GB",variantLabel:"ASUS TUF OC",price:405,perf:37,vram:16,tdp:160,len:275},
+    {id:"gpu_217",name:"PowerColor Reaper RX 9070",brand:"PowerColor",model:"RX 9070",variantLabel:"PowerColor Reaper",price:500,perf:49,vram:16,tdp:220,len:280},
+    {id:"gpu_218",name:"XFX Swift RX 9070",brand:"XFX",model:"RX 9070",variantLabel:"XFX Swift",price:505,perf:49,vram:16,tdp:220,len:285},
+    {id:"gpu_219",name:"ASRock Challenger RX 9070",brand:"ASRock",model:"RX 9070",variantLabel:"ASRock Challenger",price:520,perf:49,vram:16,tdp:220,len:288},
+    {id:"gpu_220",name:"Acer Nitro RX 9070",brand:"Acer",model:"RX 9070",variantLabel:"Acer Nitro",price:525,perf:49,vram:16,tdp:220,len:290},
+    {id:"gpu_221",name:"Gigabyte Gaming OC RX 9070",brand:"Gigabyte",model:"RX 9070",variantLabel:"Gigabyte Gaming OC",price:525,perf:49,vram:16,tdp:220,len:295},
+    {id:"gpu_222",name:"Sapphire Pulse RX 9070",brand:"Sapphire",model:"RX 9070",variantLabel:"Sapphire Pulse",price:530,perf:49,vram:16,tdp:220,len:292},
+    {id:"gpu_223",name:"PowerColor Hellhound RX 9070",brand:"PowerColor",model:"RX 9070",variantLabel:"PowerColor Hellhound",price:550,perf:49,vram:16,tdp:220,len:300},
+    {id:"gpu_224",name:"XFX Merc 310 RX 9070",brand:"XFX",model:"RX 9070",variantLabel:"XFX Merc 310",price:570,perf:49,vram:16,tdp:220,len:310},
+    {id:"gpu_225",name:"ASUS TUF OC RX 9070",brand:"ASUS",model:"RX 9070",variantLabel:"ASUS TUF OC",price:575,perf:49,vram:16,tdp:220,len:310},
+    {id:"gpu_226",name:"PowerColor Reaper RX 9070 XT",brand:"PowerColor",model:"RX 9070 XT",variantLabel:"PowerColor Reaper",price:580,perf:54,vram:16,tdp:304,len:290},
+    {id:"gpu_227",name:"XFX Swift RX 9070 XT",brand:"XFX",model:"RX 9070 XT",variantLabel:"XFX Swift",price:595,perf:54,vram:16,tdp:304,len:295},
+    {id:"gpu_228",name:"ASRock Challenger RX 9070 XT",brand:"ASRock",model:"RX 9070 XT",variantLabel:"ASRock Challenger",price:605,perf:54,vram:16,tdp:304,len:298},
+    {id:"gpu_229",name:"Acer Nitro RX 9070 XT",brand:"Acer",model:"RX 9070 XT",variantLabel:"Acer Nitro",price:610,perf:54,vram:16,tdp:304,len:300},
+    {id:"gpu_230",name:"Gigabyte Gaming OC RX 9070 XT",brand:"Gigabyte",model:"RX 9070 XT",variantLabel:"Gigabyte Gaming OC",price:620,perf:54,vram:16,tdp:304,len:305},
+    {id:"gpu_231",name:"Sapphire Pulse RX 9070 XT",brand:"Sapphire",model:"RX 9070 XT",variantLabel:"Sapphire Pulse",price:625,perf:54,vram:16,tdp:304,len:302},
+    {id:"gpu_232",name:"PowerColor Hellhound RX 9070 XT",brand:"PowerColor",model:"RX 9070 XT",variantLabel:"PowerColor Hellhound",price:640,perf:54,vram:16,tdp:304,len:310},
+    {id:"gpu_233",name:"XFX Merc 310 RX 9070 XT",brand:"XFX",model:"RX 9070 XT",variantLabel:"XFX Merc 310",price:665,perf:54,vram:16,tdp:304,len:320},
+    {id:"gpu_234",name:"ASUS TUF OC RX 9070 XT",brand:"ASUS",model:"RX 9070 XT",variantLabel:"ASUS TUF OC",price:670,perf:54,vram:16,tdp:304,len:320},
+    {id:"gpu_235",name:"PowerColor Red Devil RX 9070 XT",brand:"PowerColor",model:"RX 9070 XT",variantLabel:"PowerColor Red Devil",price:680,perf:54,vram:16,tdp:304,len:322},
+    {id:"gpu_236",name:"Sapphire Nitro+ RX 9070 XT",brand:"Sapphire",model:"RX 9070 XT",variantLabel:"Sapphire Nitro+",price:695,perf:54,vram:16,tdp:304,len:325},
+    {id:"gpu_237",name:"ASRock Taichi RX 9070 XT",brand:"ASRock",model:"RX 9070 XT",variantLabel:"ASRock Taichi",price:705,perf:54,vram:16,tdp:304,len:325},
+    {id:"gpu_238",name:"Founders Edition RTX 4090",brand:"Founders",model:"RTX 4090",variantLabel:"Founders Edition",price:1480,perf:80,vram:24,tdp:450,len:304},
+    {id:"gpu_239",name:"ASUS TUF RTX 4090",brand:"ASUS",model:"RTX 4090",variantLabel:"ASUS TUF",price:1565,perf:80,vram:24,tdp:450,len:348},
+    {id:"gpu_240",name:"MSI Suprim X RTX 4090",brand:"MSI",model:"RTX 4090",variantLabel:"MSI Suprim X",price:1610,perf:80,vram:24,tdp:450,len:358},
+    {id:"gpu_241",name:"Founders Edition RTX 4080 Super",brand:"Founders",model:"RTX 4080 Super",variantLabel:"Founders Edition",price:900,perf:64,vram:16,tdp:320,len:304},
+    {id:"gpu_242",name:"Gigabyte Gaming OC RTX 4080 Super",brand:"Gigabyte",model:"RTX 4080 Super",variantLabel:"Gigabyte Gaming OC",price:945,perf:64,vram:16,tdp:320,len:340},
+    {id:"gpu_243",name:"MSI Ventus 3X RTX 4080 Super",brand:"MSI",model:"RTX 4080 Super",variantLabel:"MSI Ventus 3X",price:920,perf:64,vram:16,tdp:320,len:338},
+    {id:"gpu_244",name:"ASUS TUF RTX 4070 Ti",brand:"ASUS",model:"RTX 4070 Ti",variantLabel:"ASUS TUF",price:680,perf:52,vram:12,tdp:285,len:305},
+    {id:"gpu_245",name:"Gigabyte Gaming OC RTX 4070 Ti",brand:"Gigabyte",model:"RTX 4070 Ti",variantLabel:"Gigabyte Gaming OC",price:670,perf:52,vram:12,tdp:285,len:336},
+    {id:"gpu_246",name:"MSI Ventus 3X RTX 4070 Ti",brand:"MSI",model:"RTX 4070 Ti",variantLabel:"MSI Ventus 3X",price:665,perf:52,vram:12,tdp:285,len:338},
+    {id:"gpu_247",name:"Founders Edition RTX 4070",brand:"Founders",model:"RTX 4070",variantLabel:"Founders Edition",price:460,perf:42,vram:12,tdp:200,len:244},
+    {id:"gpu_248",name:"Gigabyte Windforce RTX 4070",brand:"Gigabyte",model:"RTX 4070",variantLabel:"Gigabyte Windforce",price:470,perf:42,vram:12,tdp:200,len:261},
+    {id:"gpu_249",name:"MSI Ventus 2X RTX 4070",brand:"MSI",model:"RTX 4070",variantLabel:"MSI Ventus 2X",price:465,perf:42,vram:12,tdp:200,len:250},
+    {id:"gpu_250",name:"ASUS Dual RTX 3050",brand:"ASUS",model:"RTX 3050",variantLabel:"ASUS Dual",price:175,perf:17,vram:8,tdp:130,len:200},
+    {id:"gpu_251",name:"MSI Ventus 2X RTX 3050",brand:"MSI",model:"RTX 3050",variantLabel:"MSI Ventus 2X",price:165,perf:17,vram:8,tdp:130,len:200},
+    {id:"gpu_252",name:"Gigabyte Eagle RTX 3050",brand:"Gigabyte",model:"RTX 3050",variantLabel:"Gigabyte Eagle",price:170,perf:17,vram:8,tdp:130,len:212},
+    {id:"gpu_253",name:"Sapphire Pulse RX 9070 GRE",brand:"Sapphire",model:"RX 9070 GRE",variantLabel:"Sapphire Pulse",price:490,perf:44,vram:12,tdp:220,len:280},
+    {id:"gpu_254",name:"PowerColor Reaper RX 9070 GRE",brand:"PowerColor",model:"RX 9070 GRE",variantLabel:"PowerColor Reaper",price:485,perf:44,vram:12,tdp:220,len:270},
+    {id:"gpu_255",name:"ASRock Challenger RX 9070 GRE",brand:"ASRock",model:"RX 9070 GRE",variantLabel:"ASRock Challenger",price:480,perf:44,vram:12,tdp:220,len:270},
+    {id:"gpu_256",name:"Sapphire Pulse RX 6700 XT",brand:"Sapphire",model:"RX 6700 XT",variantLabel:"Sapphire Pulse",price:225,perf:33,vram:12,tdp:230,len:280},
+    {id:"gpu_257",name:"PowerColor Hellhound RX 6700 XT",brand:"PowerColor",model:"RX 6700 XT",variantLabel:"PowerColor Hellhound",price:230,perf:33,vram:12,tdp:230,len:320},
+    {id:"gpu_258",name:"XFX Speedster RX 6700 XT",brand:"XFX",model:"RX 6700 XT",variantLabel:"XFX Speedster",price:220,perf:33,vram:12,tdp:230,len:300},
+    {id:"gpu_259",name:"Sapphire Pulse RX 6650 XT",brand:"Sapphire",model:"RX 6650 XT",variantLabel:"Sapphire Pulse",price:175,perf:28,vram:8,tdp:180,len:240},
+    {id:"gpu_260",name:"ASRock Challenger RX 6650 XT",brand:"ASRock",model:"RX 6650 XT",variantLabel:"ASRock Challenger",price:170,perf:28,vram:8,tdp:180,len:245},
+    {id:"gpu_261",name:"XFX Speedster RX 6650 XT",brand:"XFX",model:"RX 6650 XT",variantLabel:"XFX Speedster",price:170,perf:28,vram:8,tdp:180,len:240},
+    {id:"gpu_262",name:"Sapphire Pulse RX 6800",brand:"Sapphire",model:"RX 6800",variantLabel:"Sapphire Pulse",price:265,perf:38,vram:16,tdp:250,len:267},
+    {id:"gpu_263",name:"XFX Speedster RX 6800",brand:"XFX",model:"RX 6800",variantLabel:"XFX Speedster",price:260,perf:38,vram:16,tdp:250,len:320},
+    {id:"gpu_264",name:"ASRock Challenger RX 6800",brand:"ASRock",model:"RX 6800",variantLabel:"ASRock Challenger",price:260,perf:38,vram:16,tdp:250,len:267},
+    {id:"gpu_265",name:"Sapphire Nitro+ RX 6900 XT",brand:"Sapphire",model:"RX 6900 XT",variantLabel:"Sapphire Nitro+",price:370,perf:43,vram:16,tdp:300,len:310},
+    {id:"gpu_266",name:"PowerColor Red Devil RX 6900 XT",brand:"PowerColor",model:"RX 6900 XT",variantLabel:"PowerColor Red Devil",price:375,perf:43,vram:16,tdp:300,len:320},
+    {id:"gpu_267",name:"ASRock Phantom Gaming RX 6900 XT",brand:"ASRock",model:"RX 6900 XT",variantLabel:"ASRock Phantom Gaming",price:365,perf:43,vram:16,tdp:300,len:300},
+    {id:"gpu_268",name:"Sapphire Nitro+ RX 6950 XT",brand:"Sapphire",model:"RX 6950 XT",variantLabel:"Sapphire Nitro+",price:420,perf:46,vram:16,tdp:335,len:320},
+    {id:"gpu_269",name:"PowerColor Red Devil RX 6950 XT",brand:"PowerColor",model:"RX 6950 XT",variantLabel:"PowerColor Red Devil",price:425,perf:46,vram:16,tdp:335,len:324},
+    {id:"gpu_270",name:"XFX Speedster RX 6950 XT",brand:"XFX",model:"RX 6950 XT",variantLabel:"XFX Speedster",price:415,perf:46,vram:16,tdp:335,len:340},
+    {id:"gpu_271",name:"Intel Limited Edition Intel Arc A750",brand:"Intel",model:"Intel Arc A750",variantLabel:"Intel Limited Edition",price:170,perf:24,vram:8,tdp:225,len:270},
+    {id:"gpu_272",name:"ASRock Challenger Intel Arc A750",brand:"ASRock",model:"Intel Arc A750",variantLabel:"ASRock Challenger",price:180,perf:24,vram:8,tdp:225,len:270},
+    {id:"gpu_273",name:"Sparkle Orc Intel Arc A750",brand:"Sparkle",model:"Intel Arc A750",variantLabel:"Sparkle Orc",price:175,perf:24,vram:8,tdp:225,len:260},
   ],
   mobo: [
     {id:"mb1",brand:"MSI",name:"MSI B450 Tomahawk Max II",model:"MSI B450 Tomahawk Max II",variantLabel:"MSI",price:90,perf:46,socket:"AM4",ramType:"DDR4",form:"ATX",m2:2,maxRam:128},
@@ -413,154 +413,154 @@ const CATALOG = {
     {id:"mb42",brand:"ASRock",name:"ASRock X870E Taichi Lite",model:"ASRock X870E Taichi Lite",variantLabel:"ASRock",price:300,perf:78,socket:"AM5",ramType:"DDR5",form:"ATX",m2:4,maxRam:256},
   ],
   ram: [
-    {id:"ram1",brand:"Corsair",name:"Corsair Vengeance LPX 16GB DDR4-3200",model:"Corsair Vengeance LPX 16GB DDR4-3200",variantLabel:"Corsair",price:90,perf:41,ramType:"DDR4",cap:16,speed:3200},
-    {id:"ram2",brand:"G.Skill",name:"G.Skill Ripjaws V 16GB DDR4-3200",model:"G.Skill Ripjaws V 16GB DDR4-3200",variantLabel:"G.Skill",price:90,perf:41,ramType:"DDR4",cap:16,speed:3200},
-    {id:"ram3",brand:"Kingston",name:"Kingston Fury Beast 16GB DDR4-3200",model:"Kingston Fury Beast 16GB DDR4-3200",variantLabel:"Kingston",price:95,perf:41,ramType:"DDR4",cap:16,speed:3200},
-    {id:"ram4",brand:"TeamGroup",name:"TeamGroup T-Force Vulcan 16GB DDR4-3200",model:"TeamGroup T-Force Vulcan 16GB DDR4-3200",variantLabel:"TeamGroup",price:95,perf:41,ramType:"DDR4",cap:16,speed:3200},
-    {id:"ram5",brand:"Patriot",name:"Patriot Viper Steel 16GB DDR4-3200",model:"Patriot Viper Steel 16GB DDR4-3200",variantLabel:"Patriot",price:95,perf:41,ramType:"DDR4",cap:16,speed:3200},
-    {id:"ram6",brand:"ADATA",name:"ADATA XPG Gammix 16GB DDR4-3200",model:"ADATA XPG Gammix 16GB DDR4-3200",variantLabel:"ADATA",price:100,perf:41,ramType:"DDR4",cap:16,speed:3200},
-    {id:"ram7",brand:"Corsair",name:"Corsair Vengeance LPX 16GB DDR4-3600",model:"Corsair Vengeance LPX 16GB DDR4-3600",variantLabel:"Corsair",price:100,perf:41,ramType:"DDR4",cap:16,speed:3600},
-    {id:"ram8",brand:"G.Skill",name:"G.Skill Ripjaws V 16GB DDR4-3600",model:"G.Skill Ripjaws V 16GB DDR4-3600",variantLabel:"G.Skill",price:100,perf:41,ramType:"DDR4",cap:16,speed:3600},
-    {id:"ram9",brand:"Kingston",name:"Kingston Fury Beast 16GB DDR4-3600",model:"Kingston Fury Beast 16GB DDR4-3600",variantLabel:"Kingston",price:105,perf:41,ramType:"DDR4",cap:16,speed:3600},
-    {id:"ram10",brand:"TeamGroup",name:"TeamGroup T-Force Vulcan 16GB DDR4-3600",model:"TeamGroup T-Force Vulcan 16GB DDR4-3600",variantLabel:"TeamGroup",price:105,perf:41,ramType:"DDR4",cap:16,speed:3600},
-    {id:"ram11",brand:"Patriot",name:"Patriot Viper Steel 16GB DDR4-3600",model:"Patriot Viper Steel 16GB DDR4-3600",variantLabel:"Patriot",price:110,perf:41,ramType:"DDR4",cap:16,speed:3600},
-    {id:"ram12",brand:"ADATA",name:"ADATA XPG Gammix 16GB DDR4-3600",model:"ADATA XPG Gammix 16GB DDR4-3600",variantLabel:"ADATA",price:110,perf:41,ramType:"DDR4",cap:16,speed:3600},
-    {id:"ram13",brand:"Corsair",name:"Corsair Vengeance LPX 32GB DDR4-3200",model:"Corsair Vengeance LPX 32GB DDR4-3200",variantLabel:"Corsair",price:150,perf:65,ramType:"DDR4",cap:32,speed:3200},
-    {id:"ram14",brand:"G.Skill",name:"G.Skill Ripjaws V 32GB DDR4-3200",model:"G.Skill Ripjaws V 32GB DDR4-3200",variantLabel:"G.Skill",price:155,perf:65,ramType:"DDR4",cap:32,speed:3200},
-    {id:"ram15",brand:"Kingston",name:"Kingston Fury Beast 32GB DDR4-3200",model:"Kingston Fury Beast 32GB DDR4-3200",variantLabel:"Kingston",price:155,perf:65,ramType:"DDR4",cap:32,speed:3200},
-    {id:"ram16",brand:"TeamGroup",name:"TeamGroup T-Force Vulcan 32GB DDR4-3200",model:"TeamGroup T-Force Vulcan 32GB DDR4-3200",variantLabel:"TeamGroup",price:160,perf:65,ramType:"DDR4",cap:32,speed:3200},
-    {id:"ram17",brand:"Patriot",name:"Patriot Viper Steel 32GB DDR4-3200",model:"Patriot Viper Steel 32GB DDR4-3200",variantLabel:"Patriot",price:160,perf:65,ramType:"DDR4",cap:32,speed:3200},
-    {id:"ram18",brand:"ADATA",name:"ADATA XPG Gammix 32GB DDR4-3200",model:"ADATA XPG Gammix 32GB DDR4-3200",variantLabel:"ADATA",price:165,perf:65,ramType:"DDR4",cap:32,speed:3200},
-    {id:"ram19",brand:"Corsair",name:"Corsair Vengeance LPX 32GB DDR4-3600",model:"Corsair Vengeance LPX 32GB DDR4-3600",variantLabel:"Corsair",price:165,perf:65,ramType:"DDR4",cap:32,speed:3600},
-    {id:"ram20",brand:"G.Skill",name:"G.Skill Ripjaws V 32GB DDR4-3600",model:"G.Skill Ripjaws V 32GB DDR4-3600",variantLabel:"G.Skill",price:170,perf:65,ramType:"DDR4",cap:32,speed:3600},
-    {id:"ram21",brand:"Kingston",name:"Kingston Fury Beast 32GB DDR4-3600",model:"Kingston Fury Beast 32GB DDR4-3600",variantLabel:"Kingston",price:170,perf:65,ramType:"DDR4",cap:32,speed:3600},
-    {id:"ram22",brand:"TeamGroup",name:"TeamGroup T-Force Vulcan 32GB DDR4-3600",model:"TeamGroup T-Force Vulcan 32GB DDR4-3600",variantLabel:"TeamGroup",price:175,perf:65,ramType:"DDR4",cap:32,speed:3600},
-    {id:"ram23",brand:"Patriot",name:"Patriot Viper Steel 32GB DDR4-3600",model:"Patriot Viper Steel 32GB DDR4-3600",variantLabel:"Patriot",price:180,perf:65,ramType:"DDR4",cap:32,speed:3600},
-    {id:"ram24",brand:"ADATA",name:"ADATA XPG Gammix 32GB DDR4-3600",model:"ADATA XPG Gammix 32GB DDR4-3600",variantLabel:"ADATA",price:180,perf:65,ramType:"DDR4",cap:32,speed:3600},
-    {id:"ram25",brand:"Corsair",name:"Corsair Vengeance 16GB DDR5-5600",model:"Corsair Vengeance 16GB DDR5-5600",variantLabel:"Corsair",price:180,perf:50,ramType:"DDR5",cap:16,speed:5600},
-    {id:"ram26",brand:"G.Skill",name:"G.Skill Flare X5 16GB DDR5-5600",model:"G.Skill Flare X5 16GB DDR5-5600",variantLabel:"G.Skill",price:185,perf:50,ramType:"DDR5",cap:16,speed:5600},
-    {id:"ram27",brand:"G.Skill",name:"G.Skill Trident Z5 16GB DDR5-5600",model:"G.Skill Trident Z5 16GB DDR5-5600",variantLabel:"G.Skill",price:185,perf:50,ramType:"DDR5",cap:16,speed:5600},
-    {id:"ram28",brand:"Kingston",name:"Kingston Fury Beast 16GB DDR5-5600",model:"Kingston Fury Beast 16GB DDR5-5600",variantLabel:"Kingston",price:190,perf:50,ramType:"DDR5",cap:16,speed:5600},
-    {id:"ram29",brand:"TeamGroup",name:"TeamGroup T-Force Delta 16GB DDR5-5600",model:"TeamGroup T-Force Delta 16GB DDR5-5600",variantLabel:"TeamGroup",price:195,perf:50,ramType:"DDR5",cap:16,speed:5600},
-    {id:"ram30",brand:"Crucial",name:"Crucial Pro 16GB DDR5-5600",model:"Crucial Pro 16GB DDR5-5600",variantLabel:"Crucial",price:200,perf:50,ramType:"DDR5",cap:16,speed:5600},
-    {id:"ram31",brand:"ADATA",name:"ADATA XPG Lancer 16GB DDR5-5600",model:"ADATA XPG Lancer 16GB DDR5-5600",variantLabel:"ADATA",price:200,perf:50,ramType:"DDR5",cap:16,speed:5600},
-    {id:"ram32",brand:"Patriot",name:"Patriot Viper Venom 16GB DDR5-5600",model:"Patriot Viper Venom 16GB DDR5-5600",variantLabel:"Patriot",price:205,perf:50,ramType:"DDR5",cap:16,speed:5600},
-    {id:"ram33",brand:"Corsair",name:"Corsair Vengeance 16GB DDR5-6000",model:"Corsair Vengeance 16GB DDR5-6000",variantLabel:"Corsair",price:190,perf:53,ramType:"DDR5",cap:16,speed:6000},
-    {id:"ram34",brand:"G.Skill",name:"G.Skill Flare X5 16GB DDR5-6000",model:"G.Skill Flare X5 16GB DDR5-6000",variantLabel:"G.Skill",price:195,perf:53,ramType:"DDR5",cap:16,speed:6000},
-    {id:"ram35",brand:"G.Skill",name:"G.Skill Trident Z5 16GB DDR5-6000",model:"G.Skill Trident Z5 16GB DDR5-6000",variantLabel:"G.Skill",price:200,perf:53,ramType:"DDR5",cap:16,speed:6000},
-    {id:"ram36",brand:"Kingston",name:"Kingston Fury Beast 16GB DDR5-6000",model:"Kingston Fury Beast 16GB DDR5-6000",variantLabel:"Kingston",price:200,perf:53,ramType:"DDR5",cap:16,speed:6000},
-    {id:"ram37",brand:"TeamGroup",name:"TeamGroup T-Force Delta 16GB DDR5-6000",model:"TeamGroup T-Force Delta 16GB DDR5-6000",variantLabel:"TeamGroup",price:205,perf:53,ramType:"DDR5",cap:16,speed:6000},
-    {id:"ram38",brand:"Crucial",name:"Crucial Pro 16GB DDR5-6000",model:"Crucial Pro 16GB DDR5-6000",variantLabel:"Crucial",price:210,perf:53,ramType:"DDR5",cap:16,speed:6000},
-    {id:"ram39",brand:"ADATA",name:"ADATA XPG Lancer 16GB DDR5-6000",model:"ADATA XPG Lancer 16GB DDR5-6000",variantLabel:"ADATA",price:215,perf:53,ramType:"DDR5",cap:16,speed:6000},
-    {id:"ram40",brand:"Patriot",name:"Patriot Viper Venom 16GB DDR5-6000",model:"Patriot Viper Venom 16GB DDR5-6000",variantLabel:"Patriot",price:215,perf:53,ramType:"DDR5",cap:16,speed:6000},
-    {id:"ram41",brand:"Corsair",name:"Corsair Vengeance 32GB DDR5-5600",model:"Corsair Vengeance 32GB DDR5-5600",variantLabel:"Corsair",price:450,perf:74,ramType:"DDR5",cap:32,speed:5600},
-    {id:"ram42",brand:"G.Skill",name:"G.Skill Flare X5 32GB DDR5-5600",model:"G.Skill Flare X5 32GB DDR5-5600",variantLabel:"G.Skill",price:460,perf:74,ramType:"DDR5",cap:32,speed:5600},
-    {id:"ram43",brand:"G.Skill",name:"G.Skill Trident Z5 32GB DDR5-5600",model:"G.Skill Trident Z5 32GB DDR5-5600",variantLabel:"G.Skill",price:470,perf:74,ramType:"DDR5",cap:32,speed:5600},
-    {id:"ram44",brand:"Kingston",name:"Kingston Fury Beast 32GB DDR5-5600",model:"Kingston Fury Beast 32GB DDR5-5600",variantLabel:"Kingston",price:475,perf:74,ramType:"DDR5",cap:32,speed:5600},
-    {id:"ram45",brand:"TeamGroup",name:"TeamGroup T-Force Delta 32GB DDR5-5600",model:"TeamGroup T-Force Delta 32GB DDR5-5600",variantLabel:"TeamGroup",price:485,perf:74,ramType:"DDR5",cap:32,speed:5600},
-    {id:"ram46",brand:"Crucial",name:"Crucial Pro 32GB DDR5-5600",model:"Crucial Pro 32GB DDR5-5600",variantLabel:"Crucial",price:495,perf:74,ramType:"DDR5",cap:32,speed:5600},
-    {id:"ram47",brand:"ADATA",name:"ADATA XPG Lancer 32GB DDR5-5600",model:"ADATA XPG Lancer 32GB DDR5-5600",variantLabel:"ADATA",price:505,perf:74,ramType:"DDR5",cap:32,speed:5600},
-    {id:"ram48",brand:"Patriot",name:"Patriot Viper Venom 32GB DDR5-5600",model:"Patriot Viper Venom 32GB DDR5-5600",variantLabel:"Patriot",price:515,perf:74,ramType:"DDR5",cap:32,speed:5600},
-    {id:"ram49",brand:"Corsair",name:"Corsair Vengeance 32GB DDR5-6000",model:"Corsair Vengeance 32GB DDR5-6000",variantLabel:"Corsair",price:470,perf:77,ramType:"DDR5",cap:32,speed:6000},
-    {id:"ram50",brand:"G.Skill",name:"G.Skill Flare X5 32GB DDR5-6000",model:"G.Skill Flare X5 32GB DDR5-6000",variantLabel:"G.Skill",price:480,perf:77,ramType:"DDR5",cap:32,speed:6000},
-    {id:"ram51",brand:"G.Skill",name:"G.Skill Trident Z5 32GB DDR5-6000",model:"G.Skill Trident Z5 32GB DDR5-6000",variantLabel:"G.Skill",price:490,perf:77,ramType:"DDR5",cap:32,speed:6000},
-    {id:"ram52",brand:"Kingston",name:"Kingston Fury Beast 32GB DDR5-6000",model:"Kingston Fury Beast 32GB DDR5-6000",variantLabel:"Kingston",price:500,perf:77,ramType:"DDR5",cap:32,speed:6000},
-    {id:"ram53",brand:"TeamGroup",name:"TeamGroup T-Force Delta 32GB DDR5-6000",model:"TeamGroup T-Force Delta 32GB DDR5-6000",variantLabel:"TeamGroup",price:510,perf:77,ramType:"DDR5",cap:32,speed:6000},
-    {id:"ram54",brand:"Crucial",name:"Crucial Pro 32GB DDR5-6000",model:"Crucial Pro 32GB DDR5-6000",variantLabel:"Crucial",price:515,perf:77,ramType:"DDR5",cap:32,speed:6000},
-    {id:"ram55",brand:"ADATA",name:"ADATA XPG Lancer 32GB DDR5-6000",model:"ADATA XPG Lancer 32GB DDR5-6000",variantLabel:"ADATA",price:525,perf:77,ramType:"DDR5",cap:32,speed:6000},
-    {id:"ram56",brand:"Patriot",name:"Patriot Viper Venom 32GB DDR5-6000",model:"Patriot Viper Venom 32GB DDR5-6000",variantLabel:"Patriot",price:535,perf:77,ramType:"DDR5",cap:32,speed:6000},
-    {id:"ram57",brand:"Corsair",name:"Corsair Vengeance 32GB DDR5-6400",model:"Corsair Vengeance 32GB DDR5-6400",variantLabel:"Corsair",price:520,perf:76,ramType:"DDR5",cap:32,speed:6400},
-    {id:"ram58",brand:"G.Skill",name:"G.Skill Flare X5 32GB DDR5-6400",model:"G.Skill Flare X5 32GB DDR5-6400",variantLabel:"G.Skill",price:530,perf:76,ramType:"DDR5",cap:32,speed:6400},
-    {id:"ram59",brand:"G.Skill",name:"G.Skill Trident Z5 32GB DDR5-6400",model:"G.Skill Trident Z5 32GB DDR5-6400",variantLabel:"G.Skill",price:540,perf:76,ramType:"DDR5",cap:32,speed:6400},
-    {id:"ram60",brand:"Kingston",name:"Kingston Fury Beast 32GB DDR5-6400",model:"Kingston Fury Beast 32GB DDR5-6400",variantLabel:"Kingston",price:550,perf:76,ramType:"DDR5",cap:32,speed:6400},
-    {id:"ram61",brand:"TeamGroup",name:"TeamGroup T-Force Delta 32GB DDR5-6400",model:"TeamGroup T-Force Delta 32GB DDR5-6400",variantLabel:"TeamGroup",price:560,perf:76,ramType:"DDR5",cap:32,speed:6400},
-    {id:"ram62",brand:"Crucial",name:"Crucial Pro 32GB DDR5-6400",model:"Crucial Pro 32GB DDR5-6400",variantLabel:"Crucial",price:570,perf:76,ramType:"DDR5",cap:32,speed:6400},
-    {id:"ram63",brand:"ADATA",name:"ADATA XPG Lancer 32GB DDR5-6400",model:"ADATA XPG Lancer 32GB DDR5-6400",variantLabel:"ADATA",price:580,perf:76,ramType:"DDR5",cap:32,speed:6400},
-    {id:"ram64",brand:"Patriot",name:"Patriot Viper Venom 32GB DDR5-6400",model:"Patriot Viper Venom 32GB DDR5-6400",variantLabel:"Patriot",price:595,perf:76,ramType:"DDR5",cap:32,speed:6400},
-    {id:"ram65",brand:"Corsair",name:"Corsair Vengeance 32GB DDR5-7200",model:"Corsair Vengeance 32GB DDR5-7200",variantLabel:"Corsair",price:560,perf:76,ramType:"DDR5",cap:32,speed:7200},
-    {id:"ram66",brand:"G.Skill",name:"G.Skill Flare X5 32GB DDR5-7200",model:"G.Skill Flare X5 32GB DDR5-7200",variantLabel:"G.Skill",price:570,perf:76,ramType:"DDR5",cap:32,speed:7200},
-    {id:"ram67",brand:"G.Skill",name:"G.Skill Trident Z5 32GB DDR5-7200",model:"G.Skill Trident Z5 32GB DDR5-7200",variantLabel:"G.Skill",price:580,perf:76,ramType:"DDR5",cap:32,speed:7200},
-    {id:"ram68",brand:"Kingston",name:"Kingston Fury Renegade 32GB DDR5-7200",model:"Kingston Fury Renegade 32GB DDR5-7200",variantLabel:"Kingston",price:595,perf:76,ramType:"DDR5",cap:32,speed:7200},
-    {id:"ram69",brand:"TeamGroup",name:"TeamGroup T-Force Delta 32GB DDR5-7200",model:"TeamGroup T-Force Delta 32GB DDR5-7200",variantLabel:"TeamGroup",price:605,perf:76,ramType:"DDR5",cap:32,speed:7200},
-    {id:"ram70",brand:"Crucial",name:"Crucial Pro 32GB DDR5-7200",model:"Crucial Pro 32GB DDR5-7200",variantLabel:"Crucial",price:615,perf:76,ramType:"DDR5",cap:32,speed:7200},
-    {id:"ram71",brand:"ADATA",name:"ADATA XPG Lancer 32GB DDR5-7200",model:"ADATA XPG Lancer 32GB DDR5-7200",variantLabel:"ADATA",price:625,perf:76,ramType:"DDR5",cap:32,speed:7200},
-    {id:"ram72",brand:"Patriot",name:"Patriot Viper Venom 32GB DDR5-7200",model:"Patriot Viper Venom 32GB DDR5-7200",variantLabel:"Patriot",price:640,perf:76,ramType:"DDR5",cap:32,speed:7200},
-    {id:"ram73",brand:"Corsair",name:"Corsair Vengeance 48GB DDR5-6400",model:"Corsair Vengeance 48GB DDR5-6400",variantLabel:"Corsair",price:720,perf:82,ramType:"DDR5",cap:48,speed:6400},
-    {id:"ram74",brand:"G.Skill",name:"G.Skill Flare X5 48GB DDR5-6400",model:"G.Skill Flare X5 48GB DDR5-6400",variantLabel:"G.Skill",price:735,perf:82,ramType:"DDR5",cap:48,speed:6400},
-    {id:"ram75",brand:"G.Skill",name:"G.Skill Trident Z5 48GB DDR5-6400",model:"G.Skill Trident Z5 48GB DDR5-6400",variantLabel:"G.Skill",price:750,perf:82,ramType:"DDR5",cap:48,speed:6400},
-    {id:"ram76",brand:"Kingston",name:"Kingston Fury Renegade 48GB DDR5-6400",model:"Kingston Fury Renegade 48GB DDR5-6400",variantLabel:"Kingston",price:765,perf:82,ramType:"DDR5",cap:48,speed:6400},
-    {id:"ram77",brand:"TeamGroup",name:"TeamGroup T-Force Delta 48GB DDR5-6400",model:"TeamGroup T-Force Delta 48GB DDR5-6400",variantLabel:"TeamGroup",price:780,perf:82,ramType:"DDR5",cap:48,speed:6400},
-    {id:"ram78",brand:"Crucial",name:"Crucial Pro 48GB DDR5-6400",model:"Crucial Pro 48GB DDR5-6400",variantLabel:"Crucial",price:790,perf:82,ramType:"DDR5",cap:48,speed:6400},
-    {id:"ram79",brand:"ADATA",name:"ADATA XPG Lancer 48GB DDR5-6400",model:"ADATA XPG Lancer 48GB DDR5-6400",variantLabel:"ADATA",price:805,perf:82,ramType:"DDR5",cap:48,speed:6400},
-    {id:"ram80",brand:"Patriot",name:"Patriot Viper Venom 48GB DDR5-6400",model:"Patriot Viper Venom 48GB DDR5-6400",variantLabel:"Patriot",price:820,perf:82,ramType:"DDR5",cap:48,speed:6400},
-    {id:"ram81",brand:"Corsair",name:"Corsair Vengeance 64GB DDR5-6000",model:"Corsair Vengeance 64GB DDR5-6000",variantLabel:"Corsair",price:850,perf:91,ramType:"DDR5",cap:64,speed:6000},
-    {id:"ram82",brand:"G.Skill",name:"G.Skill Flare X5 64GB DDR5-6000",model:"G.Skill Flare X5 64GB DDR5-6000",variantLabel:"G.Skill",price:865,perf:91,ramType:"DDR5",cap:64,speed:6000},
-    {id:"ram83",brand:"G.Skill",name:"G.Skill Trident Z5 64GB DDR5-6000",model:"G.Skill Trident Z5 64GB DDR5-6000",variantLabel:"G.Skill",price:885,perf:91,ramType:"DDR5",cap:64,speed:6000},
-    {id:"ram84",brand:"TeamGroup",name:"TeamGroup T-Force Delta 64GB DDR5-6000",model:"TeamGroup T-Force Delta 64GB DDR5-6000",variantLabel:"TeamGroup",price:920,perf:91,ramType:"DDR5",cap:64,speed:6000},
-    {id:"ram85",brand:"Corsair",name:"Corsair Vengeance 96GB DDR5-6400",model:"Corsair Vengeance 96GB DDR5-6400",variantLabel:"Corsair",price:1300,perf:96,ramType:"DDR5",cap:96,speed:6400},
-    {id:"ram86",brand:"G.Skill",name:"G.Skill Flare X5 96GB DDR5-6400",model:"G.Skill Flare X5 96GB DDR5-6400",variantLabel:"G.Skill",price:1325,perf:96,ramType:"DDR5",cap:96,speed:6400},
-    {id:"ram87",brand:"G.Skill",name:"G.Skill Trident Z5 96GB DDR5-6400",model:"G.Skill Trident Z5 96GB DDR5-6400",variantLabel:"G.Skill",price:1350,perf:96,ramType:"DDR5",cap:96,speed:6400},
-    {id:"ram88",brand:"TeamGroup",name:"TeamGroup T-Force Delta 96GB DDR5-6400",model:"TeamGroup T-Force Delta 96GB DDR5-6400",variantLabel:"TeamGroup",price:1405,perf:96,ramType:"DDR5",cap:96,speed:6400},
+    {id:"ram1",brand:"Corsair",name:"Corsair Vengeance LPX 16GB DDR4-3200",model:"Corsair Vengeance LPX 16GB DDR4-3200",variantLabel:"Corsair",price:150,perf:41,ramType:"DDR4",cap:16,speed:3200},
+    {id:"ram2",brand:"G.Skill",name:"G.Skill Ripjaws V 16GB DDR4-3200",model:"G.Skill Ripjaws V 16GB DDR4-3200",variantLabel:"G.Skill",price:150,perf:41,ramType:"DDR4",cap:16,speed:3200},
+    {id:"ram3",brand:"Kingston",name:"Kingston Fury Beast 16GB DDR4-3200",model:"Kingston Fury Beast 16GB DDR4-3200",variantLabel:"Kingston",price:155,perf:41,ramType:"DDR4",cap:16,speed:3200},
+    {id:"ram4",brand:"TeamGroup",name:"TeamGroup T-Force Vulcan 16GB DDR4-3200",model:"TeamGroup T-Force Vulcan 16GB DDR4-3200",variantLabel:"TeamGroup",price:155,perf:41,ramType:"DDR4",cap:16,speed:3200},
+    {id:"ram5",brand:"Patriot",name:"Patriot Viper Steel 16GB DDR4-3200",model:"Patriot Viper Steel 16GB DDR4-3200",variantLabel:"Patriot",price:155,perf:41,ramType:"DDR4",cap:16,speed:3200},
+    {id:"ram6",brand:"ADATA",name:"ADATA XPG Gammix 16GB DDR4-3200",model:"ADATA XPG Gammix 16GB DDR4-3200",variantLabel:"ADATA",price:160,perf:41,ramType:"DDR4",cap:16,speed:3200},
+    {id:"ram7",brand:"Corsair",name:"Corsair Vengeance LPX 16GB DDR4-3600",model:"Corsair Vengeance LPX 16GB DDR4-3600",variantLabel:"Corsair",price:155,perf:41,ramType:"DDR4",cap:16,speed:3600},
+    {id:"ram8",brand:"G.Skill",name:"G.Skill Ripjaws V 16GB DDR4-3600",model:"G.Skill Ripjaws V 16GB DDR4-3600",variantLabel:"G.Skill",price:155,perf:41,ramType:"DDR4",cap:16,speed:3600},
+    {id:"ram9",brand:"Kingston",name:"Kingston Fury Beast 16GB DDR4-3600",model:"Kingston Fury Beast 16GB DDR4-3600",variantLabel:"Kingston",price:160,perf:41,ramType:"DDR4",cap:16,speed:3600},
+    {id:"ram10",brand:"TeamGroup",name:"TeamGroup T-Force Vulcan 16GB DDR4-3600",model:"TeamGroup T-Force Vulcan 16GB DDR4-3600",variantLabel:"TeamGroup",price:160,perf:41,ramType:"DDR4",cap:16,speed:3600},
+    {id:"ram11",brand:"Patriot",name:"Patriot Viper Steel 16GB DDR4-3600",model:"Patriot Viper Steel 16GB DDR4-3600",variantLabel:"Patriot",price:165,perf:41,ramType:"DDR4",cap:16,speed:3600},
+    {id:"ram12",brand:"ADATA",name:"ADATA XPG Gammix 16GB DDR4-3600",model:"ADATA XPG Gammix 16GB DDR4-3600",variantLabel:"ADATA",price:165,perf:41,ramType:"DDR4",cap:16,speed:3600},
+    {id:"ram13",brand:"Corsair",name:"Corsair Vengeance LPX 32GB DDR4-3200",model:"Corsair Vengeance LPX 32GB DDR4-3200",variantLabel:"Corsair",price:205,perf:65,ramType:"DDR4",cap:32,speed:3200},
+    {id:"ram14",brand:"G.Skill",name:"G.Skill Ripjaws V 32GB DDR4-3200",model:"G.Skill Ripjaws V 32GB DDR4-3200",variantLabel:"G.Skill",price:210,perf:65,ramType:"DDR4",cap:32,speed:3200},
+    {id:"ram15",brand:"Kingston",name:"Kingston Fury Beast 32GB DDR4-3200",model:"Kingston Fury Beast 32GB DDR4-3200",variantLabel:"Kingston",price:210,perf:65,ramType:"DDR4",cap:32,speed:3200},
+    {id:"ram16",brand:"TeamGroup",name:"TeamGroup T-Force Vulcan 32GB DDR4-3200",model:"TeamGroup T-Force Vulcan 32GB DDR4-3200",variantLabel:"TeamGroup",price:215,perf:65,ramType:"DDR4",cap:32,speed:3200},
+    {id:"ram17",brand:"Patriot",name:"Patriot Viper Steel 32GB DDR4-3200",model:"Patriot Viper Steel 32GB DDR4-3200",variantLabel:"Patriot",price:215,perf:65,ramType:"DDR4",cap:32,speed:3200},
+    {id:"ram18",brand:"ADATA",name:"ADATA XPG Gammix 32GB DDR4-3200",model:"ADATA XPG Gammix 32GB DDR4-3200",variantLabel:"ADATA",price:220,perf:65,ramType:"DDR4",cap:32,speed:3200},
+    {id:"ram19",brand:"Corsair",name:"Corsair Vengeance LPX 32GB DDR4-3600",model:"Corsair Vengeance LPX 32GB DDR4-3600",variantLabel:"Corsair",price:215,perf:65,ramType:"DDR4",cap:32,speed:3600},
+    {id:"ram20",brand:"G.Skill",name:"G.Skill Ripjaws V 32GB DDR4-3600",model:"G.Skill Ripjaws V 32GB DDR4-3600",variantLabel:"G.Skill",price:220,perf:65,ramType:"DDR4",cap:32,speed:3600},
+    {id:"ram21",brand:"Kingston",name:"Kingston Fury Beast 32GB DDR4-3600",model:"Kingston Fury Beast 32GB DDR4-3600",variantLabel:"Kingston",price:220,perf:65,ramType:"DDR4",cap:32,speed:3600},
+    {id:"ram22",brand:"TeamGroup",name:"TeamGroup T-Force Vulcan 32GB DDR4-3600",model:"TeamGroup T-Force Vulcan 32GB DDR4-3600",variantLabel:"TeamGroup",price:225,perf:65,ramType:"DDR4",cap:32,speed:3600},
+    {id:"ram23",brand:"Patriot",name:"Patriot Viper Steel 32GB DDR4-3600",model:"Patriot Viper Steel 32GB DDR4-3600",variantLabel:"Patriot",price:230,perf:65,ramType:"DDR4",cap:32,speed:3600},
+    {id:"ram24",brand:"ADATA",name:"ADATA XPG Gammix 32GB DDR4-3600",model:"ADATA XPG Gammix 32GB DDR4-3600",variantLabel:"ADATA",price:235,perf:65,ramType:"DDR4",cap:32,speed:3600},
+    {id:"ram25",brand:"Corsair",name:"Corsair Vengeance 16GB DDR5-5600",model:"Corsair Vengeance 16GB DDR5-5600",variantLabel:"Corsair",price:230,perf:50,ramType:"DDR5",cap:16,speed:5600},
+    {id:"ram26",brand:"G.Skill",name:"G.Skill Flare X5 16GB DDR5-5600",model:"G.Skill Flare X5 16GB DDR5-5600",variantLabel:"G.Skill",price:235,perf:50,ramType:"DDR5",cap:16,speed:5600},
+    {id:"ram27",brand:"G.Skill",name:"G.Skill Trident Z5 16GB DDR5-5600",model:"G.Skill Trident Z5 16GB DDR5-5600",variantLabel:"G.Skill",price:235,perf:50,ramType:"DDR5",cap:16,speed:5600},
+    {id:"ram28",brand:"Kingston",name:"Kingston Fury Beast 16GB DDR5-5600",model:"Kingston Fury Beast 16GB DDR5-5600",variantLabel:"Kingston",price:240,perf:50,ramType:"DDR5",cap:16,speed:5600},
+    {id:"ram29",brand:"TeamGroup",name:"TeamGroup T-Force Delta 16GB DDR5-5600",model:"TeamGroup T-Force Delta 16GB DDR5-5600",variantLabel:"TeamGroup",price:245,perf:50,ramType:"DDR5",cap:16,speed:5600},
+    {id:"ram30",brand:"Crucial",name:"Crucial Pro 16GB DDR5-5600",model:"Crucial Pro 16GB DDR5-5600",variantLabel:"Crucial",price:250,perf:50,ramType:"DDR5",cap:16,speed:5600},
+    {id:"ram31",brand:"ADATA",name:"ADATA XPG Lancer 16GB DDR5-5600",model:"ADATA XPG Lancer 16GB DDR5-5600",variantLabel:"ADATA",price:250,perf:50,ramType:"DDR5",cap:16,speed:5600},
+    {id:"ram32",brand:"Patriot",name:"Patriot Viper Venom 16GB DDR5-5600",model:"Patriot Viper Venom 16GB DDR5-5600",variantLabel:"Patriot",price:255,perf:50,ramType:"DDR5",cap:16,speed:5600},
+    {id:"ram33",brand:"Corsair",name:"Corsair Vengeance 16GB DDR5-6000",model:"Corsair Vengeance 16GB DDR5-6000",variantLabel:"Corsair",price:240,perf:53,ramType:"DDR5",cap:16,speed:6000},
+    {id:"ram34",brand:"G.Skill",name:"G.Skill Flare X5 16GB DDR5-6000",model:"G.Skill Flare X5 16GB DDR5-6000",variantLabel:"G.Skill",price:245,perf:53,ramType:"DDR5",cap:16,speed:6000},
+    {id:"ram35",brand:"G.Skill",name:"G.Skill Trident Z5 16GB DDR5-6000",model:"G.Skill Trident Z5 16GB DDR5-6000",variantLabel:"G.Skill",price:250,perf:53,ramType:"DDR5",cap:16,speed:6000},
+    {id:"ram36",brand:"Kingston",name:"Kingston Fury Beast 16GB DDR5-6000",model:"Kingston Fury Beast 16GB DDR5-6000",variantLabel:"Kingston",price:250,perf:53,ramType:"DDR5",cap:16,speed:6000},
+    {id:"ram37",brand:"TeamGroup",name:"TeamGroup T-Force Delta 16GB DDR5-6000",model:"TeamGroup T-Force Delta 16GB DDR5-6000",variantLabel:"TeamGroup",price:255,perf:53,ramType:"DDR5",cap:16,speed:6000},
+    {id:"ram38",brand:"Crucial",name:"Crucial Pro 16GB DDR5-6000",model:"Crucial Pro 16GB DDR5-6000",variantLabel:"Crucial",price:260,perf:53,ramType:"DDR5",cap:16,speed:6000},
+    {id:"ram39",brand:"ADATA",name:"ADATA XPG Lancer 16GB DDR5-6000",model:"ADATA XPG Lancer 16GB DDR5-6000",variantLabel:"ADATA",price:265,perf:53,ramType:"DDR5",cap:16,speed:6000},
+    {id:"ram40",brand:"Patriot",name:"Patriot Viper Venom 16GB DDR5-6000",model:"Patriot Viper Venom 16GB DDR5-6000",variantLabel:"Patriot",price:265,perf:53,ramType:"DDR5",cap:16,speed:6000},
+    {id:"ram41",brand:"Corsair",name:"Corsair Vengeance 32GB DDR5-5600",model:"Corsair Vengeance 32GB DDR5-5600",variantLabel:"Corsair",price:330,perf:74,ramType:"DDR5",cap:32,speed:5600},
+    {id:"ram42",brand:"G.Skill",name:"G.Skill Flare X5 32GB DDR5-5600",model:"G.Skill Flare X5 32GB DDR5-5600",variantLabel:"G.Skill",price:340,perf:74,ramType:"DDR5",cap:32,speed:5600},
+    {id:"ram43",brand:"G.Skill",name:"G.Skill Trident Z5 32GB DDR5-5600",model:"G.Skill Trident Z5 32GB DDR5-5600",variantLabel:"G.Skill",price:350,perf:74,ramType:"DDR5",cap:32,speed:5600},
+    {id:"ram44",brand:"Kingston",name:"Kingston Fury Beast 32GB DDR5-5600",model:"Kingston Fury Beast 32GB DDR5-5600",variantLabel:"Kingston",price:355,perf:74,ramType:"DDR5",cap:32,speed:5600},
+    {id:"ram45",brand:"TeamGroup",name:"TeamGroup T-Force Delta 32GB DDR5-5600",model:"TeamGroup T-Force Delta 32GB DDR5-5600",variantLabel:"TeamGroup",price:365,perf:74,ramType:"DDR5",cap:32,speed:5600},
+    {id:"ram46",brand:"Crucial",name:"Crucial Pro 32GB DDR5-5600",model:"Crucial Pro 32GB DDR5-5600",variantLabel:"Crucial",price:375,perf:74,ramType:"DDR5",cap:32,speed:5600},
+    {id:"ram47",brand:"ADATA",name:"ADATA XPG Lancer 32GB DDR5-5600",model:"ADATA XPG Lancer 32GB DDR5-5600",variantLabel:"ADATA",price:385,perf:74,ramType:"DDR5",cap:32,speed:5600},
+    {id:"ram48",brand:"Patriot",name:"Patriot Viper Venom 32GB DDR5-5600",model:"Patriot Viper Venom 32GB DDR5-5600",variantLabel:"Patriot",price:395,perf:74,ramType:"DDR5",cap:32,speed:5600},
+    {id:"ram49",brand:"Corsair",name:"Corsair Vengeance 32GB DDR5-6000",model:"Corsair Vengeance 32GB DDR5-6000",variantLabel:"Corsair",price:360,perf:77,ramType:"DDR5",cap:32,speed:6000},
+    {id:"ram50",brand:"G.Skill",name:"G.Skill Flare X5 32GB DDR5-6000",model:"G.Skill Flare X5 32GB DDR5-6000",variantLabel:"G.Skill",price:370,perf:77,ramType:"DDR5",cap:32,speed:6000},
+    {id:"ram51",brand:"G.Skill",name:"G.Skill Trident Z5 32GB DDR5-6000",model:"G.Skill Trident Z5 32GB DDR5-6000",variantLabel:"G.Skill",price:380,perf:77,ramType:"DDR5",cap:32,speed:6000},
+    {id:"ram52",brand:"Kingston",name:"Kingston Fury Beast 32GB DDR5-6000",model:"Kingston Fury Beast 32GB DDR5-6000",variantLabel:"Kingston",price:390,perf:77,ramType:"DDR5",cap:32,speed:6000},
+    {id:"ram53",brand:"TeamGroup",name:"TeamGroup T-Force Delta 32GB DDR5-6000",model:"TeamGroup T-Force Delta 32GB DDR5-6000",variantLabel:"TeamGroup",price:395,perf:77,ramType:"DDR5",cap:32,speed:6000},
+    {id:"ram54",brand:"Crucial",name:"Crucial Pro 32GB DDR5-6000",model:"Crucial Pro 32GB DDR5-6000",variantLabel:"Crucial",price:400,perf:77,ramType:"DDR5",cap:32,speed:6000},
+    {id:"ram55",brand:"ADATA",name:"ADATA XPG Lancer 32GB DDR5-6000",model:"ADATA XPG Lancer 32GB DDR5-6000",variantLabel:"ADATA",price:415,perf:77,ramType:"DDR5",cap:32,speed:6000},
+    {id:"ram56",brand:"Patriot",name:"Patriot Viper Venom 32GB DDR5-6000",model:"Patriot Viper Venom 32GB DDR5-6000",variantLabel:"Patriot",price:425,perf:77,ramType:"DDR5",cap:32,speed:6000},
+    {id:"ram57",brand:"Corsair",name:"Corsair Vengeance 32GB DDR5-6400",model:"Corsair Vengeance 32GB DDR5-6400",variantLabel:"Corsair",price:420,perf:76,ramType:"DDR5",cap:32,speed:6400},
+    {id:"ram58",brand:"G.Skill",name:"G.Skill Flare X5 32GB DDR5-6400",model:"G.Skill Flare X5 32GB DDR5-6400",variantLabel:"G.Skill",price:430,perf:76,ramType:"DDR5",cap:32,speed:6400},
+    {id:"ram59",brand:"G.Skill",name:"G.Skill Trident Z5 32GB DDR5-6400",model:"G.Skill Trident Z5 32GB DDR5-6400",variantLabel:"G.Skill",price:440,perf:76,ramType:"DDR5",cap:32,speed:6400},
+    {id:"ram60",brand:"Kingston",name:"Kingston Fury Beast 32GB DDR5-6400",model:"Kingston Fury Beast 32GB DDR5-6400",variantLabel:"Kingston",price:450,perf:76,ramType:"DDR5",cap:32,speed:6400},
+    {id:"ram61",brand:"TeamGroup",name:"TeamGroup T-Force Delta 32GB DDR5-6400",model:"TeamGroup T-Force Delta 32GB DDR5-6400",variantLabel:"TeamGroup",price:460,perf:76,ramType:"DDR5",cap:32,speed:6400},
+    {id:"ram62",brand:"Crucial",name:"Crucial Pro 32GB DDR5-6400",model:"Crucial Pro 32GB DDR5-6400",variantLabel:"Crucial",price:465,perf:76,ramType:"DDR5",cap:32,speed:6400},
+    {id:"ram63",brand:"ADATA",name:"ADATA XPG Lancer 32GB DDR5-6400",model:"ADATA XPG Lancer 32GB DDR5-6400",variantLabel:"ADATA",price:475,perf:76,ramType:"DDR5",cap:32,speed:6400},
+    {id:"ram64",brand:"Patriot",name:"Patriot Viper Venom 32GB DDR5-6400",model:"Patriot Viper Venom 32GB DDR5-6400",variantLabel:"Patriot",price:485,perf:76,ramType:"DDR5",cap:32,speed:6400},
+    {id:"ram65",brand:"Corsair",name:"Corsair Vengeance 32GB DDR5-7200",model:"Corsair Vengeance 32GB DDR5-7200",variantLabel:"Corsair",price:470,perf:76,ramType:"DDR5",cap:32,speed:7200},
+    {id:"ram66",brand:"G.Skill",name:"G.Skill Flare X5 32GB DDR5-7200",model:"G.Skill Flare X5 32GB DDR5-7200",variantLabel:"G.Skill",price:480,perf:76,ramType:"DDR5",cap:32,speed:7200},
+    {id:"ram67",brand:"G.Skill",name:"G.Skill Trident Z5 32GB DDR5-7200",model:"G.Skill Trident Z5 32GB DDR5-7200",variantLabel:"G.Skill",price:490,perf:76,ramType:"DDR5",cap:32,speed:7200},
+    {id:"ram68",brand:"Kingston",name:"Kingston Fury Renegade 32GB DDR5-7200",model:"Kingston Fury Renegade 32GB DDR5-7200",variantLabel:"Kingston",price:500,perf:76,ramType:"DDR5",cap:32,speed:7200},
+    {id:"ram69",brand:"TeamGroup",name:"TeamGroup T-Force Delta 32GB DDR5-7200",model:"TeamGroup T-Force Delta 32GB DDR5-7200",variantLabel:"TeamGroup",price:510,perf:76,ramType:"DDR5",cap:32,speed:7200},
+    {id:"ram70",brand:"Crucial",name:"Crucial Pro 32GB DDR5-7200",model:"Crucial Pro 32GB DDR5-7200",variantLabel:"Crucial",price:520,perf:76,ramType:"DDR5",cap:32,speed:7200},
+    {id:"ram71",brand:"ADATA",name:"ADATA XPG Lancer 32GB DDR5-7200",model:"ADATA XPG Lancer 32GB DDR5-7200",variantLabel:"ADATA",price:530,perf:76,ramType:"DDR5",cap:32,speed:7200},
+    {id:"ram72",brand:"Patriot",name:"Patriot Viper Venom 32GB DDR5-7200",model:"Patriot Viper Venom 32GB DDR5-7200",variantLabel:"Patriot",price:545,perf:76,ramType:"DDR5",cap:32,speed:7200},
+    {id:"ram73",brand:"Corsair",name:"Corsair Vengeance 48GB DDR5-6400",model:"Corsair Vengeance 48GB DDR5-6400",variantLabel:"Corsair",price:580,perf:82,ramType:"DDR5",cap:48,speed:6400},
+    {id:"ram74",brand:"G.Skill",name:"G.Skill Flare X5 48GB DDR5-6400",model:"G.Skill Flare X5 48GB DDR5-6400",variantLabel:"G.Skill",price:595,perf:82,ramType:"DDR5",cap:48,speed:6400},
+    {id:"ram75",brand:"G.Skill",name:"G.Skill Trident Z5 48GB DDR5-6400",model:"G.Skill Trident Z5 48GB DDR5-6400",variantLabel:"G.Skill",price:610,perf:82,ramType:"DDR5",cap:48,speed:6400},
+    {id:"ram76",brand:"Kingston",name:"Kingston Fury Renegade 48GB DDR5-6400",model:"Kingston Fury Renegade 48GB DDR5-6400",variantLabel:"Kingston",price:625,perf:82,ramType:"DDR5",cap:48,speed:6400},
+    {id:"ram77",brand:"TeamGroup",name:"TeamGroup T-Force Delta 48GB DDR5-6400",model:"TeamGroup T-Force Delta 48GB DDR5-6400",variantLabel:"TeamGroup",price:635,perf:82,ramType:"DDR5",cap:48,speed:6400},
+    {id:"ram78",brand:"Crucial",name:"Crucial Pro 48GB DDR5-6400",model:"Crucial Pro 48GB DDR5-6400",variantLabel:"Crucial",price:645,perf:82,ramType:"DDR5",cap:48,speed:6400},
+    {id:"ram79",brand:"ADATA",name:"ADATA XPG Lancer 48GB DDR5-6400",model:"ADATA XPG Lancer 48GB DDR5-6400",variantLabel:"ADATA",price:655,perf:82,ramType:"DDR5",cap:48,speed:6400},
+    {id:"ram80",brand:"Patriot",name:"Patriot Viper Venom 48GB DDR5-6400",model:"Patriot Viper Venom 48GB DDR5-6400",variantLabel:"Patriot",price:665,perf:82,ramType:"DDR5",cap:48,speed:6400},
+    {id:"ram81",brand:"Corsair",name:"Corsair Vengeance 64GB DDR5-6000",model:"Corsair Vengeance 64GB DDR5-6000",variantLabel:"Corsair",price:520,perf:91,ramType:"DDR5",cap:64,speed:6000},
+    {id:"ram82",brand:"G.Skill",name:"G.Skill Flare X5 64GB DDR5-6000",model:"G.Skill Flare X5 64GB DDR5-6000",variantLabel:"G.Skill",price:535,perf:91,ramType:"DDR5",cap:64,speed:6000},
+    {id:"ram83",brand:"G.Skill",name:"G.Skill Trident Z5 64GB DDR5-6000",model:"G.Skill Trident Z5 64GB DDR5-6000",variantLabel:"G.Skill",price:550,perf:91,ramType:"DDR5",cap:64,speed:6000},
+    {id:"ram84",brand:"TeamGroup",name:"TeamGroup T-Force Delta 64GB DDR5-6000",model:"TeamGroup T-Force Delta 64GB DDR5-6000",variantLabel:"TeamGroup",price:575,perf:91,ramType:"DDR5",cap:64,speed:6000},
+    {id:"ram85",brand:"Corsair",name:"Corsair Vengeance 96GB DDR5-6400",model:"Corsair Vengeance 96GB DDR5-6400",variantLabel:"Corsair",price:660,perf:96,ramType:"DDR5",cap:96,speed:6400},
+    {id:"ram86",brand:"G.Skill",name:"G.Skill Flare X5 96GB DDR5-6400",model:"G.Skill Flare X5 96GB DDR5-6400",variantLabel:"G.Skill",price:675,perf:96,ramType:"DDR5",cap:96,speed:6400},
+    {id:"ram87",brand:"G.Skill",name:"G.Skill Trident Z5 96GB DDR5-6400",model:"G.Skill Trident Z5 96GB DDR5-6400",variantLabel:"G.Skill",price:695,perf:96,ramType:"DDR5",cap:96,speed:6400},
+    {id:"ram88",brand:"TeamGroup",name:"TeamGroup T-Force Delta 96GB DDR5-6400",model:"TeamGroup T-Force Delta 96GB DDR5-6400",variantLabel:"TeamGroup",price:735,perf:96,ramType:"DDR5",cap:96,speed:6400},
   ],
   storage: [
-    {id:"ssd1",brand:"Crucial",name:"Crucial BX500 1TB",model:"Crucial BX500 1TB",variantLabel:"Crucial",price:110,perf:35,kind:"SATA",cap:1000,iface:"SATA"},
-    {id:"ssd2",brand:"Crucial",name:"Crucial BX500 2TB",model:"Crucial BX500 2TB",variantLabel:"Crucial",price:210,perf:46,kind:"SATA",cap:2000,iface:"SATA"},
-    {id:"ssd3",brand:"WD",name:"WD Blue SA510 1TB",model:"WD Blue SA510 1TB",variantLabel:"WD",price:100,perf:36,kind:"SATA",cap:1000,iface:"SATA"},
-    {id:"ssd4",brand:"WD",name:"WD Blue SA510 2TB",model:"WD Blue SA510 2TB",variantLabel:"WD",price:200,perf:47,kind:"SATA",cap:2000,iface:"SATA"},
-    {id:"ssd5",brand:"Samsung",name:"Samsung 870 EVO 1TB",model:"Samsung 870 EVO 1TB",variantLabel:"Samsung",price:120,perf:40,kind:"SATA",cap:1000,iface:"SATA"},
-    {id:"ssd6",brand:"Samsung",name:"Samsung 870 EVO 2TB",model:"Samsung 870 EVO 2TB",variantLabel:"Samsung",price:230,perf:48,kind:"SATA",cap:2000,iface:"SATA"},
-    {id:"ssd7",brand:"Samsung",name:"Samsung 870 EVO 4TB",model:"Samsung 870 EVO 4TB",variantLabel:"Samsung",price:500,perf:52,kind:"SATA",cap:4000,iface:"SATA"},
-    {id:"ssd8",brand:"Crucial",name:"Crucial P3 Plus 1TB",model:"Crucial P3 Plus 1TB",variantLabel:"Crucial",price:140,perf:55,kind:"NVMe",cap:1000,iface:"M.2"},
-    {id:"ssd9",brand:"Crucial",name:"Crucial P3 Plus 2TB",model:"Crucial P3 Plus 2TB",variantLabel:"Crucial",price:270,perf:66,kind:"NVMe",cap:2000,iface:"M.2"},
-    {id:"ssd10",brand:"Crucial",name:"Crucial P3 Plus 4TB",model:"Crucial P3 Plus 4TB",variantLabel:"Crucial",price:640,perf:82,kind:"NVMe",cap:4000,iface:"M.2"},
-    {id:"ssd11",brand:"WD",name:"WD Black SN770 1TB",model:"WD Black SN770 1TB",variantLabel:"WD",price:150,perf:62,kind:"NVMe",cap:1000,iface:"M.2"},
-    {id:"ssd12",brand:"WD",name:"WD Black SN770 2TB",model:"WD Black SN770 2TB",variantLabel:"WD",price:300,perf:72,kind:"NVMe",cap:2000,iface:"M.2"},
-    {id:"ssd13",brand:"Samsung",name:"Samsung 990 EVO 1TB",model:"Samsung 990 EVO 1TB",variantLabel:"Samsung",price:160,perf:60,kind:"NVMe",cap:1000,iface:"M.2"},
-    {id:"ssd14",brand:"Samsung",name:"Samsung 990 EVO 2TB",model:"Samsung 990 EVO 2TB",variantLabel:"Samsung",price:300,perf:70,kind:"NVMe",cap:2000,iface:"M.2"},
-    {id:"ssd15",brand:"Kingston",name:"Kingston NV3 1TB",model:"Kingston NV3 1TB",variantLabel:"Kingston",price:130,perf:58,kind:"NVMe",cap:1000,iface:"M.2"},
-    {id:"ssd16",brand:"Kingston",name:"Kingston NV3 2TB",model:"Kingston NV3 2TB",variantLabel:"Kingston",price:250,perf:68,kind:"NVMe",cap:2000,iface:"M.2"},
-    {id:"ssd17",brand:"Lexar",name:"Lexar NM790 1TB",model:"Lexar NM790 1TB",variantLabel:"Lexar",price:150,perf:64,kind:"NVMe",cap:1000,iface:"M.2"},
-    {id:"ssd18",brand:"Lexar",name:"Lexar NM790 2TB",model:"Lexar NM790 2TB",variantLabel:"Lexar",price:290,perf:76,kind:"NVMe",cap:2000,iface:"M.2"},
-    {id:"ssd19",brand:"Lexar",name:"Lexar NM790 4TB",model:"Lexar NM790 4TB",variantLabel:"Lexar",price:700,perf:86,kind:"NVMe",cap:4000,iface:"M.2"},
-    {id:"ssd20",brand:"TeamGroup",name:"TeamGroup MP44 1TB",model:"TeamGroup MP44 1TB",variantLabel:"TeamGroup",price:140,perf:62,kind:"NVMe",cap:1000,iface:"M.2"},
-    {id:"ssd21",brand:"TeamGroup",name:"TeamGroup MP44 2TB",model:"TeamGroup MP44 2TB",variantLabel:"TeamGroup",price:280,perf:74,kind:"NVMe",cap:2000,iface:"M.2"},
-    {id:"ssd22",brand:"Crucial",name:"Crucial T500 1TB",model:"Crucial T500 1TB",variantLabel:"Crucial",price:160,perf:72,kind:"NVMe",cap:1000,iface:"M.2"},
-    {id:"ssd23",brand:"Crucial",name:"Crucial T500 2TB",model:"Crucial T500 2TB",variantLabel:"Crucial",price:290,perf:80,kind:"NVMe",cap:2000,iface:"M.2"},
-    {id:"ssd24",brand:"Crucial",name:"Crucial T500 4TB",model:"Crucial T500 4TB",variantLabel:"Crucial",price:720,perf:88,kind:"NVMe",cap:4000,iface:"M.2"},
-    {id:"ssd25",brand:"Samsung",name:"Samsung 990 Pro 1TB",model:"Samsung 990 Pro 1TB",variantLabel:"Samsung",price:180,perf:78,kind:"NVMe",cap:1000,iface:"M.2"},
-    {id:"ssd26",brand:"Samsung",name:"Samsung 990 Pro 2TB",model:"Samsung 990 Pro 2TB",variantLabel:"Samsung",price:330,perf:84,kind:"NVMe",cap:2000,iface:"M.2"},
-    {id:"ssd27",brand:"Samsung",name:"Samsung 990 Pro 4TB",model:"Samsung 990 Pro 4TB",variantLabel:"Samsung",price:760,perf:92,kind:"NVMe",cap:4000,iface:"M.2"},
-    {id:"ssd28",brand:"WD",name:"WD Black SN850X 1TB",model:"WD Black SN850X 1TB",variantLabel:"WD",price:170,perf:80,kind:"NVMe",cap:1000,iface:"M.2"},
-    {id:"ssd29",brand:"WD",name:"WD Black SN850X 2TB",model:"WD Black SN850X 2TB",variantLabel:"WD",price:379,perf:86,kind:"NVMe",cap:2000,iface:"M.2"},
-    {id:"ssd30",brand:"WD",name:"WD Black SN850X 4TB",model:"WD Black SN850X 4TB",variantLabel:"WD",price:780,perf:93,kind:"NVMe",cap:4000,iface:"M.2"},
-    {id:"ssd31",brand:"Kingston",name:"Kingston KC3000 1TB",model:"Kingston KC3000 1TB",variantLabel:"Kingston",price:170,perf:78,kind:"NVMe",cap:1000,iface:"M.2"},
-    {id:"ssd32",brand:"Kingston",name:"Kingston KC3000 2TB",model:"Kingston KC3000 2TB",variantLabel:"Kingston",price:330,perf:85,kind:"NVMe",cap:2000,iface:"M.2"},
-    {id:"ssd33",brand:"Corsair",name:"Corsair MP600 GS 1TB",model:"Corsair MP600 GS 1TB",variantLabel:"Corsair",price:160,perf:76,kind:"NVMe",cap:1000,iface:"M.2"},
-    {id:"ssd34",brand:"Corsair",name:"Corsair MP600 GS 2TB",model:"Corsair MP600 GS 2TB",variantLabel:"Corsair",price:310,perf:84,kind:"NVMe",cap:2000,iface:"M.2"},
-    {id:"ssd35",brand:"Seagate",name:"Seagate FireCuda 530 1TB",model:"Seagate FireCuda 530 1TB",variantLabel:"Seagate",price:180,perf:80,kind:"NVMe",cap:1000,iface:"M.2"},
-    {id:"ssd36",brand:"Seagate",name:"Seagate FireCuda 530 2TB",model:"Seagate FireCuda 530 2TB",variantLabel:"Seagate",price:360,perf:87,kind:"NVMe",cap:2000,iface:"M.2"},
-    {id:"ssd37",brand:"Seagate",name:"Seagate FireCuda 530 4TB",model:"Seagate FireCuda 530 4TB",variantLabel:"Seagate",price:800,perf:93,kind:"NVMe",cap:4000,iface:"M.2"},
-    {id:"ssd38",brand:"Sabrent",name:"Sabrent Rocket 4 Plus 1TB",model:"Sabrent Rocket 4 Plus 1TB",variantLabel:"Sabrent",price:170,perf:79,kind:"NVMe",cap:1000,iface:"M.2"},
-    {id:"ssd39",brand:"Sabrent",name:"Sabrent Rocket 4 Plus 2TB",model:"Sabrent Rocket 4 Plus 2TB",variantLabel:"Sabrent",price:340,perf:86,kind:"NVMe",cap:2000,iface:"M.2"},
-    {id:"ssd40",brand:"Crucial",name:"Crucial T705 Gen5 1TB",model:"Crucial T705 Gen5 1TB",variantLabel:"Crucial",price:245,perf:86,kind:"NVMe",cap:1000,iface:"M.2"},
-    {id:"ssd41",brand:"Crucial",name:"Crucial T705 Gen5 2TB",model:"Crucial T705 Gen5 2TB",variantLabel:"Crucial",price:480,perf:93,kind:"NVMe",cap:2000,iface:"M.2"},
-    {id:"ssd42",brand:"Crucial",name:"Crucial T705 Gen5 4TB",model:"Crucial T705 Gen5 4TB",variantLabel:"Crucial",price:980,perf:97,kind:"NVMe",cap:4000,iface:"M.2"},
-    {id:"ssd43",brand:"Samsung",name:"Samsung 9100 Pro Gen5 1TB",model:"Samsung 9100 Pro Gen5 1TB",variantLabel:"Samsung",price:260,perf:88,kind:"NVMe",cap:1000,iface:"M.2"},
-    {id:"ssd44",brand:"Samsung",name:"Samsung 9100 Pro Gen5 2TB",model:"Samsung 9100 Pro Gen5 2TB",variantLabel:"Samsung",price:500,perf:94,kind:"NVMe",cap:2000,iface:"M.2"},
-    {id:"ssd45",brand:"Samsung",name:"Samsung 9100 Pro Gen5 4TB",model:"Samsung 9100 Pro Gen5 4TB",variantLabel:"Samsung",price:1000,perf:98,kind:"NVMe",cap:4000,iface:"M.2"},
-    {id:"ssd46",brand:"Sabrent",name:"Sabrent Rocket 5 Gen5 1TB",model:"Sabrent Rocket 5 Gen5 1TB",variantLabel:"Sabrent",price:250,perf:87,kind:"NVMe",cap:1000,iface:"M.2"},
-    {id:"ssd47",brand:"Sabrent",name:"Sabrent Rocket 5 Gen5 2TB",model:"Sabrent Rocket 5 Gen5 2TB",variantLabel:"Sabrent",price:490,perf:93,kind:"NVMe",cap:2000,iface:"M.2"},
-    {id:"ssd48",brand:"Corsair",name:"Corsair MP700 Gen5 1TB",model:"Corsair MP700 Gen5 1TB",variantLabel:"Corsair",price:250,perf:87,kind:"NVMe",cap:1000,iface:"M.2"},
-    {id:"ssd49",brand:"Corsair",name:"Corsair MP700 Gen5 2TB",model:"Corsair MP700 Gen5 2TB",variantLabel:"Corsair",price:495,perf:94,kind:"NVMe",cap:2000,iface:"M.2"},
-    {id:"ssd50",brand:"Crucial",name:"Crucial P310 1TB",model:"Crucial P310 1TB",variantLabel:"Crucial",price:80,perf:68,kind:"NVMe",cap:1000,iface:"M.2"},
-    {id:"ssd51",brand:"Crucial",name:"Crucial P310 2TB",model:"Crucial P310 2TB",variantLabel:"Crucial",price:130,perf:70,kind:"NVMe",cap:2000,iface:"M.2"},
-    {id:"ssd52",brand:"WD",name:"WD Blue SN5000 1TB",model:"WD Blue SN5000 1TB",variantLabel:"WD",price:75,perf:72,kind:"NVMe",cap:1000,iface:"M.2"},
-    {id:"ssd53",brand:"WD",name:"WD Blue SN5000 2TB",model:"WD Blue SN5000 2TB",variantLabel:"WD",price:120,perf:74,kind:"NVMe",cap:2000,iface:"M.2"},
-    {id:"ssd54",brand:"WD",name:"WD Green SN3000 1TB",model:"WD Green SN3000 1TB",variantLabel:"WD",price:55,perf:60,kind:"NVMe",cap:1000,iface:"M.2"},
-    {id:"ssd55",brand:"Samsung",name:"Samsung 980 Pro 1TB",model:"Samsung 980 Pro 1TB",variantLabel:"Samsung",price:100,perf:82,kind:"NVMe",cap:1000,iface:"M.2"},
-    {id:"ssd56",brand:"Samsung",name:"Samsung 980 Pro 2TB",model:"Samsung 980 Pro 2TB",variantLabel:"Samsung",price:160,perf:84,kind:"NVMe",cap:2000,iface:"M.2"},
-    {id:"ssd57",brand:"Samsung",name:"Samsung 990 EVO Plus 1TB",model:"Samsung 990 EVO Plus 1TB",variantLabel:"Samsung",price:90,perf:78,kind:"NVMe",cap:1000,iface:"M.2"},
-    {id:"ssd58",brand:"Samsung",name:"Samsung 990 EVO Plus 2TB",model:"Samsung 990 EVO Plus 2TB",variantLabel:"Samsung",price:140,perf:80,kind:"NVMe",cap:2000,iface:"M.2"},
+    {id:"ssd1",brand:"Crucial",name:"Crucial BX500 1TB",model:"Crucial BX500 1TB",variantLabel:"Crucial",price:170,perf:35,kind:"SATA",cap:1000,iface:"SATA"},
+    {id:"ssd2",brand:"Crucial",name:"Crucial BX500 2TB",model:"Crucial BX500 2TB",variantLabel:"Crucial",price:330,perf:46,kind:"SATA",cap:2000,iface:"SATA"},
+    {id:"ssd3",brand:"WD",name:"WD Blue SA510 1TB",model:"WD Blue SA510 1TB",variantLabel:"WD",price:165,perf:36,kind:"SATA",cap:1000,iface:"SATA"},
+    {id:"ssd4",brand:"WD",name:"WD Blue SA510 2TB",model:"WD Blue SA510 2TB",variantLabel:"WD",price:310,perf:47,kind:"SATA",cap:2000,iface:"SATA"},
+    {id:"ssd5",brand:"Samsung",name:"Samsung 870 EVO 1TB",model:"Samsung 870 EVO 1TB",variantLabel:"Samsung",price:185,perf:40,kind:"SATA",cap:1000,iface:"SATA"},
+    {id:"ssd6",brand:"Samsung",name:"Samsung 870 EVO 2TB",model:"Samsung 870 EVO 2TB",variantLabel:"Samsung",price:360,perf:48,kind:"SATA",cap:2000,iface:"SATA"},
+    {id:"ssd7",brand:"Samsung",name:"Samsung 870 EVO 4TB",model:"Samsung 870 EVO 4TB",variantLabel:"Samsung",price:760,perf:52,kind:"SATA",cap:4000,iface:"SATA"},
+    {id:"ssd8",brand:"Crucial",name:"Crucial P3 Plus 1TB",model:"Crucial P3 Plus 1TB",variantLabel:"Crucial",price:165,perf:55,kind:"NVMe",cap:1000,iface:"M.2"},
+    {id:"ssd9",brand:"Crucial",name:"Crucial P3 Plus 2TB",model:"Crucial P3 Plus 2TB",variantLabel:"Crucial",price:295,perf:66,kind:"NVMe",cap:2000,iface:"M.2"},
+    {id:"ssd10",brand:"Crucial",name:"Crucial P3 Plus 4TB",model:"Crucial P3 Plus 4TB",variantLabel:"Crucial",price:690,perf:82,kind:"NVMe",cap:4000,iface:"M.2"},
+    {id:"ssd11",brand:"WD",name:"WD Black SN770 1TB",model:"WD Black SN770 1TB",variantLabel:"WD",price:180,perf:62,kind:"NVMe",cap:1000,iface:"M.2"},
+    {id:"ssd12",brand:"WD",name:"WD Black SN770 2TB",model:"WD Black SN770 2TB",variantLabel:"WD",price:330,perf:72,kind:"NVMe",cap:2000,iface:"M.2"},
+    {id:"ssd13",brand:"Samsung",name:"Samsung 990 EVO 1TB",model:"Samsung 990 EVO 1TB",variantLabel:"Samsung",price:215,perf:60,kind:"NVMe",cap:1000,iface:"M.2"},
+    {id:"ssd14",brand:"Samsung",name:"Samsung 990 EVO 2TB",model:"Samsung 990 EVO 2TB",variantLabel:"Samsung",price:360,perf:70,kind:"NVMe",cap:2000,iface:"M.2"},
+    {id:"ssd15",brand:"Kingston",name:"Kingston NV3 1TB",model:"Kingston NV3 1TB",variantLabel:"Kingston",price:165,perf:58,kind:"NVMe",cap:1000,iface:"M.2"},
+    {id:"ssd16",brand:"Kingston",name:"Kingston NV3 2TB",model:"Kingston NV3 2TB",variantLabel:"Kingston",price:295,perf:68,kind:"NVMe",cap:2000,iface:"M.2"},
+    {id:"ssd17",brand:"Lexar",name:"Lexar NM790 1TB",model:"Lexar NM790 1TB",variantLabel:"Lexar",price:185,perf:64,kind:"NVMe",cap:1000,iface:"M.2"},
+    {id:"ssd18",brand:"Lexar",name:"Lexar NM790 2TB",model:"Lexar NM790 2TB",variantLabel:"Lexar",price:340,perf:76,kind:"NVMe",cap:2000,iface:"M.2"},
+    {id:"ssd19",brand:"Lexar",name:"Lexar NM790 4TB",model:"Lexar NM790 4TB",variantLabel:"Lexar",price:760,perf:86,kind:"NVMe",cap:4000,iface:"M.2"},
+    {id:"ssd20",brand:"TeamGroup",name:"TeamGroup MP44 1TB",model:"TeamGroup MP44 1TB",variantLabel:"TeamGroup",price:175,perf:62,kind:"NVMe",cap:1000,iface:"M.2"},
+    {id:"ssd21",brand:"TeamGroup",name:"TeamGroup MP44 2TB",model:"TeamGroup MP44 2TB",variantLabel:"TeamGroup",price:315,perf:74,kind:"NVMe",cap:2000,iface:"M.2"},
+    {id:"ssd22",brand:"Crucial",name:"Crucial T500 1TB",model:"Crucial T500 1TB",variantLabel:"Crucial",price:205,perf:72,kind:"NVMe",cap:1000,iface:"M.2"},
+    {id:"ssd23",brand:"Crucial",name:"Crucial T500 2TB",model:"Crucial T500 2TB",variantLabel:"Crucial",price:360,perf:80,kind:"NVMe",cap:2000,iface:"M.2"},
+    {id:"ssd24",brand:"Crucial",name:"Crucial T500 4TB",model:"Crucial T500 4TB",variantLabel:"Crucial",price:810,perf:88,kind:"NVMe",cap:4000,iface:"M.2"},
+    {id:"ssd25",brand:"Samsung",name:"Samsung 990 Pro 1TB",model:"Samsung 990 Pro 1TB",variantLabel:"Samsung",price:254,perf:78,kind:"NVMe",cap:1000,iface:"M.2"},
+    {id:"ssd26",brand:"Samsung",name:"Samsung 990 Pro 2TB",model:"Samsung 990 Pro 2TB",variantLabel:"Samsung",price:388,perf:84,kind:"NVMe",cap:2000,iface:"M.2"},
+    {id:"ssd27",brand:"Samsung",name:"Samsung 990 Pro 4TB",model:"Samsung 990 Pro 4TB",variantLabel:"Samsung",price:820,perf:92,kind:"NVMe",cap:4000,iface:"M.2"},
+    {id:"ssd28",brand:"WD",name:"WD Black SN850X 1TB",model:"WD Black SN850X 1TB",variantLabel:"WD",price:215,perf:80,kind:"NVMe",cap:1000,iface:"M.2"},
+    {id:"ssd29",brand:"WD",name:"WD Black SN850X 2TB",model:"WD Black SN850X 2TB",variantLabel:"WD",price:390,perf:86,kind:"NVMe",cap:2000,iface:"M.2"},
+    {id:"ssd30",brand:"WD",name:"WD Black SN850X 4TB",model:"WD Black SN850X 4TB",variantLabel:"WD",price:820,perf:93,kind:"NVMe",cap:4000,iface:"M.2"},
+    {id:"ssd31",brand:"Kingston",name:"Kingston KC3000 1TB",model:"Kingston KC3000 1TB",variantLabel:"Kingston",price:215,perf:78,kind:"NVMe",cap:1000,iface:"M.2"},
+    {id:"ssd32",brand:"Kingston",name:"Kingston KC3000 2TB",model:"Kingston KC3000 2TB",variantLabel:"Kingston",price:375,perf:85,kind:"NVMe",cap:2000,iface:"M.2"},
+    {id:"ssd33",brand:"Corsair",name:"Corsair MP600 GS 1TB",model:"Corsair MP600 GS 1TB",variantLabel:"Corsair",price:205,perf:76,kind:"NVMe",cap:1000,iface:"M.2"},
+    {id:"ssd34",brand:"Corsair",name:"Corsair MP600 GS 2TB",model:"Corsair MP600 GS 2TB",variantLabel:"Corsair",price:365,perf:84,kind:"NVMe",cap:2000,iface:"M.2"},
+    {id:"ssd35",brand:"Seagate",name:"Seagate FireCuda 530 1TB",model:"Seagate FireCuda 530 1TB",variantLabel:"Seagate",price:225,perf:80,kind:"NVMe",cap:1000,iface:"M.2"},
+    {id:"ssd36",brand:"Seagate",name:"Seagate FireCuda 530 2TB",model:"Seagate FireCuda 530 2TB",variantLabel:"Seagate",price:415,perf:87,kind:"NVMe",cap:2000,iface:"M.2"},
+    {id:"ssd37",brand:"Seagate",name:"Seagate FireCuda 530 4TB",model:"Seagate FireCuda 530 4TB",variantLabel:"Seagate",price:870,perf:93,kind:"NVMe",cap:4000,iface:"M.2"},
+    {id:"ssd38",brand:"Sabrent",name:"Sabrent Rocket 4 Plus 1TB",model:"Sabrent Rocket 4 Plus 1TB",variantLabel:"Sabrent",price:215,perf:79,kind:"NVMe",cap:1000,iface:"M.2"},
+    {id:"ssd39",brand:"Sabrent",name:"Sabrent Rocket 4 Plus 2TB",model:"Sabrent Rocket 4 Plus 2TB",variantLabel:"Sabrent",price:385,perf:86,kind:"NVMe",cap:2000,iface:"M.2"},
+    {id:"ssd40",brand:"Crucial",name:"Crucial T705 Gen5 1TB",model:"Crucial T705 Gen5 1TB",variantLabel:"Crucial",price:285,perf:86,kind:"NVMe",cap:1000,iface:"M.2"},
+    {id:"ssd41",brand:"Crucial",name:"Crucial T705 Gen5 2TB",model:"Crucial T705 Gen5 2TB",variantLabel:"Crucial",price:545,perf:93,kind:"NVMe",cap:2000,iface:"M.2"},
+    {id:"ssd42",brand:"Crucial",name:"Crucial T705 Gen5 4TB",model:"Crucial T705 Gen5 4TB",variantLabel:"Crucial",price:1100,perf:97,kind:"NVMe",cap:4000,iface:"M.2"},
+    {id:"ssd43",brand:"Samsung",name:"Samsung 9100 Pro Gen5 1TB",model:"Samsung 9100 Pro Gen5 1TB",variantLabel:"Samsung",price:315,perf:88,kind:"NVMe",cap:1000,iface:"M.2"},
+    {id:"ssd44",brand:"Samsung",name:"Samsung 9100 Pro Gen5 2TB",model:"Samsung 9100 Pro Gen5 2TB",variantLabel:"Samsung",price:580,perf:94,kind:"NVMe",cap:2000,iface:"M.2"},
+    {id:"ssd45",brand:"Samsung",name:"Samsung 9100 Pro Gen5 4TB",model:"Samsung 9100 Pro Gen5 4TB",variantLabel:"Samsung",price:1160,perf:98,kind:"NVMe",cap:4000,iface:"M.2"},
+    {id:"ssd46",brand:"Sabrent",name:"Sabrent Rocket 5 Gen5 1TB",model:"Sabrent Rocket 5 Gen5 1TB",variantLabel:"Sabrent",price:295,perf:87,kind:"NVMe",cap:1000,iface:"M.2"},
+    {id:"ssd47",brand:"Sabrent",name:"Sabrent Rocket 5 Gen5 2TB",model:"Sabrent Rocket 5 Gen5 2TB",variantLabel:"Sabrent",price:555,perf:93,kind:"NVMe",cap:2000,iface:"M.2"},
+    {id:"ssd48",brand:"Corsair",name:"Corsair MP700 Gen5 1TB",model:"Corsair MP700 Gen5 1TB",variantLabel:"Corsair",price:290,perf:87,kind:"NVMe",cap:1000,iface:"M.2"},
+    {id:"ssd49",brand:"Corsair",name:"Corsair MP700 Gen5 2TB",model:"Corsair MP700 Gen5 2TB",variantLabel:"Corsair",price:565,perf:94,kind:"NVMe",cap:2000,iface:"M.2"},
+    {id:"ssd50",brand:"Crucial",name:"Crucial P310 1TB",model:"Crucial P310 1TB",variantLabel:"Crucial",price:180,perf:68,kind:"NVMe",cap:1000,iface:"M.2"},
+    {id:"ssd51",brand:"Crucial",name:"Crucial P310 2TB",model:"Crucial P310 2TB",variantLabel:"Crucial",price:305,perf:70,kind:"NVMe",cap:2000,iface:"M.2"},
+    {id:"ssd52",brand:"WD",name:"WD Blue SN5000 1TB",model:"WD Blue SN5000 1TB",variantLabel:"WD",price:165,perf:72,kind:"NVMe",cap:1000,iface:"M.2"},
+    {id:"ssd53",brand:"WD",name:"WD Blue SN5000 2TB",model:"WD Blue SN5000 2TB",variantLabel:"WD",price:295,perf:74,kind:"NVMe",cap:2000,iface:"M.2"},
+    {id:"ssd54",brand:"WD",name:"WD Green SN3000 1TB",model:"WD Green SN3000 1TB",variantLabel:"WD",price:145,perf:60,kind:"NVMe",cap:1000,iface:"M.2"},
+    {id:"ssd55",brand:"Samsung",name:"Samsung 980 Pro 1TB",model:"Samsung 980 Pro 1TB",variantLabel:"Samsung",price:210,perf:82,kind:"NVMe",cap:1000,iface:"M.2"},
+    {id:"ssd56",brand:"Samsung",name:"Samsung 980 Pro 2TB",model:"Samsung 980 Pro 2TB",variantLabel:"Samsung",price:390,perf:84,kind:"NVMe",cap:2000,iface:"M.2"},
+    {id:"ssd57",brand:"Samsung",name:"Samsung 990 EVO Plus 1TB",model:"Samsung 990 EVO Plus 1TB",variantLabel:"Samsung",price:200,perf:78,kind:"NVMe",cap:1000,iface:"M.2"},
+    {id:"ssd58",brand:"Samsung",name:"Samsung 990 EVO Plus 2TB",model:"Samsung 990 EVO Plus 2TB",variantLabel:"Samsung",price:320,perf:80,kind:"NVMe",cap:2000,iface:"M.2"},
   ],
   psu: [
     {id:"psu1",brand:"EVGA",name:"EVGA BR 500W",model:"EVGA BR 500W",variantLabel:"EVGA",price:60,perf:40,watt:500,eff:"Bronze"},
@@ -1284,6 +1284,27 @@ function ParticleField() {
   return <canvas ref={ref} className="rf-particles" aria-hidden="true" />;
 }
 
+function OfflineBanner({ offlinePriceStatus, priceInfo }) {
+  const fmtTs = (ts) => {
+    if (!ts) return null;
+    const d = new Date(Number(ts));
+    return d.toLocaleDateString(undefined, { month: "short", day: "numeric" }) + " at " + d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  };
+  const cached = offlinePriceStatus === "cached";
+  const sample = offlinePriceStatus === "sample" || (!offlinePriceStatus && !priceInfo);
+  const ts = priceInfo && priceInfo.cacheTs ? fmtTs(priceInfo.cacheTs) : null;
+  return (
+    <div className="rf-offline-banner" role="alert">
+      <span className="rf-offline-dot" />
+      <span className="rf-offline-label">OFFLINE</span>
+      <span className="rf-offline-sep">·</span>
+      {cached && ts ? <span>Prices from {ts}</span> : cached ? <span>Showing last known prices</span> : sample ? <span>No cached prices — showing sample data</span> : <span>Prices may be outdated</span>}
+      <span className="rf-offline-sep">·</span>
+      <span>AI unavailable</span>
+    </div>
+  );
+}
+
 export default function RigForge() {
   const [view, setView] = useState("home"); // home | survey | budget | results
   const [useCase, setUseCase] = useState(null);
@@ -1300,6 +1321,14 @@ export default function RigForge() {
   const [assistantOpen, setAssistantOpen] = useState(false);
   const [isFs, setIsFs] = useState(false);
   const [priceInfo, setPriceInfo] = useState(null);
+  const [isOnline, setIsOnline] = useState(() => (typeof navigator !== "undefined" ? navigator.onLine : true));
+  const [offlinePriceStatus, setOfflinePriceStatus] = useState(null); // null | "cached" | "sample"
+  useEffect(() => {
+    const up = () => setIsOnline(true);
+    const dn = () => setIsOnline(false);
+    window.addEventListener("online", up); window.addEventListener("offline", dn);
+    return () => { window.removeEventListener("online", up); window.removeEventListener("offline", dn); };
+  }, []);
   const [theme, setTheme] = useState("dark"); // default dark mode
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsTab, setSettingsTab] = useState("appearance");
@@ -1336,18 +1365,23 @@ export default function RigForge() {
     (async () => {
       try {
         const res = await fetch(PRICES_URL + "?t=" + Date.now(), { cache: "no-store" });
-        if (!res.ok) return;
+        if (!res.ok) throw new Error("not ok");
         const data = await res.json();
         if (cancelled || !data || !data.prices) return;
         let n = 0;
         for (const c of CATEGORY_ORDER) {
           for (const part of CATALOG[c]) {
             const entry = data.prices[part.id];
-            // lowest price AND which store it came from
+            // lowest price AND which store it came from.
+            // Guard: ignore any scraped price wildly off the catalog baseline — that
+            // means a wrong product got matched to this part (e.g. a $160 hit on a ~$400 GPU).
+            const baseline = part.price;
+            const ceil = (c === "ram" || c === "storage") ? 4 : 2.2; // RAM/SSD can legitimately more than double in the shortage
+            const plausible = (v) => typeof v === "number" && v > 0 && (!baseline || (v >= baseline * 0.5 && v <= baseline * ceil));
             let best = null, bestSrc = null;
             if (entry) {
               for (const [src, v] of Object.entries(entry)) {
-                if (typeof v === "number" && v > 0 && (best == null || v < best)) { best = v; bestSrc = src; }
+                if (plausible(v) && (best == null || v < best)) { best = v; bestSrc = src; }
               }
             }
             if (best != null) { part.price = best; part._live = true; part._source = bestSrc; n++; }
@@ -1373,8 +1407,48 @@ export default function RigForge() {
         }
         PRICE_LIVE = n > 0; // only go "live" if we actually got real prices; empty feed => keep baseline, nothing marked out of stock
         setPriceInfo({ updatedAt: data.updatedAt, count: n });
+        // Cache for offline use
+        const ls = LS();
+        if (ls && n > 0) {
+          try { ls.setItem("forgeapc-price-cache", JSON.stringify(data)); ls.setItem("forgeapc-price-ts", Date.now().toString()); ls.setItem("forgeapc-ever-online", "1"); } catch (e) {}
+        }
+        setOfflinePriceStatus(null);
       } catch (e) {
-        /* offline / not deployed: keep built-in sample prices */
+        if (cancelled) return;
+        // Offline or unreachable — try the most recent cached prices
+        const ls = LS();
+        const raw = ls && ls.getItem("forgeapc-price-cache");
+        const everOnline = ls && ls.getItem("forgeapc-ever-online");
+        if (raw) {
+          try {
+            const data = JSON.parse(raw);
+            if (data && data.prices) {
+              let n = 0;
+              for (const c of CATEGORY_ORDER) {
+                for (const part of CATALOG[c]) {
+                  const entry = data.prices[part.id];
+                  const baseline = part.price;
+                  const ceil = (c === "ram" || c === "storage") ? 4 : 2.2;
+                  const plausible = (v) => typeof v === "number" && v > 0 && (!baseline || (v >= baseline * 0.5 && v <= baseline * ceil));
+                  let best = null, bestSrc = null;
+                  if (entry) { for (const [src, v] of Object.entries(entry)) { if (plausible(v) && (best == null || v < best)) { best = v; bestSrc = src; } } }
+                  if (best != null) { part.price = best; part._live = true; part._source = bestSrc; n++; }
+                  else { part._live = false; part._source = null; }
+                  const lm = (data.media && data.media[part.id]) || {};
+                  const pickSrc = (src) => { if (src === "newegg") { const live = lm.newegg && lm.newegg.url ? lm.newegg : null; return live || (MEDIA_NE && MEDIA_NE[part.id]) || null; } if (src === "amazon") { const live = lm.amazon && lm.amazon.url ? lm.amazon : null; return live || MEDIA[part.id] || null; } return null; };
+                  let chosen = pickSrc(bestSrc) || pickSrc("amazon") || pickSrc("newegg");
+                  if (chosen) { if (chosen.img) part.img = chosen.img; if (chosen.url) part.url = chosen.url; }
+                }
+              }
+              PRICE_LIVE = n > 0;
+              const ts = ls && ls.getItem("forgeapc-price-ts");
+              setPriceInfo({ updatedAt: data.updatedAt, count: n, fromCache: true, cacheTs: ts ? Number(ts) : null });
+              setOfflinePriceStatus("cached");
+            }
+          } catch (e2) { setOfflinePriceStatus(everOnline ? "cached" : "sample"); }
+        } else {
+          setOfflinePriceStatus(everOnline ? "cached" : "sample");
+        }
       }
     })();
     return () => { cancelled = true; };
@@ -1419,6 +1493,7 @@ export default function RigForge() {
   useEffect(() => { setAiVerdict(null); setAiBusy(false); }, [parts, useCase, budget, view]);
   const runVerdict = useCallback(async () => {
     if (!parts || !parts.cpu || !useCase || !analysis || aiBusy) return;
+    if (!isOnline) { setAiVerdict("__offline__"); return; }
     setAiBusy(true); setAiVerdict(null);
     const summary = {
       useCase: USE_CASES[useCase].label,
@@ -1503,6 +1578,8 @@ export default function RigForge() {
       <div className="rf-bg" />
       <div className="rf-grid" />
       <ParticleField />
+      {!isOnline && <OfflineBanner offlinePriceStatus={offlinePriceStatus} priceInfo={priceInfo} />}
+      {!isOnline && <div style={{height:"38px"}} />}
 
       <header className="rf-header">
         <div className="rf-brand" onClick={() => setView("home")}>
@@ -1562,7 +1639,7 @@ export default function RigForge() {
         )}
         {view === "results" && parts && analysis && (
           <Results
-            useCase={useCase} budget={budget} parts={parts} analysis={analysis} verdict={aiVerdict} aiBusy={aiBusy} onGenerate={runVerdict}
+            useCase={useCase} budget={budget} parts={parts} analysis={analysis} verdict={aiVerdict} aiBusy={aiBusy} onGenerate={runVerdict} isOnline={isOnline}
             expanded={expanded} setExpanded={setExpanded}
             onSwap={(c) => setPicker(c)} onRemove={removePart}
             onRegen={generateAuto} onSave={() => setSavingOpen(true)}
@@ -1601,7 +1678,7 @@ export default function RigForge() {
           <Sparkles size={18} /> Ask AI
         </button>
       )}
-      <Assistant open={assistantOpen} onClose={() => setAssistantOpen(false)} useCase={useCase} budget={budget} parts={parts} />
+      <Assistant open={assistantOpen} onClose={() => setAssistantOpen(false)} useCase={useCase} budget={budget} parts={parts} isOnline={isOnline} />
 
       {toast && <div className="rf-toast"><Check size={15} /> {toast}</div>}
     </div>
@@ -1783,7 +1860,7 @@ function BudgetStep({ useCase, budget, setBudget, onBack, onAuto, onManual }) {
 }
 
 /* ----------------------------- RESULTS ----------------------------- */
-function Results({ useCase, budget, parts, analysis, verdict, aiBusy, onGenerate, expanded, setExpanded, onSwap, onRemove, onRegen, onSave }) {
+function Results({ useCase, budget, parts, analysis, verdict, aiBusy, onGenerate, expanded, setExpanded, onSwap, onRemove, onRegen, onSave, isOnline }) {
   const UC = USE_CASES[useCase];
   const a = analysis;
   // Total counts only parts with a live price, so a hidden (out-of-stock) part never adds a made-up number.
@@ -1810,10 +1887,14 @@ function Results({ useCase, budget, parts, analysis, verdict, aiBusy, onGenerate
         </div>
         <div className="rf-verdict">
           <div className="rf-verdict-tag"><Sparkles size={13} /> AI verdict <span className="rf-hybrid">Opus 4.8</span>{aiBusy && <span className="rf-verdict-state"> · thinking…</span>}</div>
-          {verdict ? (
+          {verdict === "__offline__" ? (
+            <p className="rf-offline-msg">AI unavailable — connect to the internet to generate a verdict.</p>
+          ) : verdict ? (
             <p>{verdict}</p>
           ) : aiBusy ? (
             <p className="rf-verdict-busy">Analyzing your build with current prices…</p>
+          ) : isOnline === false ? (
+            <p className="rf-offline-msg">AI unavailable offline — connect to generate a verdict.</p>
           ) : (
             <button className="rf-forge-btn outline rf-verdict-btn" onClick={onGenerate}><Sparkles size={14} /> Generate AI verdict</button>
           )}
@@ -1909,7 +1990,7 @@ function Results({ useCase, budget, parts, analysis, verdict, aiBusy, onGenerate
                 <button className="rf-chip-btn primary" onClick={() => onSwap(cat)}><Repeat2 size={13} /> {part ? "Swap" : "Add"}</button>
               </div>
 
-              {part && isOpen && <InfoPanel cat={cat} part={part} band={band} status={status} useCase={useCase} incompatible={!compatible} enableAsk budget={budget} parts={parts} />}
+              {part && isOpen && <InfoPanel cat={cat} part={part} band={band} status={status} useCase={useCase} incompatible={!compatible} enableAsk budget={budget} parts={parts} isOnline={isOnline} />}
             </div>
           );
         })}
@@ -2013,7 +2094,7 @@ function partProsCons(cat, part, band, status, useCase) {
   return { pros, cons };
 }
 
-function PartAsk({ part, cat, useCase, budget, parts }) {
+function PartAsk({ part, cat, useCase, budget, parts, isOnline }) {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]); // { role:'user'|'assistant', text, err? }
@@ -2052,6 +2133,13 @@ function PartAsk({ part, cat, useCase, budget, parts }) {
       </button>
     );
   }
+  if (!isOnline) {
+    return (
+      <div className="rf-ask-inline">
+        <div className="rf-offline-msg" style={{marginTop:"6px"}}>AI is unavailable offline. Connect to the internet to ask questions about this part.</div>
+      </div>
+    );
+  }
   return (
     <div className="rf-ask-inline">
       {messages.length > 0 && (
@@ -2075,7 +2163,7 @@ function PartAsk({ part, cat, useCase, budget, parts }) {
   );
 }
 
-function InfoPanel({ cat, part, band, status, useCase, compact, incompatible, enableAsk, budget, parts }) {
+function InfoPanel({ cat, part, band, status, useCase, compact, incompatible, enableAsk, budget, parts, isOnline }) {
   const facts = partFacts(cat, part);
   const { pros, cons } = partProsCons(cat, part, band, status, useCase);
   const allCons = incompatible ? ["Not compatible with your current build", ...cons] : cons;
@@ -2103,7 +2191,7 @@ function InfoPanel({ cat, part, band, status, useCase, compact, incompatible, en
           </ul>
         </div>
       </div>
-      {enableAsk && <PartAsk part={part} cat={cat} useCase={useCase} budget={budget} parts={parts} />}
+      {enableAsk && <PartAsk part={part} cat={cat} useCase={useCase} budget={budget} parts={parts} isOnline={isOnline} />}
     </div>
   );
 }
@@ -2364,7 +2452,7 @@ async function streamChat({ system, messages }, onDelta) {
   throw lastErr || new Error("request failed");
 }
 
-function Assistant({ open, onClose, useCase, budget, parts }) {
+function Assistant({ open, onClose, useCase, budget, parts, isOnline }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -2500,16 +2588,18 @@ function Assistant({ open, onClose, useCase, budget, parts }) {
           );
         })}
         {error && <div className="rf-asst-error">{error}</div>}
+        {!isOnline && <div className="rf-asst-offline">You are offline — AI is unavailable. Reconnect to use the assistant.</div>}
       </div>
 
       <div className="rf-asst-input">
         <input
           value={input}
-          placeholder="Ask about your build…"
+          placeholder={isOnline ? "Ask about your build…" : "Offline — AI unavailable"}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && send()}
+          onKeyDown={(e) => e.key === "Enter" && isOnline && send()}
+          disabled={!isOnline}
         />
-        <button className="rf-asst-send" onClick={() => send()} disabled={loading || streaming || !input.trim()}><Send size={16} /></button>
+        <button className="rf-asst-send" onClick={() => send()} disabled={loading || streaming || !input.trim() || !isOnline}><Send size={16} /></button>
       </div>
     </div>
   );
@@ -2541,8 +2631,9 @@ animation:rfDrift 26s ease-in-out infinite alternate;}
 @keyframes rfDrift{0%{transform:translate3d(0,0,0) scale(1);}50%{transform:translate3d(2%,1.5%,0) scale(1.06);}100%{transform:translate3d(-2%,-1%,0) scale(1.03);}}
 .rf-particles{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
 /* frosted glass on the main boxes so the particles diffuse through */
-.rf-scorecard,.rf-part,.rf-pick,.rf-saved-card,.rf-compat,.rf-drawer,.rf-settings-menu,.rf-uc-card,.rf-asst-panel{
-  backdrop-filter:blur(11px) saturate(1.25);-webkit-backdrop-filter:blur(11px) saturate(1.25);}
+.rf-scorecard,.rf-part,.rf-pick,.rf-saved-card,.rf-compat,.rf-drawer,.rf-settings-menu,.rf-uc-card,.rf-asst-panel,.rf-modal,.rf-info{
+  backdrop-filter:blur(20px) saturate(1.6) brightness(1.05);-webkit-backdrop-filter:blur(20px) saturate(1.6) brightness(1.05);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.10), inset 0 0 0 1px rgba(255,255,255,0.02), 0 10px 36px rgba(0,0,0,0.32);}
 .rf-scorecard,.rf-part,.rf-pick,.rf-saved-card,.rf-uc-card{transition:border-color .25s var(--ease-spring),transform .25s var(--ease-spring),box-shadow .25s var(--ease-spring),background .25s var(--ease);}
 .rf-grid{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.5;
 background-image:linear-gradient(var(--c-grid) 1px,transparent 1px),linear-gradient(90deg,var(--c-grid) 1px,transparent 1px);
@@ -2766,6 +2857,18 @@ font-family:'Sora';font-size:12.5px;padding:7px 12px;border-radius:9px;cursor:po
 .rf-ask-msg.assistant{align-self:flex-start;background:rgba(124,92,255,0.06);border:1px solid rgba(124,92,255,0.22);}
 .rf-ask-think{color:var(--c-muted);font-style:italic;}
 .rf-ask-err{border-color:rgba(255,90,90,0.4)!important;background:rgba(255,90,90,0.08)!important;color:var(--c-bad);}
+/* ---- Offline banner ---- */
+.rf-offline-banner{position:fixed;top:0;left:0;right:0;z-index:999;display:flex;align-items:center;gap:10px;padding:9px 20px;
+  background:rgba(220,30,50,0.93);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  font-family:'Chakra Petch',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.5px;color:#fff;
+  box-shadow:0 4px 24px rgba(220,30,50,0.45);}
+.rf-offline-dot{width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 8px #fff;animation:rprPulse 1.4s ease-in-out infinite;flex-shrink:0;}
+.rf-offline-label{font-size:13px;font-weight:700;letter-spacing:1.5px;}
+.rf-offline-sep{opacity:0.55;}
+/* inline offline message in verdict / chat / part ask */
+.rf-offline-msg{color:var(--c-bad);font-size:13px;font-style:italic;margin:4px 0;}
+.rf-asst-offline{margin:8px 14px;padding:10px 13px;border-radius:10px;background:rgba(220,30,50,0.12);border:1px solid rgba(220,30,50,0.35);color:var(--c-bad);font-family:'Sora',sans-serif;font-size:13px;line-height:1.5;}
+.rf-asst-input input:disabled{opacity:0.45;cursor:not-allowed;}
 .rf-info-specs{margin-bottom:16px;}
 .rf-pc-head{display:inline-flex;align-items:center;gap:7px;font-family:'JetBrains Mono';font-size:10px;letter-spacing:2px;color:var(--c-accent2);margin-bottom:11px;}
 .rf-pc-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
@@ -2790,7 +2893,7 @@ font-family:'Sora';font-size:12.5px;padding:7px 12px;border-radius:9px;cursor:po
 
 /* DRAWER */
 .rf-drawer-wrap{position:fixed;inset:0;z-index:40;background:rgba(2,4,8,0.66);backdrop-filter:blur(4px);display:flex;justify-content:flex-end;animation:rfFade .28s var(--ease);}
-.rf-drawer{width:min(460px,100%);height:100%;background:#0b0f16;border-left:1px solid var(--c-border);
+.rf-drawer{width:min(460px,100%);height:100%;background:rgba(11,15,22,0.72);border-left:1px solid var(--c-border);
 display:flex;flex-direction:column;animation:rfSlideR .42s var(--ease);will-change:transform,opacity;}
 .rf-drawer-head{display:flex;align-items:flex-start;justify-content:space-between;padding:20px;border-bottom:1px solid var(--c-border);}
 .rf-drawer-list{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px;}
