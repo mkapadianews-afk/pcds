@@ -1,6 +1,6 @@
 /* FORGEAPC service worker — offline app shell + runtime caching.
    Bumps the cache name on each meaningful change so old caches clear. */
-const CACHE = "forgeapc-v1";
+const CACHE = "forgeapc-v2";
 const CORE = [
   "/",
   "/index.html",
