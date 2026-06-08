@@ -2016,26 +2016,34 @@ function partProsCons(cat, part, band, status, useCase) {
 function PartAsk({ part, cat, useCase, budget, parts }) {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
-  const [answer, setAnswer] = useState("");
+  const [messages, setMessages] = useState([]); // { role:'user'|'assistant', text, err? }
   const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState(false);
   const ask = async () => {
     const q = input.trim();
     if (!q || loading) return;
-    setLoading(true); setErr(false); setAnswer("");
+    const history = [...messages, { role: "user", text: q }];
+    setMessages([...history, { role: "assistant", text: "" }]);
+    setInput("");
+    setLoading(true);
     const ucLabel = useCase ? tUC(useCase) : "unspecified";
     const buildLines = parts ? CATEGORY_ORDER.filter((c) => parts[c]).map((c) => `${CAT_META[c].label}: ${parts[c].name} ($${parts[c].price})`).join("; ") : "";
     const system =
       "You are the built-in AI assistant for FORGEAPC, a PC-part-picker app. " +
       "Your name and model identity is \"Opus 4.8\" by Anthropic (Claude). If anyone asks what model or AI you are, always say you are Opus 4.8 by Anthropic. Never mention Haiku, Sonnet, or any other model name. " +
-      "Answer the user's question about ONE specific part, in the context of their full build, use case and budget. " +
+      "Answer the user's question about ONE specific part, in the context of their full build, use case and budget. The conversation may have follow-up questions — keep your earlier answers in mind. " +
       "Keep answers short and practical — usually 2-4 sentences. Use a short bullet list only if it genuinely helps. No fluff or filler. " +
       "Context: as of mid-2026 a severe AI-driven memory/storage shortage makes RAM and SSDs very expensive (64GB DDR5 ~$850, 32GB ~$470, 1TB SSD ~$165). DDR5-6000 CL30 is the value sweet spot; motherboards above ~$250 are usually overkill.\n\n" +
       `The part in question: ${CAT_META[cat].label} — ${part.name} ($${part.price}). Use case: ${ucLabel}. Budget: ${fmt(budget)}. Full build: ${buildLines || "not assembled yet"}.`;
+    const payload = history.map((m) => ({ role: m.role, content: m.text }));
     try {
-      await streamChat({ system, messages: [{ role: "user", content: q }] }, (full) => setAnswer(full));
-    } catch (e) { setErr(true); }
-    finally { setLoading(false); }
+      await streamChat({ system, messages: payload }, (full) => {
+        setMessages((m) => { const c = [...m]; c[c.length - 1] = { role: "assistant", text: full }; return c; });
+      });
+    } catch (e) {
+      setMessages((m) => { const c = [...m]; c[c.length - 1] = { role: "assistant", text: "Could not reach the assistant — please try again.", err: true }; return c; });
+    } finally {
+      setLoading(false);
+    }
   };
   if (!open) {
     return (
@@ -2046,14 +2054,23 @@ function PartAsk({ part, cat, useCase, budget, parts }) {
   }
   return (
     <div className="rf-ask-inline">
+      {messages.length > 0 && (
+        <div className="rf-ask-thread">
+          {messages.map((m, i) => {
+            const thinking = m.role === "assistant" && !m.text && loading && i === messages.length - 1;
+            return (
+              <div key={i} className={"rf-ask-msg " + m.role + (m.err ? " rf-ask-err" : "") + (thinking ? " rf-ask-think" : "")}>
+                {m.text || (thinking ? "Thinking…" : "")}
+              </div>
+            );
+          })}
+        </div>
+      )}
       <div className="rf-ask-row">
         <input className="rf-ask-input" value={input} autoFocus placeholder="Ask anything about this part…"
           onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") ask(); }} />
         <button className="rf-ask-send" onClick={ask} disabled={loading || !input.trim()}>{loading ? "…" : "Ask"}</button>
       </div>
-      {answer && <div className="rf-ask-answer">{answer}</div>}
-      {loading && !answer && <div className="rf-ask-answer rf-ask-think">Thinking…</div>}
-      {err && <div className="rf-ask-answer rf-ask-err">Could not reach the assistant — please try again.</div>}
     </div>
   );
 }
@@ -2527,7 +2544,7 @@ animation:rfDrift 26s ease-in-out infinite alternate;}
 .rf-scorecard,.rf-part,.rf-pick,.rf-saved-card,.rf-compat,.rf-drawer,.rf-settings-menu,.rf-uc-card,.rf-asst-panel{
   backdrop-filter:blur(11px) saturate(1.25);-webkit-backdrop-filter:blur(11px) saturate(1.25);}
 .rf-scorecard,.rf-part,.rf-pick,.rf-saved-card,.rf-uc-card{transition:border-color .25s var(--ease-spring),transform .25s var(--ease-spring),box-shadow .25s var(--ease-spring),background .25s var(--ease);}
-.rf-grid{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.7;
+.rf-grid{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.5;
 background-image:linear-gradient(var(--c-grid) 1px,transparent 1px),linear-gradient(90deg,var(--c-grid) 1px,transparent 1px);
 background-size:46px 46px;
 mask-image:linear-gradient(to bottom,#000 0%,rgba(0,0,0,0.62) 55%,rgba(0,0,0,0.4) 100%);
@@ -2739,13 +2756,16 @@ font-family:'Sora';font-size:12.5px;padding:7px 12px;border-radius:9px;cursor:po
 .rf-ask-inline{margin-top:14px;display:flex;flex-direction:column;gap:10px;}
 .rf-ask-row{display:flex;gap:8px;align-items:center;}
 .rf-ask-input{flex:1;min-width:0;background:rgba(255,255,255,0.03);border:1px solid var(--c-border);border-radius:10px;padding:9px 12px;color:var(--c-text);font-family:'Sora';font-size:13px;outline:none;transition:border-color .15s ease,box-shadow .15s ease;}
-.rf-ask-input:focus{border-color:var(--c-accent);box-shadow:0 0 0 3px rgba(25,232,219,0.12);}
+.rf-ask-input:focus{border-color:var(--c-accent);}
 .rf-ask-send{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:10px;cursor:pointer;font-family:'Chakra Petch';font-weight:600;font-size:12px;letter-spacing:0.4px;color:#04201e;background:var(--c-accent);border:1px solid var(--c-accent);transition:transform .12s ease,box-shadow .15s ease,opacity .15s ease;}
 .rf-ask-send:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 18px rgba(25,232,219,0.3);}
 .rf-ask-send:disabled{opacity:0.45;cursor:not-allowed;}
-.rf-ask-answer{background:rgba(124,92,255,0.06);border:1px solid rgba(124,92,255,0.22);border-radius:12px;padding:12px 14px;color:var(--c-text);font-family:'Sora';font-size:13px;line-height:1.6;white-space:pre-wrap;}
+.rf-ask-thread{display:flex;flex-direction:column;gap:8px;}
+.rf-ask-msg{max-width:92%;border-radius:12px;padding:10px 13px;color:var(--c-text);font-family:'Sora';font-size:13px;line-height:1.6;white-space:pre-wrap;}
+.rf-ask-msg.user{align-self:flex-end;background:rgba(25,232,219,0.10);border:1px solid rgba(25,232,219,0.28);}
+.rf-ask-msg.assistant{align-self:flex-start;background:rgba(124,92,255,0.06);border:1px solid rgba(124,92,255,0.22);}
 .rf-ask-think{color:var(--c-muted);font-style:italic;}
-.rf-ask-err{border-color:rgba(255,90,90,0.4);background:rgba(255,90,90,0.08);color:var(--c-bad);}
+.rf-ask-err{border-color:rgba(255,90,90,0.4)!important;background:rgba(255,90,90,0.08)!important;color:var(--c-bad);}
 .rf-info-specs{margin-bottom:16px;}
 .rf-pc-head{display:inline-flex;align-items:center;gap:7px;font-family:'JetBrains Mono';font-size:10px;letter-spacing:2px;color:var(--c-accent2);margin-bottom:11px;}
 .rf-pc-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
