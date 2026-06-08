@@ -125,10 +125,24 @@ async function apifyPrices(actorId, { allowQueryMatch = false, token } = {}) {
       // Amazon: EXACT ASIN ONLY. Newegg (allowQueryMatch): EXACT URL/item code
       // first, then the search term that produced the row, then title contains.
       let id = (asin && byAsin[asin]) || null;
+      // Newegg product URL can appear under many different field names depending
+      // on the actor. Read all the common ones, and as a last resort scan the whole
+      // row for any known Newegg item code, so a match never depends on the exact
+      // field name the actor happened to use.
+      const negUrlRaw =
+        it.url || it.link || it.productUrl || it.itemUrl || it.href ||
+        it.pageUrl || it.productLink || it.product_url || it.itemLink || "";
       if (!id && allowQueryMatch) {
-        const uk = neggKey(it.url || it.link || "");
+        const uk = neggKey(negUrlRaw);
         if (uk && byUrl[uk]) id = byUrl[uk];
         if (!id) id = byQuery[norm(query)] || null;
+        if (!id) {
+          let blob = "";
+          try { blob = JSON.stringify(it).toLowerCase(); } catch (e) {}
+          for (const k of Object.keys(byUrl)) {
+            if (k.length >= 6 && blob.includes(k)) { id = byUrl[k]; break; }
+          }
+        }
         if (!id) {
           const nt = norm(title);
           for (const [qn, pid] of Object.entries(byQuery)) {
@@ -142,8 +156,8 @@ async function apifyPrices(actorId, { allowQueryMatch = false, token } = {}) {
 
       if (out[id] == null || price < out[id]) out[id] = price;
       // capture product image + link (first decent one wins)
-      const thumb = it.thumbnailImage || it.image || it.img || (Array.isArray(it.images) ? it.images[0] : "");
-      const link = it.url || (asin ? `https://www.amazon.com/dp/${asin}` : "");
+      const thumb = it.thumbnailImage || it.image || it.imageUrl || it.img || it.thumbnail || (Array.isArray(it.images) ? it.images[0] : "");
+      const link = negUrlRaw || (asin ? `https://www.amazon.com/dp/${asin}` : "");
       if (!media[id] && (thumb || link)) media[id] = { img: thumb || "", url: link || "" };
     }
   } catch (e) {}
