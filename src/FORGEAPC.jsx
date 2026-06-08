@@ -1298,6 +1298,12 @@ export default function RigForge() {
   const [savingOpen, setSavingOpen] = useState(false);
   const [toast, setToast] = useState(null);
   const [assistantOpen, setAssistantOpen] = useState(false);
+  const [askSeed, setAskSeed] = useState(null);
+  const askAbout = (part) => {
+    if (!part) return;
+    setAskSeed(`Tell me about the ${part.name} in my build — is it a good pick for my ${useCase ? tUC(useCase) : "use case"} use case and ${fmt(budget)} budget, and what are its main strengths and weak points?`);
+    setAssistantOpen(true);
+  };
   const [isFs, setIsFs] = useState(false);
   const [priceInfo, setPriceInfo] = useState(null);
   const [theme, setTheme] = useState("dark"); // default dark mode
@@ -1565,7 +1571,7 @@ export default function RigForge() {
             useCase={useCase} budget={budget} parts={parts} analysis={analysis} verdict={aiVerdict} aiBusy={aiBusy} onGenerate={runVerdict}
             expanded={expanded} setExpanded={setExpanded}
             onSwap={(c) => setPicker(c)} onRemove={removePart}
-            onRegen={generateAuto} onSave={() => setSavingOpen(true)}
+            onRegen={generateAuto} onSave={() => setSavingOpen(true)} onAskPart={askAbout}
           />
         )}
       </main>
@@ -1601,7 +1607,7 @@ export default function RigForge() {
           <Sparkles size={18} /> Ask AI
         </button>
       )}
-      <Assistant open={assistantOpen} onClose={() => setAssistantOpen(false)} useCase={useCase} budget={budget} parts={parts} />
+      <Assistant open={assistantOpen} onClose={() => setAssistantOpen(false)} useCase={useCase} budget={budget} parts={parts} seed={askSeed} onSeedConsumed={() => setAskSeed(null)} />
 
       {toast && <div className="rf-toast"><Check size={15} /> {toast}</div>}
     </div>
@@ -1783,7 +1789,7 @@ function BudgetStep({ useCase, budget, setBudget, onBack, onAuto, onManual }) {
 }
 
 /* ----------------------------- RESULTS ----------------------------- */
-function Results({ useCase, budget, parts, analysis, verdict, aiBusy, onGenerate, expanded, setExpanded, onSwap, onRemove, onRegen, onSave }) {
+function Results({ useCase, budget, parts, analysis, verdict, aiBusy, onGenerate, expanded, setExpanded, onSwap, onRemove, onRegen, onSave, onAskPart }) {
   const UC = USE_CASES[useCase];
   const a = analysis;
   // Total counts only parts with a live price, so a hidden (out-of-stock) part never adds a made-up number.
@@ -1909,7 +1915,7 @@ function Results({ useCase, budget, parts, analysis, verdict, aiBusy, onGenerate
                 <button className="rf-chip-btn primary" onClick={() => onSwap(cat)}><Repeat2 size={13} /> {part ? "Swap" : "Add"}</button>
               </div>
 
-              {part && isOpen && <InfoPanel cat={cat} part={part} band={band} status={status} useCase={useCase} incompatible={!compatible} />}
+              {part && isOpen && <InfoPanel cat={cat} part={part} band={band} status={status} useCase={useCase} incompatible={!compatible} onAsk={onAskPart} />}
             </div>
           );
         })}
@@ -2013,7 +2019,7 @@ function partProsCons(cat, part, band, status, useCase) {
   return { pros, cons };
 }
 
-function InfoPanel({ cat, part, band, status, useCase, compact, incompatible }) {
+function InfoPanel({ cat, part, band, status, useCase, compact, incompatible, onAsk }) {
   const facts = partFacts(cat, part);
   const { pros, cons } = partProsCons(cat, part, band, status, useCase);
   const allCons = incompatible ? ["Not compatible with your current build", ...cons] : cons;
@@ -2041,6 +2047,11 @@ function InfoPanel({ cat, part, band, status, useCase, compact, incompatible }) 
           </ul>
         </div>
       </div>
+      {onAsk && (
+        <button className="rf-ask-part-btn" onClick={() => onAsk(part)}>
+          <Sparkles size={13} /> Ask AI about this part
+        </button>
+      )}
     </div>
   );
 }
@@ -2301,7 +2312,7 @@ async function streamChat({ system, messages }, onDelta) {
   throw lastErr || new Error("request failed");
 }
 
-function Assistant({ open, onClose, useCase, budget, parts }) {
+function Assistant({ open, onClose, useCase, budget, parts, seed, onSeedConsumed }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -2397,6 +2408,15 @@ function Assistant({ open, onClose, useCase, budget, parts }) {
       setLoading(false);
     }
   };
+
+  const seedRef = useRef(null);
+  useEffect(() => {
+    if (open && seed && seedRef.current !== seed && !loading && !streaming) {
+      seedRef.current = seed;
+      onSeedConsumed && onSeedConsumed();
+      send(seed);
+    }
+  }, [open, seed]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!open) return null;
   return (
@@ -2685,6 +2705,11 @@ font-family:'Sora';font-size:12.5px;padding:7px 12px;border-radius:9px;cursor:po
 .rf-chip-btn.primary:hover{background:rgba(25,232,219,0.1);}
 
 .rf-info{padding:14px 16px 16px 72px;border-top:1px solid var(--c-border);}
+.rf-ask-part-btn{margin-top:14px;display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:10px;cursor:pointer;
+  font-family:'Chakra Petch';font-weight:600;font-size:12px;letter-spacing:0.4px;color:var(--c-accent);
+  background:rgba(25,232,219,0.08);border:1px solid rgba(25,232,219,0.28);transition:background .15s ease,transform .12s ease,box-shadow .15s ease;}
+.rf-ask-part-btn:hover{background:rgba(25,232,219,0.15);transform:translateY(-1px);box-shadow:0 6px 18px rgba(25,232,219,0.18);}
+.rf-ask-part-btn:active{transform:translateY(0);}
 .rf-info-specs{margin-bottom:16px;}
 .rf-pc-head{display:inline-flex;align-items:center;gap:7px;font-family:'JetBrains Mono';font-size:10px;letter-spacing:2px;color:var(--c-accent2);margin-bottom:11px;}
 .rf-pc-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
