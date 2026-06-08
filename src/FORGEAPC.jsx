@@ -1376,8 +1376,9 @@ export default function RigForge() {
             // Guard: ignore any scraped price wildly off the catalog baseline — that
             // means a wrong product got matched to this part (e.g. a $160 hit on a ~$400 GPU).
             const baseline = part.price;
-            const ceil = (c === "ram" || c === "storage") ? 4 : 2.2; // RAM/SSD can legitimately more than double in the shortage
-            const plausible = (v) => typeof v === "number" && v > 0 && (!baseline || (v >= baseline * 0.5 && v <= baseline * ceil));
+            // Only guard the LOW side: reject prices well below baseline (a wrong, cheaper product
+            // matched to this part). No upper cap — prices can legitimately spike (e.g. RAM shortage).
+            const plausible = (v) => typeof v === "number" && v > 0 && (!baseline || v >= baseline * 0.5);
             let best = null, bestSrc = null;
             if (entry) {
               for (const [src, v] of Object.entries(entry)) {
@@ -1428,8 +1429,7 @@ export default function RigForge() {
                 for (const part of CATALOG[c]) {
                   const entry = data.prices[part.id];
                   const baseline = part.price;
-                  const ceil = (c === "ram" || c === "storage") ? 4 : 2.2;
-                  const plausible = (v) => typeof v === "number" && v > 0 && (!baseline || (v >= baseline * 0.5 && v <= baseline * ceil));
+                  const plausible = (v) => typeof v === "number" && v > 0 && (!baseline || v >= baseline * 0.5);
                   let best = null, bestSrc = null;
                   if (entry) { for (const [src, v] of Object.entries(entry)) { if (plausible(v) && (best == null || v < best)) { best = v; bestSrc = src; } } }
                   if (best != null) { part.price = best; part._live = true; part._source = bestSrc; n++; }
