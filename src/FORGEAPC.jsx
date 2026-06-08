@@ -1298,12 +1298,6 @@ export default function RigForge() {
   const [savingOpen, setSavingOpen] = useState(false);
   const [toast, setToast] = useState(null);
   const [assistantOpen, setAssistantOpen] = useState(false);
-  const [askSeed, setAskSeed] = useState(null);
-  const askAbout = (part) => {
-    if (!part) return;
-    setAskSeed(`Tell me about the ${part.name} in my build — is it a good pick for my ${useCase ? tUC(useCase) : "use case"} use case and ${fmt(budget)} budget, and what are its main strengths and weak points?`);
-    setAssistantOpen(true);
-  };
   const [isFs, setIsFs] = useState(false);
   const [priceInfo, setPriceInfo] = useState(null);
   const [theme, setTheme] = useState("dark"); // default dark mode
@@ -1571,7 +1565,7 @@ export default function RigForge() {
             useCase={useCase} budget={budget} parts={parts} analysis={analysis} verdict={aiVerdict} aiBusy={aiBusy} onGenerate={runVerdict}
             expanded={expanded} setExpanded={setExpanded}
             onSwap={(c) => setPicker(c)} onRemove={removePart}
-            onRegen={generateAuto} onSave={() => setSavingOpen(true)} onAskPart={askAbout}
+            onRegen={generateAuto} onSave={() => setSavingOpen(true)}
           />
         )}
       </main>
@@ -1607,7 +1601,7 @@ export default function RigForge() {
           <Sparkles size={18} /> Ask AI
         </button>
       )}
-      <Assistant open={assistantOpen} onClose={() => setAssistantOpen(false)} useCase={useCase} budget={budget} parts={parts} seed={askSeed} onSeedConsumed={() => setAskSeed(null)} />
+      <Assistant open={assistantOpen} onClose={() => setAssistantOpen(false)} useCase={useCase} budget={budget} parts={parts} />
 
       {toast && <div className="rf-toast"><Check size={15} /> {toast}</div>}
     </div>
@@ -1789,7 +1783,7 @@ function BudgetStep({ useCase, budget, setBudget, onBack, onAuto, onManual }) {
 }
 
 /* ----------------------------- RESULTS ----------------------------- */
-function Results({ useCase, budget, parts, analysis, verdict, aiBusy, onGenerate, expanded, setExpanded, onSwap, onRemove, onRegen, onSave, onAskPart }) {
+function Results({ useCase, budget, parts, analysis, verdict, aiBusy, onGenerate, expanded, setExpanded, onSwap, onRemove, onRegen, onSave }) {
   const UC = USE_CASES[useCase];
   const a = analysis;
   // Total counts only parts with a live price, so a hidden (out-of-stock) part never adds a made-up number.
@@ -1915,7 +1909,7 @@ function Results({ useCase, budget, parts, analysis, verdict, aiBusy, onGenerate
                 <button className="rf-chip-btn primary" onClick={() => onSwap(cat)}><Repeat2 size={13} /> {part ? "Swap" : "Add"}</button>
               </div>
 
-              {part && isOpen && <InfoPanel cat={cat} part={part} band={band} status={status} useCase={useCase} incompatible={!compatible} onAsk={onAskPart} />}
+              {part && isOpen && <InfoPanel cat={cat} part={part} band={band} status={status} useCase={useCase} incompatible={!compatible} enableAsk budget={budget} parts={parts} />}
             </div>
           );
         })}
@@ -2019,7 +2013,52 @@ function partProsCons(cat, part, band, status, useCase) {
   return { pros, cons };
 }
 
-function InfoPanel({ cat, part, band, status, useCase, compact, incompatible, onAsk }) {
+function PartAsk({ part, cat, useCase, budget, parts }) {
+  const [open, setOpen] = useState(false);
+  const [input, setInput] = useState("");
+  const [answer, setAnswer] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState(false);
+  const ask = async () => {
+    const q = input.trim();
+    if (!q || loading) return;
+    setLoading(true); setErr(false); setAnswer("");
+    const ucLabel = useCase ? tUC(useCase) : "unspecified";
+    const buildLines = parts ? CATEGORY_ORDER.filter((c) => parts[c]).map((c) => `${CAT_META[c].label}: ${parts[c].name} ($${parts[c].price})`).join("; ") : "";
+    const system =
+      "You are the built-in AI assistant for FORGEAPC, a PC-part-picker app. " +
+      "Your name and model identity is \"Opus 4.8\" by Anthropic (Claude). If anyone asks what model or AI you are, always say you are Opus 4.8 by Anthropic. Never mention Haiku, Sonnet, or any other model name. " +
+      "Answer the user's question about ONE specific part, in the context of their full build, use case and budget. " +
+      "Keep answers short and practical — usually 2-4 sentences. Use a short bullet list only if it genuinely helps. No fluff or filler. " +
+      "Context: as of mid-2026 a severe AI-driven memory/storage shortage makes RAM and SSDs very expensive (64GB DDR5 ~$850, 32GB ~$470, 1TB SSD ~$165). DDR5-6000 CL30 is the value sweet spot; motherboards above ~$250 are usually overkill.\n\n" +
+      `The part in question: ${CAT_META[cat].label} — ${part.name} ($${part.price}). Use case: ${ucLabel}. Budget: ${fmt(budget)}. Full build: ${buildLines || "not assembled yet"}.`;
+    try {
+      await streamChat({ system, messages: [{ role: "user", content: q }] }, (full) => setAnswer(full));
+    } catch (e) { setErr(true); }
+    finally { setLoading(false); }
+  };
+  if (!open) {
+    return (
+      <button className="rf-ask-part-btn" onClick={() => setOpen(true)}>
+        <Sparkles size={13} /> Ask AI about this part
+      </button>
+    );
+  }
+  return (
+    <div className="rf-ask-inline">
+      <div className="rf-ask-row">
+        <input className="rf-ask-input" value={input} autoFocus placeholder="Ask anything about this part…"
+          onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") ask(); }} />
+        <button className="rf-ask-send" onClick={ask} disabled={loading || !input.trim()}>{loading ? "…" : "Ask"}</button>
+      </div>
+      {answer && <div className="rf-ask-answer">{answer}</div>}
+      {loading && !answer && <div className="rf-ask-answer rf-ask-think">Thinking…</div>}
+      {err && <div className="rf-ask-answer rf-ask-err">Could not reach the assistant — please try again.</div>}
+    </div>
+  );
+}
+
+function InfoPanel({ cat, part, band, status, useCase, compact, incompatible, enableAsk, budget, parts }) {
   const facts = partFacts(cat, part);
   const { pros, cons } = partProsCons(cat, part, band, status, useCase);
   const allCons = incompatible ? ["Not compatible with your current build", ...cons] : cons;
@@ -2047,11 +2086,7 @@ function InfoPanel({ cat, part, band, status, useCase, compact, incompatible, on
           </ul>
         </div>
       </div>
-      {onAsk && (
-        <button className="rf-ask-part-btn" onClick={() => onAsk(part)}>
-          <Sparkles size={13} /> Ask AI about this part
-        </button>
-      )}
+      {enableAsk && <PartAsk part={part} cat={cat} useCase={useCase} budget={budget} parts={parts} />}
     </div>
   );
 }
@@ -2312,7 +2347,7 @@ async function streamChat({ system, messages }, onDelta) {
   throw lastErr || new Error("request failed");
 }
 
-function Assistant({ open, onClose, useCase, budget, parts, seed, onSeedConsumed }) {
+function Assistant({ open, onClose, useCase, budget, parts }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -2408,15 +2443,6 @@ function Assistant({ open, onClose, useCase, budget, parts, seed, onSeedConsumed
       setLoading(false);
     }
   };
-
-  const seedRef = useRef(null);
-  useEffect(() => {
-    if (open && seed && seedRef.current !== seed && !loading && !streaming) {
-      seedRef.current = seed;
-      onSeedConsumed && onSeedConsumed();
-      send(seed);
-    }
-  }, [open, seed]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!open) return null;
   return (
@@ -2710,6 +2736,16 @@ font-family:'Sora';font-size:12.5px;padding:7px 12px;border-radius:9px;cursor:po
   background:rgba(25,232,219,0.08);border:1px solid rgba(25,232,219,0.28);transition:background .15s ease,transform .12s ease,box-shadow .15s ease;}
 .rf-ask-part-btn:hover{background:rgba(25,232,219,0.15);transform:translateY(-1px);box-shadow:0 6px 18px rgba(25,232,219,0.18);}
 .rf-ask-part-btn:active{transform:translateY(0);}
+.rf-ask-inline{margin-top:14px;display:flex;flex-direction:column;gap:10px;}
+.rf-ask-row{display:flex;gap:8px;align-items:center;}
+.rf-ask-input{flex:1;min-width:0;background:rgba(255,255,255,0.03);border:1px solid var(--c-border);border-radius:10px;padding:9px 12px;color:var(--c-text);font-family:'Sora';font-size:13px;outline:none;transition:border-color .15s ease,box-shadow .15s ease;}
+.rf-ask-input:focus{border-color:var(--c-accent);box-shadow:0 0 0 3px rgba(25,232,219,0.12);}
+.rf-ask-send{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:10px;cursor:pointer;font-family:'Chakra Petch';font-weight:600;font-size:12px;letter-spacing:0.4px;color:#04201e;background:var(--c-accent);border:1px solid var(--c-accent);transition:transform .12s ease,box-shadow .15s ease,opacity .15s ease;}
+.rf-ask-send:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 18px rgba(25,232,219,0.3);}
+.rf-ask-send:disabled{opacity:0.45;cursor:not-allowed;}
+.rf-ask-answer{background:rgba(124,92,255,0.06);border:1px solid rgba(124,92,255,0.22);border-radius:12px;padding:12px 14px;color:var(--c-text);font-family:'Sora';font-size:13px;line-height:1.6;white-space:pre-wrap;}
+.rf-ask-think{color:var(--c-muted);font-style:italic;}
+.rf-ask-err{border-color:rgba(255,90,90,0.4);background:rgba(255,90,90,0.08);color:var(--c-bad);}
 .rf-info-specs{margin-bottom:16px;}
 .rf-pc-head{display:inline-flex;align-items:center;gap:7px;font-family:'JetBrains Mono';font-size:10px;letter-spacing:2px;color:var(--c-accent2);margin-bottom:11px;}
 .rf-pc-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
