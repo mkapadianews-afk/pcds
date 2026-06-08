@@ -3,7 +3,7 @@ import {
   Cpu, CircuitBoard, MemoryStick, HardDrive, Power, Box, Fan, MonitorPlay,
   Gamepad2, Clapperboard, Radio, Boxes, BrainCircuit, Briefcase,
   Sparkles, Save, Plus, Trash2, Check, X, AlertTriangle, ChevronRight,
-  ChevronLeft, Zap, DollarSign, RotateCcw, ShieldCheck, ShieldAlert, Repeat2, Wrench, Send, Bot, MessageCircle, Maximize, Minimize, Settings, Sun, Moon
+  ChevronLeft, Zap, DollarSign, RotateCcw, ShieldCheck, ShieldAlert, Repeat2, Wrench, Send, Bot, MessageCircle, Maximize, Minimize, Settings, Sun, Moon, Search
 } from "lucide-react";
 import { MEDIA, MEDIA_NE } from "../data/part-media.js";
 /* ----------------------------- i18n ----------------------------- */
@@ -1305,22 +1305,23 @@ export default function RigForge() {
     [parts, analysis, useCase, budget]
   );
 
-  // AI overview: generated ON DEMAND (button press) via /api/chat, grounded in the
-  // actual parts + current prices. Not automatic, so it only costs an API call when
-  // the user asks for it. Cleared whenever the build/inputs change.
+  // AI scoring + verdict: a single /api/chat call returns the BUILD SCORE, the
+  // PRICE/PERFORMANCE score AND the written verdict as JSON. It fires automatically
+  // (debounced) once per finished, compatible build — the engine's numbers show
+  // instantly as a fallback while it runs or if the API can't be reached.
   const [aiVerdict, setAiVerdict] = useState(null);
   const [aiBusy, setAiBusy] = useState(false);
   useEffect(() => { setAiVerdict(null); setAiBusy(false); }, [parts, useCase, budget, view]);
   const runVerdict = useCallback(async () => {
     if (!parts || !parts.cpu || !useCase || !analysis || aiBusy) return;
-    setAiBusy(true);
-    setAiVerdict(null);
+    setAiBusy(true); setAiVerdict(null);
     const summary = {
       useCase: USE_CASES[useCase].label,
       budget,
       buildTotal: analysis.total,
-      performanceScore: analysis.score,
-      pricePerfScore: analysis.ppScore,
+      withinBudget: analysis.total <= budget,
+      performanceScore_of1000: analysis.score,
+      pricePerformanceScore_of100: analysis.ppScore,
       compatible: analysis.compat.pass,
       parts: CATEGORY_ORDER.filter((c) => parts[c]).map((c) => ({
         slot: c,
@@ -1334,11 +1335,11 @@ export default function RigForge() {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          system: "You are a sharp PC-building advisor. You're given a build as JSON: each part has labeled specs with units (e.g. tdpWatts, vramGB, capacityGB, speedMHz, wattage, coolerType, driveType, ratingOutOf100 where higher = stronger relative to its category), plus current prices, overall scores, budget, use case, and any compatibility issues. Write a verdict of about 3 sentences (~55-70 words): how well it fits the use case and budget, its main strength, and the weakest link or bottleneck. Use ONLY the specs given — never invent or assume a spec (e.g. read driveType for SATA vs NVMe). When judging the cooler, weigh coolerType and ratedForTdpWatts against the CPU's tdpWatts and cores: high-TDP or high-core chips (X3D, Ryzen 9, i7/i9, ~120W+) genuinely benefit from a strong air cooler or AIO — never call an AIO 'overkill' for those. Be specific; reference key parts by name. Plain prose only — no markdown, no lists, no preamble.",
+          system: "You are a sharp PC-building advisor. You're given a build as JSON: each part has a ratingOutOf100 (benchmark-based real-world performance within its category — the primary measure of performance), labeled specs, current prices, the build's performanceScore_of1000 (use-case-weighted real performance vs the best possible build) and pricePerformanceScore_of100, budget, use case, and any compatibility issues. Write about 3 sentences (~55-70 words): how well it fits the use case and budget, its main strength, and the genuine weakest link or bottleneck. Judge by real-world performance for the use case, NOT by raw spec numbers — do NOT call a normal mainstream spec (e.g. an 8GB GPU, 16GB RAM, a 1TB SSD) a flaw unless it truly bottlenecks the use case at this budget. Use ONLY the specs given — never invent a spec (e.g. read driveType for SATA vs NVMe). When judging the cooler, weigh coolerType and ratedForTdpWatts against the CPU's tdpWatts and cores: high-TDP or high-core chips (X3D, Ryzen 9, i7/i9, ~120W+) genuinely benefit from a strong air cooler or AIO — never call an AIO 'overkill' for those. Be specific; reference key parts by name. Plain prose only — no markdown, no lists, no preamble.",
           messages: [{ role: "user", content: "Here is the build as JSON:\n" + JSON.stringify(summary, null, 1) + "\n\nWrite the verdict." }],
         }),
       });
-      if (res.ok) { const data = await res.json(); if (data && data.text) setAiVerdict(data.text.trim()); }
+      if (res.ok) { const data = await res.json(); if (data && data.text) setAiVerdict(String(data.text).trim()); }
     } catch (e) { /* leave unset; button stays available to retry */ }
     finally { setAiBusy(false); }
   }, [parts, useCase, budget, analysis, aiBusy]);
@@ -1448,7 +1449,7 @@ export default function RigForge() {
         )}
         {view === "results" && parts && analysis && (
           <Results
-            useCase={useCase} budget={budget} parts={parts} analysis={analysis} verdict={aiVerdict} aiBusy={aiBusy} aiLive={!!aiVerdict} onGenerate={runVerdict}
+            useCase={useCase} budget={budget} parts={parts} analysis={analysis} verdict={aiVerdict} aiBusy={aiBusy} onGenerate={runVerdict}
             expanded={expanded} setExpanded={setExpanded}
             onSwap={(c) => setPicker(c)} onRemove={removePart}
             onRegen={generateAuto} onSave={() => setSavingOpen(true)}
@@ -1659,7 +1660,7 @@ function BudgetStep({ useCase, budget, setBudget, onBack, onAuto, onManual }) {
 }
 
 /* ----------------------------- RESULTS ----------------------------- */
-function Results({ useCase, budget, parts, analysis, verdict, aiBusy, aiLive, onGenerate, expanded, setExpanded, onSwap, onRemove, onRegen, onSave }) {
+function Results({ useCase, budget, parts, analysis, verdict, aiBusy, onGenerate, expanded, setExpanded, onSwap, onRemove, onRegen, onSave }) {
   const UC = USE_CASES[useCase];
   const a = analysis;
   // Total counts only parts with a live price, so a hidden (out-of-stock) part never adds a made-up number.
@@ -1924,6 +1925,7 @@ function Picker({ cat, current, useCase, budget, parts, onClose, onPick }) {
   const band = (budget * USE_CASES[useCase].alloc[cat]) / 100;
   const [openId, setOpenId] = useState(null);      // variant id with "More info" open
   const [openModel, setOpenModel] = useState(null); // model group expanded to variants
+  const [q, setQ] = useState(""); // search filter
 
   const models = useMemo(() => {
     const rest = { ...parts };
@@ -1966,6 +1968,17 @@ function Picker({ cat, current, useCase, budget, parts, onClose, onPick }) {
     return list;
   }, [cat, parts, band, useCase, current]);
 
+  // search filter: match model, brand, or any variant name/label
+  const shown = useMemo(() => {
+    const s = q.trim().toLowerCase();
+    if (!s) return models;
+    const toks = s.split(/\s+/);
+    return models.filter((g) => {
+      const hay = (g.model + " " + g.variants.map((v) => `${v.brand} ${v.name} ${v.variantLabel || ""} ${v.model || ""}`).join(" ")).toLowerCase();
+      return toks.every((tk) => hay.includes(tk));
+    });
+  }, [models, q]);
+
   const VariantActions = ({ v }) => {
     const open = openId === v.id;
     const isCur = current && current.id === v.id;
@@ -1994,16 +2007,22 @@ function Picker({ cat, current, useCase, budget, parts, onClose, onPick }) {
         <div className="rf-drawer-head">
           <div>
             <div className="rf-eyebrow"><Meta.Icon size={13} /> {t("chooseA")} {tCat(cat).toUpperCase()}</div>
-            <div className="rf-muted rf-sm">{CATALOG[cat].length} options · sorted by your match score · budget slice {fmt(band)}</div>
+            <div className="rf-muted rf-sm">{q.trim() ? `${shown.length} of ${CATALOG[cat].length}` : CATALOG[cat].length} options · sorted by your match score · budget slice {fmt(band)}</div>
           </div>
           <button className="rf-icon-btn" onClick={onClose}><X size={18} /></button>
         </div>
+        <div className="rf-drawer-search">
+          <Search size={15} />
+          <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder={`Search ${tCat(cat).toLowerCase()}…`} spellCheck={false} />
+          {q && <button className="rf-search-clear" onClick={() => setQ("")} aria-label="Clear"><X size={14} /></button>}
+        </div>
         <div className="rf-drawer-list">
-          {models.map((g, gi) => {
+          {shown.length === 0 && <div className="rf-pick-empty">No {tCat(cat).toLowerCase()} matches “{q}”.</div>}
+          {shown.map((g, gi) => {
             const expanded = openModel === g.model;
             const _lp = g.variants.filter((v) => !partOOS(v)).map((v) => v.price);
             const priceLabel = _lp.length ? (Math.min(..._lp) === Math.max(..._lp) ? fmt(Math.min(..._lp)) : `${fmt(Math.min(..._lp))}–${fmt(Math.max(..._lp))}`) : t("outOfStock");
-            const showDivider = gi > 0 && g._over && !models[gi - 1]._over;
+            const showDivider = gi > 0 && g._over && !shown[gi - 1]._over;
             return (
               <React.Fragment key={g.model}>
                 {showDivider && <div className="rf-pick-divider"><span>{t("overBudgetCat", { x: tCat(cat).toLowerCase() })}</span></div>}
@@ -2462,17 +2481,17 @@ font-size:13px;padding:8px 16px;border-radius:9px;cursor:pointer;transition:.16s
 /* RESULTS */
 .rf-results-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:18px 0 18px;flex-wrap:wrap;}
 .rf-results-actions{display:flex;gap:10px;}
-.rf-scorecard{display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:center;
-background:var(--c-panel);border:1px solid var(--c-border);border-radius:18px;padding:24px;margin-bottom:14px;}
-.rf-gauges{display:flex;gap:14px;}
+.rf-scorecard{display:grid;grid-template-columns:auto 1fr;gap:32px;align-items:center;
+background:var(--c-panel);border:1px solid var(--c-border);border-radius:20px;padding:30px;margin-bottom:18px;}
+.rf-gauges{display:flex;gap:20px;}
 .rf-gauge{position:relative;display:grid;place-items:center;}
 .rf-gauge svg{transform:rotate(0);}
 .rf-gauge-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .rf-gauge-num{font-family:'JetBrains Mono';font-weight:700;font-size:34px;line-height:1;}
-.rf-gauge-label{font-size:9.5px;letter-spacing:1.5px;color:var(--c-muted);margin-top:3px;}
+.rf-gauge-label{font-size:9.5px;letter-spacing:1.8px;color:var(--c-muted);margin-top:5px;}
 .rf-verdict-tag{display:inline-flex;align-items:center;gap:7px;font-family:'JetBrains Mono';font-size:11px;letter-spacing:1px;color:var(--c-accent2);margin-bottom:9px;}
 .rf-hybrid{font-size:9px;background:rgba(124,92,255,0.16);border:1px solid rgba(124,92,255,0.3);color:var(--c-accent2);padding:1px 6px;border-radius:20px;letter-spacing:1px;}
-.rf-verdict p{margin:0 0 16px;font-size:14.5px;line-height:1.6;color:var(--c-text);}
+.rf-verdict p{margin:0 0 16px;font-size:15px;line-height:1.66;color:var(--c-text);}
 .rf-verdict-busy{opacity:.62;transition:opacity .4s var(--ease);}
 .rf-verdict-btn{margin:2px 0 14px;}
 .rf-total-row{display:flex;align-items:center;gap:12px;font-size:13px;}
@@ -2487,11 +2506,11 @@ background:var(--c-panel);border:1px solid var(--c-border);border-radius:18px;pa
 .rf-compat ul{margin:8px 0 0;padding-left:18px;color:var(--c-bad);font-size:13px;line-height:1.7;}
 .rf-compat strong{font-family:'Chakra Petch';font-weight:600;}
 
-.rf-parts{display:flex;flex-direction:column;gap:10px;}
-.rf-part{background:var(--c-panel);border:1px solid var(--c-border);border-radius:14px;overflow:hidden;transition:border-color .2s;}
-.rf-part:hover{border-color:var(--c-hover);}
-.rf-part-top{display:flex;align-items:center;gap:14px;padding:14px 16px 0;}
-.rf-part-actions{display:flex;gap:8px;justify-content:flex-end;padding:11px 16px 14px;}
+.rf-parts{display:flex;flex-direction:column;gap:12px;}
+.rf-part{background:var(--c-panel);border:1px solid var(--c-border);border-radius:16px;overflow:hidden;transition:border-color .2s,transform .2s,box-shadow .2s;}
+.rf-part:hover{border-color:var(--c-hover);transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,0.22);}
+.rf-part-top{display:flex;align-items:center;gap:14px;padding:16px 18px 0;}
+.rf-part-actions{display:flex;gap:8px;justify-content:flex-end;padding:13px 18px 16px;}
 .rf-part-icon{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;color:var(--c-accent);background:rgba(46,230,207,0.08);border:1px solid rgba(46,230,207,0.16);flex-shrink:0;}
 .rf-part-img-link{flex-shrink:0;display:block;}
 .rf-part-img{width:42px;height:42px;border-radius:11px;object-fit:contain;background:#fff;border:1px solid var(--c-border);padding:2px;cursor:pointer;transition:transform .12s ease;}
@@ -2550,6 +2569,13 @@ font-family:'Sora';font-size:12.5px;padding:7px 12px;border-radius:9px;cursor:po
 display:flex;flex-direction:column;animation:rfSlideR .42s var(--ease);will-change:transform,opacity;}
 .rf-drawer-head{display:flex;align-items:flex-start;justify-content:space-between;padding:20px;border-bottom:1px solid var(--c-border);}
 .rf-drawer-list{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px;}
+.rf-drawer-search{display:flex;align-items:center;gap:9px;margin:12px 14px 0;padding:10px 13px;background:var(--c-panel);border:1px solid var(--c-border);border-radius:11px;color:var(--c-muted);transition:border-color .16s,box-shadow .16s;}
+.rf-drawer-search:focus-within{border-color:var(--c-accent);box-shadow:0 0 0 3px rgba(46,230,207,0.15);color:var(--c-accent);}
+.rf-drawer-search input{flex:1;background:transparent;border:none;outline:none;color:var(--c-text);font-family:'Sora';font-size:14px;}
+.rf-drawer-search input::placeholder{color:var(--c-muted);}
+.rf-search-clear{background:transparent;border:none;color:var(--c-muted);cursor:pointer;display:grid;place-items:center;padding:2px;border-radius:6px;transition:.15s;}
+.rf-search-clear:hover{color:var(--c-text);background:var(--c-panel-2);}
+.rf-pick-empty{text-align:center;color:var(--c-muted);font-size:13.5px;padding:34px 12px;}
 .rf-pick{display:flex;flex-direction:column;background:var(--c-panel);border:1px solid var(--c-border);
 border-radius:12px;padding:12px;color:var(--c-text);transition:border-color .16s,background .16s;}
 .rf-pick:hover{border-color:rgba(46,230,207,0.3);}
