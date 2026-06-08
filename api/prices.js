@@ -137,9 +137,10 @@ async function apifyPrices(actorId, { allowQueryMatch = false, token } = {}) {
       const asin = (it.asin || it.ASIN || "").toString().toUpperCase();
       const query = it.searchQuery || it.keyword || it.query || it.input || "";
       const price =
-        num(it.price) ?? num(it.salePrice) ?? num(it.finalPrice) ?? num(it.currentPrice) ??
-        num(it.sellingPrice) ?? num(it.priceCurrent) ?? num(it.price_current) ?? num(it.productPrice) ??
-        num(it.pricing) ?? num(it.priceInfo) ?? num(it.prices) ?? num(it.priceValue);
+        num(it.price) ?? num(it.priceCurrentDollars) ?? num(it.salePrice) ?? num(it.finalPrice) ??
+        num(it.currentPrice) ?? num(it.sellingPrice) ?? num(it.priceCurrent) ?? num(it.price_current) ??
+        num(it.productPrice) ?? num(it.pricing) ?? num(it.priceInfo) ?? num(it.prices) ??
+        num(it.priceValue) ?? num(it.priceWas);
       if (price == null) continue;
 
       // resolve which part this item is.
@@ -177,7 +178,7 @@ async function apifyPrices(actorId, { allowQueryMatch = false, token } = {}) {
 
       if (out[id] == null || price < out[id]) out[id] = price;
       // capture product image + link (first decent one wins)
-      const thumb = it.thumbnailImage || it.image || it.imageUrl || it.img || it.thumbnail || it.mainImage || (Array.isArray(it.images) ? it.images[0] : "") || (Array.isArray(it.imageUrls) ? it.imageUrls[0] : "");
+      const thumb = it.thumbnailImage || it.image || it.imageUrl || it.img || it.thumbnail || it.mainImage || it.mainImageUrl || (Array.isArray(it.images) ? it.images[0] : "") || (Array.isArray(it.imageUrls) ? it.imageUrls[0] : "") || (Array.isArray(it.galleryImageUrls) ? it.galleryImageUrls[0] : "");
       const link = negUrlRaw || (asin ? `https://www.amazon.com/dp/${asin}` : "");
       if (!media[id] && (thumb || link)) media[id] = { img: thumb || "", url: link || "" };
     }
