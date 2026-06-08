@@ -93,15 +93,25 @@ async function bestBuyPrices() {
 async function apifyPrices(actorId, { allowQueryMatch = false, token } = {}) {
   const out = {};
   const media = {};
-  if (!token || !actorId) return { out, media };
+  const dbg = { configured: !!(token && actorId), hasToken: !!token, actorId: actorId || null, httpStatus: null, itemsRead: 0, matched: 0, sampleKeys: null, sampleTitle: null, sampleUrl: null, samplePriceRaw: null };
+  if (!token || !actorId) return { out, media, dbg };
   try {
     // Works whether the ID is an ACTOR id or a TASK id: try actor runs first,
     // then fall back to task runs. A scheduled task run also counts as an actor run.
     const q = `runs/last/dataset/items?token=${token}&status=SUCCEEDED&clean=true&limit=5000`;
     let r = await fetch(`https://api.apify.com/v2/acts/${actorId}/${q}`);
     if (!r.ok) r = await fetch(`https://api.apify.com/v2/actor-tasks/${actorId}/${q}`);
-    if (!r.ok) return { out, media };
+    dbg.httpStatus = r.status;
+    if (!r.ok) return { out, media, dbg };
     const items = await r.json();
+    dbg.itemsRead = Array.isArray(items) ? items.length : 0;
+    if (items[0]) {
+      const f = items[0];
+      dbg.sampleKeys = Object.keys(f);
+      dbg.sampleTitle = (f.title || f.name || f.productName || f.productTitle || "").toString().slice(0, 80);
+      dbg.sampleUrl = f.url || f.link || f.productUrl || f.itemUrl || f.href || f.pageUrl || null;
+      dbg.samplePriceRaw = f.price ?? f.salePrice ?? f.finalPrice ?? f.currentPrice ?? f.pricing ?? f.prices ?? null;
+    }
 
     // build lookups: exact ASIN match first (most reliable), then query, then title
     const byAsin = {};
@@ -171,8 +181,9 @@ async function apifyPrices(actorId, { allowQueryMatch = false, token } = {}) {
       const link = negUrlRaw || (asin ? `https://www.amazon.com/dp/${asin}` : "");
       if (!media[id] && (thumb || link)) media[id] = { img: thumb || "", url: link || "" };
     }
-  } catch (e) {}
-  return { out, media };
+  } catch (e) { dbg.error = String(e && e.message || e); }
+  dbg.matched = Object.keys(out).length;
+  return { out, media, dbg };
 }
 
 export default async function handler(req, res) {
@@ -210,5 +221,13 @@ export default async function handler(req, res) {
   }
 
   res.setHeader("Cache-Control", "no-store, max-age=0, must-revalidate");
-  res.status(200).json({ updatedAt: new Date().toISOString(), prices, media });
+  const payload = { updatedAt: new Date().toISOString(), prices, media };
+  if (/[?&]debug=1\b/.test(req.url || "")) {
+    payload._debug = {
+      env: { amazonActorSet: !!AMAZON_ACTOR, neweggActorSet: !!NEWEGG_ACTOR, amazonTokenSet: !!AMAZON_TOKEN, neweggTokenSet: !!NEWEGG_TOKEN, bestBuyKeySet: !!BESTBUY_KEY },
+      amazon: amz.dbg,
+      newegg: neg.dbg,
+    };
+  }
+  res.status(200).json(payload);
 }
