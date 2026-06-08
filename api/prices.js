@@ -184,6 +184,6 @@ export default async function handler(req, res) {
     if (amazon || newegg) media[id] = { amazon, newegg };
   }
 
-  res.setHeader("Cache-Control", "s-maxage=86400, stale-while-revalidate=43200");
+  res.setHeader("Cache-Control", "no-store, max-age=0, must-revalidate");
   res.status(200).json({ updatedAt: new Date().toISOString(), prices, media });
 }

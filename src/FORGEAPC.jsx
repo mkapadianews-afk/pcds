@@ -1230,7 +1230,7 @@ export default function RigForge() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(PRICES_URL);
+        const res = await fetch(PRICES_URL + "?t=" + Date.now(), { cache: "no-store" });
         if (!res.ok) return;
         const data = await res.json();
         if (cancelled || !data || !data.prices) return;
