@@ -56,6 +56,16 @@ function floorFor(id) {
   return 0;
 }
 
+// Robustly pull a positive number out of varied shapes: 12.3, "$12.30",
+// {value:12.3}, {current:...}, {amount:...} — actors differ a lot here.
+function num(v) {
+  if (typeof v === "number") return v > 0 ? v : null;
+  if (typeof v === "string") { const n = parseFloat(v.replace(/[^0-9.]/g, "")); return n > 0 ? n : null; }
+  if (v && typeof v === "object")
+    return num(v.value ?? v.amount ?? v.current ?? v.price ?? v.final ?? v.now ?? v.min);
+  return null;
+}
+
 // ---------------- Best Buy (live official API) ----------------
 async function bestBuyPrices() {
   const out = {};
@@ -112,14 +122,15 @@ async function apifyPrices(actorId, { allowQueryMatch = false, token } = {}) {
 
     for (const it of items) {
       // NOTE: field names vary by actor — adjust to match your chosen actor's output.
-      const title = it.title || it.name || it.productTitle || "";
+      const title = it.title || it.name || it.productTitle || it.productName || it.product_title || "";
       if (USED.test(title) || USED_WORD.test(title) || USED.test(it.brand || "")) continue; // never show used/refurbished
       const asin = (it.asin || it.ASIN || "").toString().toUpperCase();
       const query = it.searchQuery || it.keyword || it.query || it.input || "";
-      let price = it.price ?? it.salePrice ?? it.finalPrice ?? it.currentPrice;
-      if (price && typeof price === "object") price = price.value ?? price.amount; // some actors nest price
-      if (typeof price === "string") price = parseFloat(price.replace(/[^0-9.]/g, ""));
-      if (typeof price !== "number" || !(price > 0)) continue;
+      const price =
+        num(it.price) ?? num(it.salePrice) ?? num(it.finalPrice) ?? num(it.currentPrice) ??
+        num(it.sellingPrice) ?? num(it.priceCurrent) ?? num(it.price_current) ?? num(it.productPrice) ??
+        num(it.pricing) ?? num(it.priceInfo) ?? num(it.prices) ?? num(it.priceValue);
+      if (price == null) continue;
 
       // resolve which part this item is.
       // Amazon: EXACT ASIN ONLY. Newegg (allowQueryMatch): EXACT URL/item code
@@ -156,7 +167,7 @@ async function apifyPrices(actorId, { allowQueryMatch = false, token } = {}) {
 
       if (out[id] == null || price < out[id]) out[id] = price;
       // capture product image + link (first decent one wins)
-      const thumb = it.thumbnailImage || it.image || it.imageUrl || it.img || it.thumbnail || (Array.isArray(it.images) ? it.images[0] : "");
+      const thumb = it.thumbnailImage || it.image || it.imageUrl || it.img || it.thumbnail || it.mainImage || (Array.isArray(it.images) ? it.images[0] : "") || (Array.isArray(it.imageUrls) ? it.imageUrls[0] : "");
       const link = negUrlRaw || (asin ? `https://www.amazon.com/dp/${asin}` : "");
       if (!media[id] && (thumb || link)) media[id] = { img: thumb || "", url: link || "" };
     }
