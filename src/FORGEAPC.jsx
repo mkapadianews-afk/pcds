@@ -16,8 +16,8 @@ const _UCL = {"en": {"gaming": "Gaming", "content": "Content Creation", "streami
 const _UCT = {"en": {"gaming": "Max FPS", "content": "Video & Photo", "streaming": "Play & Broadcast", "workstation": "Render & CAD", "ai": "VRAM Hungry", "office": "Snappy & Cheap"}, "es": {"gaming": "Máx FPS", "content": "Vídeo y Foto", "streaming": "Jugar y Transmitir", "workstation": "Renderizado y CAD", "ai": "Hambriento de VRAM", "office": "Rápido y Barato"}, "zh": {"gaming": "最高帧率", "content": "视频与照片", "streaming": "边玩边播", "workstation": "渲染与CAD", "ai": "显存需求高", "office": "流畅又便宜"}, "hi": {"gaming": "अधिकतम FPS", "content": "वीडियो और फोटो", "streaming": "खेलें और प्रसारित करें", "workstation": "रेंडर और CAD", "ai": "अधिक VRAM", "office": "तेज़ और सस्ता"}, "ar": {"gaming": "أقصى إطارات", "content": "فيديو وصور", "streaming": "لعب وبث", "workstation": "تصيير وCAD", "ai": "نهم للذاكرة", "office": "سريع ورخيص"}, "pt": {"gaming": "Máx FPS", "content": "Vídeo e Foto", "streaming": "Jogar e Transmitir", "workstation": "Renderização e CAD", "ai": "Faminto por VRAM", "office": "Rápido e Barato"}, "fr": {"gaming": "FPS max", "content": "Vidéo & Photo", "streaming": "Jouer & Diffuser", "workstation": "Rendu & CAO", "ai": "Gourmand en VRAM", "office": "Rapide & Abordable"}, "ru": {"gaming": "Макс FPS", "content": "Видео и фото", "streaming": "Игра и трансляция", "workstation": "Рендер и CAD", "ai": "Нужен VRAM", "office": "Быстро и дёшево"}, "ja": {"gaming": "最大FPS", "content": "動画と写真", "streaming": "プレイ＆配信", "workstation": "レンダー＆CAD", "ai": "VRAM大食い", "office": "軽快＆安価"}, "de": {"gaming": "Max FPS", "content": "Video & Foto", "streaming": "Spielen & Senden", "workstation": "Rendern & CAD", "ai": "VRAM-hungrig", "office": "Flott & Günstig"}};
 const _CATL = {"en": {"cpu": "CPU", "gpu": "Graphics Card", "mobo": "Motherboard", "ram": "Memory", "storage": "Storage", "psu": "Power Supply", "case": "Case", "cooler": "CPU Cooler"}, "es": {"cpu": "CPU", "gpu": "Tarjeta Gráfica", "mobo": "Placa Base", "ram": "Memoria", "storage": "Almacenamiento", "psu": "Fuente", "case": "Caja", "cooler": "Disipador"}, "zh": {"cpu": "处理器", "gpu": "显卡", "mobo": "主板", "ram": "内存", "storage": "存储", "psu": "电源", "case": "机箱", "cooler": "散热器"}, "hi": {"cpu": "सीपीयू", "gpu": "ग्राफिक्स कार्ड", "mobo": "मदरबोर्ड", "ram": "मेमोरी", "storage": "स्टोरेज", "psu": "बिजली आपूर्ति", "case": "केस", "cooler": "कूलर"}, "ar": {"cpu": "معالج", "gpu": "بطاقة رسومات", "mobo": "اللوحة الأم", "ram": "الذاكرة", "storage": "التخزين", "psu": "مزود الطاقة", "case": "الصندوق", "cooler": "مبرد"}, "pt": {"cpu": "CPU", "gpu": "Placa de Vídeo", "mobo": "Placa-Mãe", "ram": "Memória", "storage": "Armazenamento", "psu": "Fonte", "case": "Gabinete", "cooler": "Cooler"}, "fr": {"cpu": "Processeur", "gpu": "Carte Graphique", "mobo": "Carte Mère", "ram": "Mémoire", "storage": "Stockage", "psu": "Alimentation", "case": "Boîtier", "cooler": "Refroidisseur"}, "ru": {"cpu": "Процессор", "gpu": "Видеокарта", "mobo": "Материнская плата", "ram": "Память", "storage": "Накопитель", "psu": "Блок питания", "case": "Корпус", "cooler": "Охлаждение"}, "ja": {"cpu": "CPU", "gpu": "グラフィックカード", "mobo": "マザーボード", "ram": "メモリ", "storage": "ストレージ", "psu": "電源", "case": "ケース", "cooler": "クーラー"}, "de": {"cpu": "Prozessor", "gpu": "Grafikkarte", "mobo": "Hauptplatine", "ram": "Arbeitsspeicher", "storage": "Speicher", "psu": "Netzteil", "case": "Gehäuse", "cooler": "Kühler"}};
 const _pick = (mp, k) => (mp[CUR_LANG] && mp[CUR_LANG][k]) || mp.en[k] || k;
-const tUC = (k) => _pick(_UCL, k);
-const tUCtag = (k) => _pick(_UCT, k);
+const tUC = (k) => (_UCL[CUR_LANG] && _UCL[CUR_LANG][k]) || _UCL.en[k] || (USE_CASES[k] && USE_CASES[k].label) || k;
+const tUCtag = (k) => (_UCT[CUR_LANG] && _UCT[CUR_LANG][k]) || _UCT.en[k] || (USE_CASES[k] && USE_CASES[k].tag) || k;
 const tCat = (k) => _pick(_CATL, k);
 function t(key, vars) {
   const d = I18N[CUR_LANG] || I18N.en, x = I18N_X[CUR_LANG] || I18N_X.en;
@@ -704,6 +704,35 @@ const USE_CASES = {
   office:      { label: "Office / Everyday",tag: "Snappy & Cheap",    Icon: Briefcase,   alloc: { gpu:0, cpu:24, mobo:13, ram:26, storage:20, psu:8, case:6, cooler:3 } },
 };
 
+// The six selectable use cases (captured before any blended keys are registered).
+const BASE_UC_KEYS = Object.keys(USE_CASES);
+
+// Register (and cache) a blended use case from multiple base keys. The blend gets an
+// averaged budget allocation and a `blend` list; ucPerf() averages the picks across
+// the listed base cases. Returns the single key (real or blended) to use everywhere.
+function makeUseCase(keys) {
+  keys = (keys || []).filter((k) => BASE_UC_KEYS.includes(k));
+  if (keys.length <= 1) return keys[0] || "gaming";
+  const key = [...keys].sort().join("+");
+  if (!USE_CASES[key]) {
+    const alloc = {};
+    for (const c of CATEGORY_ORDER) alloc[c] = Math.round(keys.reduce((s, k) => s + (USE_CASES[k].alloc[c] || 0), 0) / keys.length);
+    USE_CASES[key] = {
+      label: keys.map((k) => USE_CASES[k].label).join(" + "),
+      tag: "Multi-purpose",
+      Icon: USE_CASES[keys[0]].Icon,
+      alloc,
+      blend: keys,
+    };
+  }
+  return key;
+}
+// Re-register a blended key (e.g. from a saved build) if it isn't present yet.
+function ensureUseCase(key) {
+  if (!key || USE_CASES[key]) return key;
+  return key.indexOf("+") >= 0 ? makeUseCase(key.split("+")) : key;
+}
+
 const MAX_PERF = Object.fromEntries(
   CATEGORY_ORDER.map((c) => [c, Math.max(...CATALOG[c].map((p) => p.perf))])
 );
@@ -723,11 +752,19 @@ const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 // productivity rewards CPU cores; AI/content reward GPU VRAM; workstation/AI/
 // content reward RAM & storage capacity; gaming treats 32GB RAM as the sweet spot.
 function ucPerf(cat, part, uc) {
+  const U = USE_CASES[uc];
+  if (U && U.blend) { // blended use case: average the picks across its base cases
+    let s = 0; for (const k of U.blend) s += ucPerf(cat, part, k); return s / U.blend.length;
+  }
   const heavyRam = uc === "workstation" || uc === "ai" || uc === "content";
   switch (cat) {
     case "cpu":
       if (uc === "content" || uc === "workstation" || uc === "ai")
         return part.perf * 0.6 + (Math.min(part.cores, 16) / 16) * 100 * 0.4;
+      // gaming / streaming: large-cache X3D chips punch far above their base rating —
+      // a 7600X3D out-games a Core Ultra 5 / non-X3D Ryzen despite a lower MT score.
+      if ((uc === "gaming" || uc === "streaming") && /X3D/i.test(part.name || part.model || ""))
+        return Math.min(100, part.perf + 10);
       return part.perf;
     case "gpu":
       if (uc === "ai") return part.perf * 0.5 + (Math.min(part.vram, 32) / 32) * 100 * 0.5;
@@ -1209,8 +1246,8 @@ function ParticleField() {
     const spawn = () => ({
       x: Math.random() * w, y: Math.random() * h,
       r: Math.random() * 1.9 + 0.5,
-      vx: (Math.random() - 0.5) * 0.22,
-      vy: (Math.random() - 0.5) * 0.22 - 0.05,
+      vx: (Math.random() - 0.5) * 0.13,
+      vy: (Math.random() - 0.5) * 0.13 - 0.03,
       a: Math.random() * 0.5 + 0.15,
       c: COLORS[Math.random() < 0.72 ? 0 : 1],
       tw: Math.random() * Math.PI * 2,
@@ -1226,7 +1263,7 @@ function ParticleField() {
     const tick = () => {
       ctx.clearRect(0, 0, w, h);
       for (const p of parts) {
-        p.x += p.vx; p.y += p.vy; p.tw += 0.02;
+        p.x += p.vx; p.y += p.vy; p.tw += 0.014;
         if (p.x < -12) p.x = w + 12; else if (p.x > w + 12) p.x = -12;
         if (p.y < -12) p.y = h + 12; else if (p.y > h + 12) p.y = -12;
         const a = p.a * (0.55 + 0.45 * Math.sin(p.tw));
@@ -1391,11 +1428,18 @@ export default function RigForge() {
       performanceScore_of1000: analysis.score,
       pricePerformanceScore_of100: analysis.ppScore,
       compatible: analysis.compat.pass,
-      parts: CATEGORY_ORDER.filter((c) => parts[c]).map((c) => ({
-        slot: c,
-        priceUSD: partOOS(parts[c]) ? "out of stock" : parts[c].price,
-        ...describePart(c, parts[c]),
-      })),
+      parts: CATEGORY_ORDER.filter((c) => parts[c]).map((c) => {
+        const band = (budget * USE_CASES[useCase].alloc[c]) / 100;
+        const dp = describePart(c, parts[c]);
+        const rawPower = dp.ratingOutOf100; delete dp.ratingOutOf100;
+        return {
+          slot: c,
+          priceUSD: partOOS(parts[c]) ? "out of stock" : parts[c].price,
+          matchScore_0to100: partScore({ ...parts[c], cat: c }, band, useCase),
+          rawPowerVsBest_0to100: rawPower,
+          ...dp,
+        };
+      }),
       compatibilityIssues: analysis.compat.issues && analysis.compat.issues.length ? analysis.compat.issues : "none",
     };
     try {
@@ -1403,7 +1447,7 @@ export default function RigForge() {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          system: "You are a sharp PC-building advisor. You're given a build as JSON: each part has a ratingOutOf100 (benchmark-based real-world performance within its category — the primary measure of performance), labeled specs, current prices, the build's performanceScore_of1000 (use-case-weighted real performance vs the best possible build) and pricePerformanceScore_of100, budget, use case, and any compatibility issues. Write about 3 sentences (~55-70 words): how well it fits the use case and budget, its main strength, and the genuine weakest link or bottleneck. Judge by real-world performance for the use case, NOT by raw spec numbers — do NOT call a normal mainstream spec (e.g. an 8GB GPU, 16GB RAM, a 1TB SSD) a flaw unless it truly bottlenecks the use case at this budget. Use ONLY the specs given — never invent a spec (e.g. read driveType for SATA vs NVMe). When judging the cooler, weigh coolerType and ratedForTdpWatts against the CPU's tdpWatts and cores: high-TDP or high-core chips (X3D, Ryzen 9, i7/i9, ~120W+) genuinely benefit from a strong air cooler or AIO — never call an AIO 'overkill' for those. Be specific; reference key parts by name. Plain prose only — no markdown, no lists, no preamble.",
+          system: "You are a sharp PC-building advisor. You're given a build as JSON. For each part: matchScore_0to100 = how good a pick that part is for THIS build's budget and use case — this is the score shown to the user, where higher means a better choice; rawPowerVsBest_0to100 = its absolute power versus the most powerful possible part (a flagship ≈ 100), so a budget part naturally has a low number here and that is NOT a weakness. Also given: labeled specs, current prices, the build's performanceScore_of1000 (use-case-weighted real performance) and pricePerformanceScore_of100, budget, use case, and compatibility issues. When you describe how good a part is, use its matchScore — NEVER call a part low-scoring or weak because its rawPowerVsBest is low (e.g. a 9060 XT with matchScore 92 is an excellent pick even though its rawPowerVsBest is ~35). Write about 3 sentences (~55-70 words): how well the build fits the use case and budget, its main strength, and the genuine weakest link or bottleneck. Judge by real-world fit for the use case, NOT by raw spec numbers — do NOT call a normal mainstream spec (e.g. an 8GB GPU, 16GB RAM, a 1TB SSD) a flaw unless it truly bottlenecks the use case at this budget. Use ONLY the specs given — never invent a spec (e.g. read driveType for SATA vs NVMe). When judging the cooler, weigh coolerType and ratedForTdpWatts against the CPU's tdpWatts and cores: high-TDP or high-core chips (X3D, Ryzen 9, i7/i9, ~120W+) genuinely benefit from a strong air cooler or AIO — never call an AIO 'overkill' for those. Be specific; reference key parts by name. Plain prose only — no markdown, no lists, no preamble.",
           messages: [{ role: "user", content: "Here is the build as JSON:\n" + JSON.stringify(summary, null, 1) + "\n\nWrite the verdict." }],
         }),
       });
@@ -1415,7 +1459,7 @@ export default function RigForge() {
   const flash = (msg) => { setToast(msg); setTimeout(() => setToast(null), 2200); };
 
   const startSurvey = () => { setUseCase(null); setView("survey"); };
-  const chooseUseCase = (k) => { setUseCase(k); setView("budget"); };
+  const chooseUseCase = (sel) => { setUseCase(makeUseCase(Array.isArray(sel) ? sel : [sel])); setView("budget"); };
   const generateAuto = () => { setAutoGen(true); setParts(assembleBuild(useCase, budget)); setExpanded({}); setView("results"); };
   const startManual = () => { setAutoGen(false); setParts({}); setExpanded({}); setView("results"); };
 
@@ -1451,7 +1495,7 @@ export default function RigForge() {
     setView("home");
   };
   const deleteBuild = async (id) => { await sDel("build:" + id); await refreshSaved(); };
-  const openSaved = (b) => { setAutoGen(false); setUseCase(b.useCase); setBudget(b.budget); setParts(b.parts); setView("results"); };
+  const openSaved = (b) => { setAutoGen(false); setUseCase(ensureUseCase(b.useCase)); setBudget(b.budget); setParts(b.parts); setView("results"); };
 
   return (
     <div className={"rf-root" + (theme === "light" ? " rf-light" : "")} dir={lang === "ar" ? "rtl" : "ltr"}>
@@ -1645,22 +1689,32 @@ function Home({ saved, loading, onNew, onOpen, onDelete, priceInfo }) {
 
 /* ----------------------------- SURVEY ----------------------------- */
 function Survey({ onPick }) {
+  const [sel, setSel] = useState([]);
+  const toggle = (k) => setSel((s) => (s.includes(k) ? s.filter((x) => x !== k) : [...s, k]));
   return (
     <div className="rf-fade rf-step">
       <div className="rf-step-head">
         <div className="rf-eyebrow">STEP 1 OF 2</div>
         <h2>{t("useCaseQ")}</h2>
-        <p className="rf-muted">This sets which parts matter most and how your budget gets split.</p>
+        <p className="rf-muted">Pick one or more — this sets which parts matter most and how your budget gets split.</p>
       </div>
       <div className="rf-uc-grid">
-        {Object.entries(USE_CASES).map(([k, uc], i) => (
-          <button key={k} className="rf-uc-card rf-pop" style={{ animationDelay: i * 55 + "ms" }} onClick={() => onPick(k)}>
-            <div className="rf-uc-icon"><uc.Icon size={24} /></div>
-            <div className="rf-uc-label">{tUC(k)}</div>
-            <div className="rf-uc-tag">{tUCtag(k)}</div>
-            <div className="rf-uc-go"><ChevronRight size={16} /></div>
-          </button>
-        ))}
+        {BASE_UC_KEYS.map((k, i) => {
+          const uc = USE_CASES[k];
+          const on = sel.includes(k);
+          return (
+            <button key={k} className={"rf-uc-card rf-pop" + (on ? " sel" : "")} style={{ animationDelay: i * 55 + "ms" }} onClick={() => toggle(k)}>
+              <div className="rf-uc-icon"><uc.Icon size={24} /></div>
+              <div className="rf-uc-label">{tUC(k)}</div>
+              <div className="rf-uc-tag">{tUCtag(k)}</div>
+              <div className={"rf-uc-check" + (on ? " on" : "")}>{on && <Check size={14} />}</div>
+            </button>
+          );
+        })}
+      </div>
+      <div className="rf-step-foot">
+        <span className="rf-muted rf-sm">{sel.length ? sel.map(tUC).join(" + ") : "Select at least one"}</span>
+        <button className="rf-btn rf-btn-lg" disabled={!sel.length} onClick={() => onPick(sel)}>Next <ChevronRight size={18} /></button>
       </div>
     </div>
   );
@@ -2404,7 +2458,7 @@ function StyleBlock() {
 .rf-root{--c-bg:#070a0f;--c-panel:rgba(255,255,255,0.045);--c-panel-2:rgba(255,255,255,0.075);
 --c-border:rgba(255,255,255,0.1);--c-text:#e8edf4;--c-muted:#7c8798;
 --c-accent:#19e8db;--c-accent2:#7c5cff;--c-good:#46e0a0;--c-warn:#ffc24b;--c-bad:#ff5c72;
---c-track:rgba(255,255,255,0.08);--c-hover:rgba(255,255,255,0.22);--c-grid:rgba(255,255,255,0.035);
+--c-track:rgba(255,255,255,0.08);--c-hover:rgba(255,255,255,0.22);--c-grid:rgba(255,255,255,0.05);
 --ease:cubic-bezier(.16,1,.3,1);--ease-spring:cubic-bezier(.22,1,.36,1);--ease-soft:cubic-bezier(.45,0,.15,1);
 position:relative;min-height:100vh;width:100%;background:var(--c-bg);color:var(--c-text);
 font-family:'Sora',system-ui,sans-serif;overflow-x:hidden;}
@@ -2421,10 +2475,10 @@ animation:rfDrift 26s ease-in-out infinite alternate;}
 @keyframes rfDrift{0%{transform:translate3d(0,0,0) scale(1);}50%{transform:translate3d(2%,1.5%,0) scale(1.06);}100%{transform:translate3d(-2%,-1%,0) scale(1.03);}}
 .rf-particles{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
 /* frosted glass on the main boxes so the particles diffuse through */
-.rf-scorecard,.rf-part,.rf-pick,.rf-saved-card,.rf-compat,.rf-drawer,.rf-drawer-search,.rf-settings-menu,.rf-uc-card,.rf-asst-panel{
+.rf-scorecard,.rf-part,.rf-pick,.rf-saved-card,.rf-compat,.rf-drawer,.rf-settings-menu,.rf-uc-card,.rf-asst-panel{
   backdrop-filter:blur(11px) saturate(1.25);-webkit-backdrop-filter:blur(11px) saturate(1.25);}
 .rf-scorecard,.rf-part,.rf-pick,.rf-saved-card,.rf-uc-card{transition:border-color .25s var(--ease-spring),transform .25s var(--ease-spring),box-shadow .25s var(--ease-spring),background .25s var(--ease);}
-.rf-grid{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.4;
+.rf-grid{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.7;
 background-image:linear-gradient(var(--c-grid) 1px,transparent 1px),linear-gradient(90deg,var(--c-grid) 1px,transparent 1px);
 background-size:46px 46px;mask-image:radial-gradient(circle at 50% 0%,black,transparent 75%);}
 .rf-header{position:relative;z-index:30;display:flex;align-items:center;justify-content:space-between;
@@ -2489,9 +2543,9 @@ h3{font-family:'Chakra Petch';font-weight:600;font-size:18px;margin:0 0 6px;}
 .rf-price-status{display:flex;align-items:center;gap:8px;margin-top:16px;font-size:12px;color:var(--c-muted);font-family:'JetBrains Mono';letter-spacing:0.3px;flex-wrap:wrap;}
 .rf-db-count{display:inline-flex;align-items:center;gap:6px;color:var(--c-accent);}
 .rf-dot-sep{opacity:0.5;}
-.rf-live-dot{width:9px;height:9px;border-radius:50%;background:#22c55e;flex-shrink:0;animation:rfPulseDot 2.4s ease-in-out infinite;}
+.rf-live-dot{width:9px;height:9px;border-radius:50%;background:#22c55e;flex-shrink:0;animation:rfPulseDot 2.6s ease-in-out infinite;}
 .rf-live-ind{animation:rfBreathe 2.8s ease-in-out infinite;}
-@keyframes rfPulseDot{0%,100%{transform:scale(1);box-shadow:0 0 6px 1px rgba(34,197,94,.75)}50%{transform:scale(1.35);box-shadow:0 0 13px 4px rgba(34,197,94,.3)}}
+@keyframes rfPulseDot{0%,100%{transform:scale(0.9);box-shadow:0 0 5px 1px rgba(34,197,94,.55)}50%{transform:scale(1.32);box-shadow:0 0 15px 5px rgba(34,197,94,.4)}}
 @keyframes rfBreathe{0%,100%{opacity:1}50%{opacity:0.76}}
 .rf-section-head{display:flex;align-items:baseline;justify-content:space-between;margin:38px 0 16px;border-top:1px solid var(--c-border);padding-top:24px;}
 .rf-empty{display:flex;flex-direction:column;align-items:center;gap:12px;padding:46px;border:1px dashed var(--c-border);border-radius:16px;text-align:center;}
@@ -2527,8 +2581,11 @@ padding:22px;cursor:pointer;transition:transform .2s,border-color .2s,background
 background:rgba(25,232,219,0.1);border:1px solid rgba(25,232,219,0.2);margin-bottom:14px;}
 .rf-uc-label{font-family:'Chakra Petch';font-weight:600;font-size:17px;}
 .rf-uc-tag{color:var(--c-muted);font-size:13px;margin-top:3px;}
-.rf-uc-go{position:absolute;top:22px;right:20px;color:var(--c-muted);transition:.2s;}
-.rf-uc-card:hover .rf-uc-go{color:var(--c-accent);transform:translateX(3px);}
+.rf-uc-check{position:absolute;top:18px;right:18px;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--c-border);display:grid;place-items:center;color:#04140f;background:transparent;transition:.18s var(--ease-spring);}
+.rf-uc-check.on{background:var(--c-accent);border-color:var(--c-accent);box-shadow:0 0 14px rgba(25,232,219,0.5);}
+.rf-uc-card.sel{border-color:var(--c-accent);background:rgba(25,232,219,0.08);box-shadow:0 0 0 1px var(--c-accent) inset;}
+.rf-step-foot{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:26px;flex-wrap:wrap;}
+.rf-btn:disabled{opacity:0.45;cursor:not-allowed;}
 
 /* BUDGET */
 .rf-budget-display{font-family:'JetBrains Mono';font-weight:700;font-size:58px;text-align:center;
@@ -2646,8 +2703,8 @@ font-family:'Sora';font-size:12.5px;padding:7px 12px;border-radius:9px;cursor:po
 display:flex;flex-direction:column;animation:rfSlideR .42s var(--ease);will-change:transform,opacity;}
 .rf-drawer-head{display:flex;align-items:flex-start;justify-content:space-between;padding:20px;border-bottom:1px solid var(--c-border);}
 .rf-drawer-list{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px;}
-.rf-drawer-search{display:flex;align-items:center;gap:9px;margin:12px 14px 0;padding:10px 13px;background:var(--c-panel);border:1px solid var(--c-border);border-radius:11px;color:var(--c-muted);transition:border-color .16s,box-shadow .16s;}
-.rf-drawer-search:focus-within{border-color:var(--c-accent);box-shadow:0 0 0 3px rgba(25,232,219,0.15);color:var(--c-accent);}
+.rf-drawer-search{display:flex;align-items:center;gap:9px;margin:10px 16px 2px;padding:8px 2px;background:transparent;border:none;border-bottom:1px solid var(--c-border);border-radius:0;color:var(--c-muted);transition:border-color .16s,color .16s;}
+.rf-drawer-search:focus-within{border-bottom-color:var(--c-accent);color:var(--c-accent);box-shadow:none;}
 .rf-drawer-search input{flex:1;background:transparent;border:none;outline:none;color:var(--c-text);font-family:'Sora';font-size:14px;}
 .rf-drawer-search input::placeholder{color:var(--c-muted);}
 .rf-search-clear{background:transparent;border:none;color:var(--c-muted);cursor:pointer;display:grid;place-items:center;padding:2px;border-radius:6px;transition:.15s;}
