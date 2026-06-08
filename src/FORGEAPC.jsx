@@ -1860,6 +1860,7 @@ function Results({ useCase, budget, parts, analysis, verdict, aiBusy, onGenerate
           return (
             <div key={cat} className="rf-part rf-pop" style={{ animationDelay: i * 45 + "ms" }}>
               <div className="rf-part-top">
+                <div className="rf-part-media">
                 {part && part.img ? (
                   <a href={part.url || "#"} target="_blank" rel="noopener noreferrer" className="rf-part-img-link" onClick={(e) => e.stopPropagation()} title="View product page">
                     <img src={part.img} alt={part.name} className="rf-part-img" loading="lazy" />
@@ -1867,6 +1868,8 @@ function Results({ useCase, budget, parts, analysis, verdict, aiBusy, onGenerate
                 ) : (
                   <div className="rf-part-icon"><Meta.Icon size={20} /></div>
                 )}
+                {part && part._source && <span className={"rf-part-src " + part._source}>{({ amazon: "Amazon", newegg: "Newegg", bestbuy: "Best Buy" })[part._source] || ""}</span>}
+                </div>
                 <div className="rf-part-info">
                   <div className="rf-part-cat">{tCat(cat)}</div>
                   {part ? (
@@ -2648,6 +2651,11 @@ background:var(--c-panel);border:1px solid var(--c-border);border-radius:20px;pa
 .rf-part-top{display:flex;align-items:center;gap:14px;padding:16px 18px 0;}
 .rf-part-actions{display:flex;gap:8px;justify-content:flex-end;padding:13px 18px 16px;}
 .rf-part-icon{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;color:var(--c-accent);background:rgba(25,232,219,0.08);border:1px solid rgba(25,232,219,0.16);flex-shrink:0;}
+.rf-part-media{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;}
+.rf-part-src{font-size:9px;letter-spacing:0.6px;text-transform:uppercase;font-family:'JetBrains Mono';line-height:1;color:var(--c-muted);}
+.rf-part-src.amazon{color:var(--c-warn);}
+.rf-part-src.newegg{color:var(--c-accent2);}
+.rf-part-src.bestbuy{color:var(--c-accent);}
 .rf-part-img-link{flex-shrink:0;display:block;}
 .rf-part-img{width:42px;height:42px;border-radius:11px;object-fit:contain;background:#fff;border:1px solid var(--c-border);padding:2px;cursor:pointer;transition:transform .12s ease;}
 .rf-part-img:hover{transform:scale(1.03);}
