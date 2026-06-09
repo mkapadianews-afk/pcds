@@ -1830,7 +1830,7 @@ function MoggerPicker({ cat, current, budget, spent, onPick, onClose }) {
   );
 }
 
-function MoggerBuild({ round, player, oppLabel, oppBuild, oppLocked, oppIsAI, onDone }) {
+function MoggerBuild({ round, player, oppLabel, oppBuild, oppLocked, oppIsAI, liveOpp, oppLiveScore, oppLiveDone, onMyScore, onDone }) {
   const oppFinal = useMemo(() => (oppBuild ? moggerScore(oppBuild, round.useCase, round.budget).total : null), []);
   const [build, setBuild] = useState({});
   const [open, setOpen] = useState(null);
@@ -1842,9 +1842,15 @@ function MoggerBuild({ round, player, oppLabel, oppBuild, oppLocked, oppIsAI, on
     const t = setInterval(() => setLeft((l) => { if (l <= 1) { clearInterval(t); onDone(ref.current); return 0; } return l - 1; }), 1000);
     return () => clearInterval(t);
   }, []);
-  const hasOpp = oppIsAI || !!oppBuild;
+  const hasOpp = oppIsAI || !!oppBuild || !!liveOpp;
   const mkDecoy = () => { const d = {}; for (const c of CATEGORY_ORDER) { const o = moggerOptions(c); d[c] = o[Math.floor(Math.random() * o.length)]; } return d; };
   const [decoy, setDecoy] = useState(mkDecoy);
+  const swapOneDecoy = () => setDecoy((prev) => { const c = CATEGORY_ORDER[Math.floor(Math.random() * CATEGORY_ORDER.length)]; const o = moggerOptions(c); return { ...prev, [c]: o[Math.floor(Math.random() * o.length)] }; });
+  // my live score (broadcast to opponent online); shown as "?" locally
+  const myScore = useMemo(() => moggerScore(build, round.useCase, round.budget).total, [build]);
+  useEffect(() => { if (onMyScore) onMyScore(myScore); }, [myScore]);
+  // live online opponent: flicker one part each time their score updates
+  useEffect(() => { if (liveOpp) swapOneDecoy(); }, [oppLiveScore]);
   // AI opponent: score fluctuates upward (chunky +50-120, occasional -50-120), then locks in.
   // Each score tick swaps exactly ONE part in its (blurred) build — not all at once.
   useEffect(() => {
@@ -1854,7 +1860,6 @@ function MoggerBuild({ round, player, oppLabel, oppBuild, oppLocked, oppIsAI, on
     const t0 = Date.now();
     let cur = 0;
     let iv;
-    const swapOne = () => setDecoy((prev) => { const c = CATEGORY_ORDER[Math.floor(Math.random() * CATEGORY_ORDER.length)]; const o = moggerOptions(c); return { ...prev, [c]: o[Math.floor(Math.random() * o.length)] }; });
     const step = () => {
       const elapsed = (Date.now() - t0) / 1000;
       if (elapsed >= lockAt) { setOppShown(oppFinal); setOppDone(true); return; }
@@ -1865,7 +1870,7 @@ function MoggerBuild({ round, player, oppLabel, oppBuild, oppLocked, oppIsAI, on
       else d = (50 + Math.random() * 70);
       cur = Math.max(0, Math.min(ceiling, cur + d));
       setOppShown(Math.round(cur));
-      swapOne(); // one part changes, in sync with the score
+      swapOneDecoy(); // one part changes, in sync with the score
       iv = setTimeout(step, 1700 + Math.random() * 1100);
     };
     iv = setTimeout(step, 900);
@@ -1874,6 +1879,8 @@ function MoggerBuild({ round, player, oppLabel, oppBuild, oppLocked, oppIsAI, on
   const spent = CATEGORY_ORDER.reduce((s, c) => s + (build[c] ? build[c].price : 0), 0);
   const over = spent > round.budget;
   const filled = CATEGORY_ORDER.filter((c) => build[c]).length;
+  const shownOpp = oppIsAI ? oppShown : oppLocked ? oppFinal : liveOpp ? (oppLiveScore == null ? null : oppLiveScore) : null;
+  const shownDone = oppIsAI ? oppDone : oppLocked ? true : liveOpp ? !!oppLiveDone : false;
   const mm = Math.floor(left / 60), ss = String(left % 60).padStart(2, "0");
   const low = left <= 15;
   const UC = USE_CASES[round.useCase];
@@ -1891,8 +1898,8 @@ function MoggerBuild({ round, player, oppLabel, oppBuild, oppLocked, oppIsAI, on
         </div>
         <div className="pm-board opp">
           <div className="pm-board-name">{oppLabel}</div>
-          <div className="pm-board-score opp">{oppShown == null ? "—" : oppShown}</div>
-          <div className={"pm-board-sub" + (oppDone ? " locked" : "")}>{oppShown == null ? "waiting" : oppDone ? "🔒 locked in — waiting for you" : "building…"}</div>
+          <div className="pm-board-score opp">{shownOpp == null ? "—" : shownOpp}</div>
+          <div className={"pm-board-sub" + (shownDone ? " locked" : "")}>{shownOpp == null ? "waiting" : shownDone ? "🔒 locked in — waiting for you" : "building…"}</div>
         </div>
       </div>
       <div className="pm-challenge-row"><span className="pm-uc"><UC.Icon size={16} /> {UC.label}</span><span className="pm-budget">Budget {fmt(round.budget)}</span></div>
@@ -2047,6 +2054,212 @@ function MoggerIntro({ round, player, onGo }) {
   );
 }
 
+function tourNextPow2(n) { let s = 2; while (s < n) s *= 2; return s; }
+function tourIsAI(id) { return typeof id === "string" && id.indexOf("AI#") === 0; }
+
+function MoggerTournament({ onExit }) {
+  const [phase, setPhase] = useState("entry"); // entry|joinentry|lobby|intro|build|waiting|roundresult|eliminated|champion
+  const [code, setCode] = useState("");
+  const [joinCode, setJoinCode] = useState("");
+  const [players, setPlayers] = useState([]);
+  const [round, setRound] = useState(0);
+  const [challenge, setChallenge] = useState(null);
+  const [myOpp, setMyOpp] = useState(null);
+  const [results, setResults] = useState(null);
+  const [champion, setChampion] = useState(null);
+  const [status, setStatus] = useState("");
+  const [name, setName] = useState("");
+  const [names, setNames] = useState({});
+  const [liveScores, setLiveScores] = useState({});
+  const [roundMatches, setRoundMatches] = useState([]);
+  const chRef = useRef(null), challengeRef = useRef(null), myBuildRef = useRef(null), cosmeticRef = useRef(null), namesRef = useRef({}), liveScoresRef = useRef({});
+  const isHostRef = useRef(false), slotsRef = useRef([]), matchesRef = useRef([]), reportsRef = useRef({}), resolvedRef = useRef(false), roundNumRef = useRef(0), resolveTimer = useRef(null), aiTimersRef = useRef([]);
+
+  const cleanup = () => { if (resolveTimer.current) clearTimeout(resolveTimer.current); aiTimersRef.current.forEach(clearTimeout); aiTimersRef.current = []; netLeave(chRef.current); chRef.current = null; };
+  useEffect(() => () => cleanup(), []);
+
+  const label = (id) => id === netId ? (name ? name + " (you)" : "You") : tourIsAI(id) ? "AI" : (namesRef.current[id] || ("Player " + String(id).slice(0, 4)));
+
+  const handleRound = (payload) => {
+    setResults(null);
+    setRoundMatches(payload.matches);
+    liveScoresRef.current = {}; setLiveScores({});
+    const secsLeft = Math.max(8, Math.round(payload.challenge.secs - (Date.now() - payload.challenge.startAt) / 1000));
+    const ch = { ...payload.challenge, secs: secsLeft };
+    challengeRef.current = ch; setChallenge(ch); setRound(payload.round);
+    const m = payload.matches.find((x) => x.a === netId || x.b === netId);
+    if (m) {
+      const opp = m.a === netId ? m.b : m.a;
+      setMyOpp(opp);
+      cosmeticRef.current = moggerAI(ch.useCase, ch.budget, moggerRollTier());
+      myBuildRef.current = null;
+      setPhase("intro");
+    } else { setMyOpp(null); setPhase("eliminated"); }
+  };
+
+  // ---- host bracket engine ----
+  const runRound = () => {
+    resolvedRef.current = false; reportsRef.current = {};
+    const slots = slotsRef.current;
+    const matches = [];
+    for (let i = 0; i < slots.length; i += 2) matches.push({ a: slots[i], b: slots[i + 1] });
+    matchesRef.current = matches;
+    const useCase = mRand(MOGGER_UCS), budget = mRand(MOGGER_BUDGETS), secs = 50 + Math.floor(Math.random() * 370);
+    const challengePayload = { useCase, budget, secs, startAt: Date.now() };
+    chRef.current.send({ type: "broadcast", event: "tour_round", payload: { round: roundNumRef.current, matches, challenge: challengePayload, slots } });
+    handleRound({ round: roundNumRef.current, matches, challenge: challengePayload, slots });
+    // simulate climbing scores for AI seats so spectators see them tick like real players
+    aiTimersRef.current.forEach(clearTimeout); aiTimersRef.current = [];
+    matches.flatMap((m) => [m.a, m.b]).filter(tourIsAI).forEach((aid) => {
+      const ceiling = 500 + Math.random() * 350, lockAt = secs * (0.55 + Math.random() * 0.3), t0 = Date.now();
+      let cur = 0;
+      const stepFn = () => {
+        if ((Date.now() - t0) / 1000 >= lockAt) return;
+        const roll = Math.random();
+        const d = roll < 0.18 ? -(50 + Math.random() * 70) : roll < 0.30 ? (120 + Math.random() * 80) : (50 + Math.random() * 70);
+        cur = Math.max(0, Math.min(ceiling, cur + d));
+        const sc = Math.round(cur);
+        liveScoresRef.current = { ...liveScoresRef.current, [aid]: sc }; setLiveScores(liveScoresRef.current);
+        try { chRef.current && chRef.current.send({ type: "broadcast", event: "tour_live", payload: { id: aid, score: sc } }); } catch (e) { /* ignore */ }
+        aiTimersRef.current.push(setTimeout(stepFn, 1800 + Math.random() * 1000));
+      };
+      aiTimersRef.current.push(setTimeout(stepFn, 700 + Math.random() * 800));
+    });
+    if (resolveTimer.current) clearTimeout(resolveTimer.current);
+    resolveTimer.current = setTimeout(() => resolveRound(), (secs + 12) * 1000);
+  };
+  const tryResolve = () => {
+    if (resolvedRef.current) return;
+    const need = matchesRef.current.flatMap((m) => [m.a, m.b]).filter((id) => !tourIsAI(id));
+    if (need.every((id) => reportsRef.current[id])) resolveRound();
+  };
+  const resolveRound = () => {
+    if (resolvedRef.current) return; resolvedRef.current = true;
+    if (resolveTimer.current) { clearTimeout(resolveTimer.current); resolveTimer.current = null; }
+    aiTimersRef.current.forEach(clearTimeout); aiTimersRef.current = [];
+    const ch = challengeRef.current || {};
+    const scoreOf = (id) => { if (tourIsAI(id)) { const b = moggerAI(ch.useCase, ch.budget, moggerRollTier()); return moggerScore(b, ch.useCase, ch.budget).total; } const r = reportsRef.current[id]; return r ? r.score : 0; };
+    const res = matchesRef.current.map((m) => { const a = scoreOf(m.a), b = scoreOf(m.b); return { a: m.a, b: m.b, aScore: a, bScore: b, winner: a >= b ? m.a : m.b }; });
+    const winners = res.map((r) => r.winner);
+    chRef.current.send({ type: "broadcast", event: "tour_results", payload: { round: roundNumRef.current, results: res, winners } });
+    setResults({ round: roundNumRef.current, results: res, winners }); setPhase((p) => p === "champion" ? p : "roundresult");
+    if (winners.length === 1) {
+      setTimeout(() => { try { chRef.current.send({ type: "broadcast", event: "tour_done", payload: { champion: winners[0] } }); } catch (e) {} setChampion(winners[0]); setPhase("champion"); }, 3500);
+    } else { slotsRef.current = winners; roundNumRef.current += 1; setTimeout(() => runRound(), 5000); }
+  };
+
+  const wire = (ch) => {
+    ch.on("broadcast", { event: "tour_round" }, ({ payload }) => handleRound(payload));
+    ch.on("broadcast", { event: "tour_results" }, ({ payload }) => { setResults(payload); setPhase((p) => p === "champion" ? p : "roundresult"); });
+    ch.on("broadcast", { event: "tour_done" }, ({ payload }) => { setChampion(payload.champion); setPhase("champion"); });
+    ch.on("broadcast", { event: "tour_report" }, ({ payload }) => { if (isHostRef.current) { reportsRef.current[payload.id] = { score: payload.score }; tryResolve(); } });
+    ch.on("broadcast", { event: "tour_live" }, ({ payload }) => { liveScoresRef.current = { ...liveScoresRef.current, [payload.id]: payload.score }; setLiveScores(liveScoresRef.current); });
+    ch.on("presence", { event: "sync" }, () => {
+      const st = ch.presenceState();
+      setPlayers(Object.keys(st));
+      const nm = {}; for (const k of Object.keys(st)) { const m = st[k] && st[k][0]; if (m && m.name) nm[k] = m.name; }
+      namesRef.current = nm; setNames(nm);
+    });
+  };
+  const broadcastLive = (s) => { try { chRef.current && chRef.current.send({ type: "broadcast", event: "tour_live", payload: { id: netId, score: s } }); } catch (e) { /* ignore */ } };
+
+  const doHost = () => {
+    isHostRef.current = true; const c = netCode(); setCode(c);
+    const ch = netRoom("tour-" + c); chRef.current = ch; wire(ch);
+    ch.subscribe((s) => { if (s === "SUBSCRIBED") ch.track({ id: netId, name: name.trim() || "Player", joinedAt: Date.now() }); });
+    setPhase("lobby");
+  };
+  const doJoin = () => {
+    const c = joinCode.trim().toUpperCase(); if (c.length < 4) return; setCode(c);
+    const ch = netRoom("tour-" + c); chRef.current = ch; wire(ch);
+    ch.subscribe((s) => { if (s === "SUBSCRIBED") ch.track({ id: netId, name: name.trim() || "Player", joinedAt: Date.now() }); });
+    setStatus("Joined — waiting for the host to start the tournament…"); setPhase("lobby");
+  };
+  const startTournament = () => {
+    const humans = players.slice().sort();
+    const size = tourNextPow2(Math.max(2, humans.length));
+    const seats = humans.slice(); let k = 1; while (seats.length < size) seats.push("AI#" + (k++));
+    slotsRef.current = seats; roundNumRef.current = 1; runRound();
+  };
+
+  const onBuildDone = (b) => {
+    myBuildRef.current = b;
+    const ch = challengeRef.current || {};
+    const score = moggerScore(b, ch.useCase, ch.budget).total;
+    if (isHostRef.current) { reportsRef.current[netId] = { score }; setPhase("waiting"); tryResolve(); }
+    else { try { chRef.current.send({ type: "broadcast", event: "tour_report", payload: { id: netId, score } }); } catch (e) {} setPhase("waiting"); }
+  };
+  const quit = () => { cleanup(); onExit(); };
+
+  if (phase === "intro" && challenge) return <MoggerIntro round={challenge} player={null} onGo={() => setPhase("build")} />;
+  if (phase === "build" && challenge) return <MoggerBuild round={challenge} player="You" oppLabel={tourIsAI(myOpp) ? "AI Opponent" : "Opponent"} oppBuild={cosmeticRef.current} oppIsAI={true} oppLocked={false} onMyScore={broadcastLive} onDone={onBuildDone} />;
+
+  const ResultsList = () => results ? (
+    <div className="pm-tour-list">
+      {results.results.map((r, i) => (
+        <div key={i} className={"pm-tour-match" + ((r.winner === netId) ? " mine-win" : (r.a === netId || r.b === netId) ? " mine-lose" : "")}>
+          <span className={r.winner === r.a ? "pm-tour-win" : ""}>{label(r.a)} <b>{r.aScore}</b></span>
+          <span className="pm-tour-vs">vs</span>
+          <span className={r.winner === r.b ? "pm-tour-win" : ""}>{label(r.b)} <b>{r.bScore}</b></span>
+        </div>
+      ))}
+    </div>
+  ) : null;
+
+  return (
+    <div className="pm-card pm-center rf-fade">
+      {phase === "entry" && (<>
+        <h2 className="pm-h2">🏆 Tournament</h2>
+        <p className="pm-p">A live bracket — winners advance through consecutive rounds until one champion remains. Empty seats are filled by AI.</p>
+        <input className="pm-namein" value={name} maxLength={14} onChange={(e) => setName(e.target.value)} placeholder="Enter your name" />
+        <div className="pm-mode-grid">
+          <button className="pm-mode" disabled={!name.trim()} onClick={doHost}><span className="pm-mode-icon"><Plus size={22} /></span><span className="pm-mode-name">Host tournament</span><span className="pm-mode-sub">Get a code, gather players</span></button>
+          <button className="pm-mode" disabled={!name.trim()} onClick={() => setPhase("joinentry")}><span className="pm-mode-icon"><ChevronRight size={22} /></span><span className="pm-mode-name">Join tournament</span><span className="pm-mode-sub">Enter a code</span></button>
+        </div>
+        {!name.trim() && <p className="pm-tour-count">Enter a name to continue</p>}
+        <button className="rf-ghost pm-exit" onClick={quit}><ChevronLeft size={15} /> Back</button>
+      </>)}
+      {phase === "joinentry" && (<>
+        <h2 className="pm-h2">Join tournament</h2>
+        <input className="pm-codein" value={joinCode} maxLength={5} onChange={(e) => setJoinCode(e.target.value.toUpperCase())} placeholder="CODE" />
+        <div className="pm-row"><button className="rf-btn rf-ghost-btn" onClick={() => setPhase("entry")}><ChevronLeft size={16} /> Back</button><button className="rf-btn" onClick={doJoin}>Join <ChevronRight size={16} /></button></div>
+      </>)}
+      {phase === "lobby" && (<>
+        <h2 className="pm-h2">Tournament lobby</h2>
+        {isHostRef.current && <div className="pm-code">{code}</div>}
+        <p className="pm-p">{isHostRef.current ? "Share this code. Start when everyone has joined." : status}</p>
+        <div className="pm-tour-players">{players.map((p) => <span key={p} className={"pm-tour-chip" + (p === netId ? " me" : "")}>{label(p)}</span>)}</div>
+        <p className="pm-tour-count">{players.length} player{players.length === 1 ? "" : "s"}{players.length > 1 ? " · bracket of " + tourNextPow2(Math.max(2, players.length)) + (tourNextPow2(Math.max(2, players.length)) > players.length ? " (rest AI)" : "") : ""}</p>
+        {isHostRef.current
+          ? <div className="pm-row pm-center-row"><button className="rf-btn rf-ghost-btn" onClick={quit}>Cancel</button><button className="rf-btn" disabled={players.length < 2} onClick={startTournament}>Start tournament <ChevronRight size={16} /></button></div>
+          : <><div className="pm-spinner" /><button className="rf-btn rf-ghost-btn" onClick={quit}>Leave</button></>}
+      </>)}
+      {phase === "waiting" && (<><h2 className="pm-h2">🔒 Locked in · Round {round}</h2><div className="pm-spinner" /><p className="pm-p">Waiting for the round to finish…</p></>)}
+      {phase === "roundresult" && (<><h2 className="pm-h2">Round {results ? results.round : round} results</h2><ResultsList /><p className="pm-p">{results && results.winners && results.winners.length > 1 ? "Next round starting…" : "Final result coming up…"}</p></>)}
+      {phase === "eliminated" && (<>
+        <h2 className="pm-h2">👀 Spectating · Round {round}</h2>
+        <p className="pm-p">You were knocked out — watch the live matches below.</p>
+        <div className="pm-spec-list">
+          {roundMatches.map((m, i) => (
+            <div key={i} className="pm-spec-match">
+              <div className="pm-spec-side"><span className="pm-spec-name">{label(m.a)}</span><span className="pm-spec-score">{liveScores[m.a] != null ? liveScores[m.a] : "…"}</span></div>
+              <span className="pm-vs-word">VS</span>
+              <div className="pm-spec-side"><span className="pm-spec-name">{label(m.b)}</span><span className="pm-spec-score">{liveScores[m.b] != null ? liveScores[m.b] : "…"}</span></div>
+            </div>
+          ))}
+        </div>
+        {results && <ResultsList />}
+        <button className="rf-btn rf-ghost-btn" onClick={quit}>Quit</button>
+      </>)}
+      {phase === "champion" && (<>
+        <h2 className={"pm-verdict-title " + (champion === netId ? "win" : "lose")}>{champion === netId ? "🏆 CHAMPION!" : "🏆 " + label(champion) + " wins"}</h2>
+        <p className="pm-p">{champion === netId ? "You won the whole tournament. Mogged everyone." : "Tournament over."}</p>
+        <div className="pm-row pm-center-row"><button className="rf-btn" onClick={quit}>Back to menu</button></div>
+      </>)}
+    </div>
+  );
+}
+
 function MoggerOnline({ onExit }) {
   const [phase, setPhase] = useState("menu"); // menu|joinentry|host|join|search|starting|intro|build|waiting|result|left
   const [code, setCode] = useState("");
@@ -2056,7 +2269,8 @@ function MoggerOnline({ onExit }) {
   const [oppBuild, setOppBuild] = useState(null);
   const [aiOpp, setAiOpp] = useState(null);
   const [status, setStatus] = useState("");
-  const chRef = useRef(null), lobbyRef = useRef(null), myBuildRef = useRef(null), oppRef = useRef(null), startedRef = useRef(false), pairedRef = useRef(false);
+  const [oppLiveScore, setOppLiveScore] = useState(null);
+  const chRef = useRef(null), lobbyRef = useRef(null), myBuildRef = useRef(null), oppRef = useRef(null), startedRef = useRef(false), pairedRef = useRef(false), roundRef = useRef(null);
   // host settings
   const [pick, setPick] = useState(false);
   const [uc, setUc] = useState(MOGGER_UCS[0]);
@@ -2071,10 +2285,16 @@ function MoggerOnline({ onExit }) {
     ch.on("broadcast", { event: "round_start" }, ({ payload }) => {
       const secsLeft = Math.max(8, Math.round(payload.secs - (Date.now() - payload.startAt) / 1000));
       startedRef.current = true;
+      roundRef.current = { ...payload.round, secs: secsLeft };
       setRound({ ...payload.round, secs: secsLeft });
       setPhase("intro");
     });
-    ch.on("broadcast", { event: "lock_in" }, ({ payload }) => { oppRef.current = payload.build || {}; setOppBuild(payload.build || {}); });
+    ch.on("broadcast", { event: "score" }, ({ payload }) => { setOppLiveScore(payload.score); });
+    ch.on("broadcast", { event: "lock_in" }, ({ payload }) => {
+      oppRef.current = payload.build || {};
+      setOppBuild(payload.build || {});
+      const r = roundRef.current; if (r) setOppLiveScore(moggerScore(payload.build || {}, r.useCase, r.budget).total);
+    });
     ch.on("presence", { event: "sync" }, () => {
       const st = ch.presenceState();
       const others = Object.keys(st).filter((k) => k !== netId);
@@ -2082,6 +2302,7 @@ function MoggerOnline({ onExit }) {
       if (startedRef.current && others.length === 0) setPhase((p) => (p === "result" ? p : "left"));
     });
   };
+  const broadcastScore = (s) => { try { chRef.current && chRef.current.send({ type: "broadcast", event: "score", payload: { score: s } }); } catch (e) { /* ignore */ } };
 
   const beginRound = (manual) => {
     const useCase = (manual && pick) ? uc : mRand(MOGGER_UCS);
@@ -2089,7 +2310,7 @@ function MoggerOnline({ onExit }) {
     const secs = (manual && pick && timer) ? timer : (50 + Math.floor(Math.random() * 370));
     const r = { useCase, budget: bud, secs };
     chRef.current.send({ type: "broadcast", event: "round_start", payload: { round: r, startAt: Date.now(), secs } });
-    startedRef.current = true; setRound(r); setPhase("intro");
+    startedRef.current = true; roundRef.current = r; setRound(r); setPhase("intro");
   };
 
   const doHost = () => {
@@ -2116,6 +2337,7 @@ function MoggerOnline({ onExit }) {
   const startAIFallback = () => {
     const useCase = mRand(MOGGER_UCS), bud = mRand(MOGGER_BUDGETS), secs = 50 + Math.floor(Math.random() * 370);
     setAiOpp(moggerAI(useCase, bud, moggerRollTier()));
+    roundRef.current = { useCase, budget: bud, secs };
     setRound({ useCase, budget: bud, secs }); startedRef.current = true; setPhase("intro");
   };
   const doRandom = () => {
@@ -2153,11 +2375,12 @@ function MoggerOnline({ onExit }) {
     try { chRef.current && chRef.current.send({ type: "broadcast", event: "lock_in", payload: { build: b } }); } catch (e) { /* ignore */ }
     if (oppRef.current) setPhase("result"); else setPhase("waiting");
   };
-  const reset = () => { cleanup(); startedRef.current = false; pairedRef.current = false; oppRef.current = null; myBuildRef.current = null; setOppBuild(null); setAiOpp(null); setRound(null); setOppPresent(false); setCode(""); setJoinCode(""); setPhase("menu"); };
+  const reset = () => { cleanup(); startedRef.current = false; pairedRef.current = false; oppRef.current = null; roundRef.current = null; myBuildRef.current = null; setOppBuild(null); setOppLiveScore(null); setAiOpp(null); setRound(null); setOppPresent(false); setCode(""); setJoinCode(""); setPhase("menu"); };
 
   const oppName = aiOpp ? "AI Opponent" : "Opponent";
+  if (phase === "tournament") return <MoggerTournament onExit={() => setPhase("menu")} />;
   if (phase === "intro" && round) return <MoggerIntro round={round} player={null} onGo={() => setPhase("build")} />;
-  if (phase === "build" && round) return <MoggerBuild round={round} player="You" oppLabel={oppName} oppBuild={aiOpp || null} oppIsAI={!!aiOpp} oppLocked={false} onDone={onBuildDone} />;
+  if (phase === "build" && round) return <MoggerBuild round={round} player="You" oppLabel={oppName} oppBuild={aiOpp || null} oppIsAI={!!aiOpp} oppLocked={false} liveOpp={!aiOpp} oppLiveScore={oppLiveScore} oppLiveDone={!!oppBuild} onMyScore={aiOpp ? undefined : broadcastScore} onDone={onBuildDone} />;
   if (phase === "result" && round && myBuildRef.current && (aiOpp || oppBuild)) return <MoggerResult round={round} you={myBuildRef.current} opp={aiOpp || oppBuild} oppName={oppName} onAgain={reset} onMenu={() => { cleanup(); onExit(); }} />;
 
   return (
@@ -2168,6 +2391,7 @@ function MoggerOnline({ onExit }) {
           <button className="pm-mode" onClick={doRandom}><span className="pm-mode-icon"><Radio size={22} /></span><span className="pm-mode-name">Find a match</span><span className="pm-mode-sub">Random opponent · AI if none</span></button>
           <button className="pm-mode" onClick={doHost}><span className="pm-mode-icon"><Plus size={22} /></span><span className="pm-mode-name">Host a room</span><span className="pm-mode-sub">Get a code, play a friend</span></button>
           <button className="pm-mode" onClick={() => setPhase("joinentry")}><span className="pm-mode-icon"><ChevronRight size={22} /></span><span className="pm-mode-name">Join a room</span><span className="pm-mode-sub">Enter a friend's code</span></button>
+          <button className="pm-mode" onClick={() => setPhase("tournament")}><span className="pm-mode-icon">🏆</span><span className="pm-mode-name">Tournament</span><span className="pm-mode-sub">Bracket · 3+ players, AI fills seats</span></button>
         </div>
         <button className="rf-ghost pm-exit" onClick={() => { cleanup(); onExit(); }}><ChevronLeft size={15} /> Back</button>
       </>)}
@@ -3696,6 +3920,26 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .pm-code{font-family:'JetBrains Mono';font-weight:700;font-size:48px;letter-spacing:10px;color:var(--c-accent);text-shadow:0 0 24px rgba(25,232,219,0.4);margin:6px 0 4px;padding-left:10px;}
 .pm-codein{width:100%;text-align:center;font-family:'JetBrains Mono';font-weight:700;font-size:34px;letter-spacing:8px;text-transform:uppercase;padding:14px;margin-bottom:16px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid var(--c-border);color:var(--c-text);outline:none;}
 .pm-codein:focus{border-color:var(--c-accent);}
+.pm-tour-count{font-family:'JetBrains Mono';font-size:12px;color:var(--c-muted);margin:0 0 16px;}
+.pm-tour-list{display:flex;flex-direction:column;gap:8px;margin:6px 0 16px;}
+.pm-tour-match{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid var(--c-border);font-size:13px;}
+.pm-tour-match.mine-win{border-color:var(--c-good);background:rgba(70,224,160,0.08);}
+.pm-tour-match.mine-lose{border-color:var(--c-bad);background:rgba(255,92,114,0.08);}
+.pm-tour-match span{display:flex;align-items:center;gap:6px;}
+.pm-tour-match b{font-family:'JetBrains Mono';color:var(--c-text);}
+.pm-tour-win{color:var(--c-good);font-weight:600;}
+.pm-tour-vs{color:var(--c-muted);font-family:'Chakra Petch';font-size:12px;}
+.pm-namein{width:100%;text-align:center;font-family:'Sora',sans-serif;font-size:18px;padding:13px;margin-bottom:16px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid var(--c-border);color:var(--c-text);outline:none;}
+.pm-namein:focus{border-color:var(--c-accent);}
+.pm-mode:disabled{opacity:.4;cursor:not-allowed;}
+.pm-tour-players{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:4px 0 8px;}
+.pm-tour-chip{font-size:12px;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,0.05);border:1px solid var(--c-border);color:var(--c-text);}
+.pm-tour-chip.me{border-color:var(--c-accent);color:var(--c-accent);}
+.pm-spec-list{display:flex;flex-direction:column;gap:8px;margin:8px 0 16px;}
+.pm-spec-match{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid var(--c-border);}
+.pm-spec-side{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;min-width:0;}
+.pm-spec-name{font-size:12px;color:var(--c-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.pm-spec-score{font-family:'JetBrains Mono';font-weight:600;font-size:22px;color:var(--c-accent);}
 .pm-vs-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;}
 .pm-vs-word{font-family:'Chakra Petch';font-weight:700;font-size:20px;color:var(--c-text);opacity:.5;}
 .pm-challenge-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
