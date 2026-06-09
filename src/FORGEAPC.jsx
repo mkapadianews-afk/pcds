@@ -6,6 +6,7 @@ import {
   ChevronLeft, Zap, DollarSign, RotateCcw, ShieldCheck, ShieldAlert, Repeat2, Wrench, Send, Bot, MessageCircle, Maximize, Minimize, Settings, Sun, Moon, Search
 } from "lucide-react";
 import { MEDIA, MEDIA_NE } from "../data/part-media.js";
+import { myId as netId, makeCode as netCode, roomChannel as netRoom, lobbyChannel as netLobby, leave as netLeave } from "./moggerNet.js";
 /* ----------------------------- i18n ----------------------------- */
 const LANGS = [{"code": "en", "name": "English"}, {"code": "es", "name": "Español"}, {"code": "zh", "name": "中文"}, {"code": "hi", "name": "हिन्दी"}, {"code": "ar", "name": "العربية"}, {"code": "pt", "name": "Português"}, {"code": "fr", "name": "Français"}, {"code": "ru", "name": "Русский"}, {"code": "ja", "name": "日本語"}, {"code": "de", "name": "Deutsch"}];
 const I18N = {"en": {"myRigs": "My Rigs", "settings": "Settings", "appearance": "Appearance", "language": "Language", "theme": "Theme", "dark": "Dark", "light": "Light", "back": "Back", "saveRig": "Save rig", "select": "Select", "selected": "Selected", "moreInfo": "More info", "hideInfo": "Hide info", "autoForge": "Auto-Forge", "buildYourself": "Build It Yourself", "yourBuild": "Your build", "budgetQ": "What's your budget?", "useCaseQ": "What will this PC be for?", "livePrices": "Live prices", "samplePrices": "sample prices", "updated": "updated", "componentsDb": "components in the database", "overBudgetCat": "Over your {x} budget", "performance": "PERFORMANCE", "pricePerf": "PRICE / PERF", "pros": "PROS", "cons": "CONS"}, "es": {"myRigs": "Mis Equipos", "settings": "Ajustes", "appearance": "Apariencia", "language": "Idioma", "theme": "Tema", "dark": "Oscuro", "light": "Claro", "back": "Atrás", "saveRig": "Guardar", "select": "Elegir", "selected": "Elegido", "moreInfo": "Más info", "hideInfo": "Ocultar", "autoForge": "Auto-Forjar", "buildYourself": "Hazlo tú mismo", "yourBuild": "Tu equipo", "budgetQ": "¿Cuál es tu presupuesto?", "useCaseQ": "¿Para qué será este PC?", "livePrices": "Precios en vivo", "samplePrices": "precios de muestra", "updated": "actualizado", "componentsDb": "componentes en la base de datos", "overBudgetCat": "Supera tu presupuesto de {x}", "performance": "RENDIMIENTO", "pricePerf": "PRECIO / REND", "pros": "PROS", "cons": "CONTRAS"}, "zh": {"myRigs": "我的配置", "settings": "设置", "appearance": "外观", "language": "语言", "theme": "主题", "dark": "深色", "light": "浅色", "back": "返回", "saveRig": "保存配置", "select": "选择", "selected": "已选", "moreInfo": "更多信息", "hideInfo": "隐藏", "autoForge": "自动配置", "buildYourself": "自己组装", "yourBuild": "你的配置", "budgetQ": "你的预算是多少？", "useCaseQ": "这台电脑用来做什么？", "livePrices": "实时价格", "samplePrices": "示例价格", "updated": "更新于", "componentsDb": "个组件已入库", "overBudgetCat": "超出{x}预算", "performance": "性能", "pricePerf": "性价比", "pros": "优点", "cons": "缺点"}, "hi": {"myRigs": "मेरे रिग", "settings": "सेटिंग्स", "appearance": "रूप", "language": "भाषा", "theme": "थीम", "dark": "गहरा", "light": "हल्का", "back": "वापस", "saveRig": "सहेजें", "select": "चुनें", "selected": "चयनित", "moreInfo": "और जानकारी", "hideInfo": "छिपाएं", "autoForge": "ऑटो-फोर्ज", "buildYourself": "खुद बनाएं", "yourBuild": "आपका बिल्ड", "budgetQ": "आपका बजट क्या है?", "useCaseQ": "यह पीसी किसलिए होगा?", "livePrices": "लाइव कीमतें", "samplePrices": "नमूना कीमतें", "updated": "अपडेट", "componentsDb": "घटक डेटाबेस में", "overBudgetCat": "{x} बजट से अधिक", "performance": "प्रदर्शन", "pricePerf": "मूल्य/प्रदर्शन", "pros": "फायदे", "cons": "नुकसान"}, "ar": {"myRigs": "أجهزتي", "settings": "الإعدادات", "appearance": "المظهر", "language": "اللغة", "theme": "السمة", "dark": "داكن", "light": "فاتح", "back": "رجوع", "saveRig": "حفظ", "select": "اختيار", "selected": "محدد", "moreInfo": "المزيد", "hideInfo": "إخفاء", "autoForge": "تجميع تلقائي", "buildYourself": "اصنعه بنفسك", "yourBuild": "تجميعتك", "budgetQ": "ما هي ميزانيتك؟", "useCaseQ": "لأي غرض هذا الحاسوب؟", "livePrices": "أسعار حية", "samplePrices": "أسعار تجريبية", "updated": "محدّث", "componentsDb": "مكوّن في قاعدة البيانات", "overBudgetCat": "يتجاوز ميزانية {x}", "performance": "الأداء", "pricePerf": "السعر/الأداء", "pros": "الإيجابيات", "cons": "السلبيات"}, "pt": {"myRigs": "Meus PCs", "settings": "Configurações", "appearance": "Aparência", "language": "Idioma", "theme": "Tema", "dark": "Escuro", "light": "Claro", "back": "Voltar", "saveRig": "Salvar", "select": "Selecionar", "selected": "Selecionado", "moreInfo": "Mais info", "hideInfo": "Ocultar", "autoForge": "Auto-Forjar", "buildYourself": "Faça você mesmo", "yourBuild": "Sua build", "budgetQ": "Qual é o seu orçamento?", "useCaseQ": "Para que será este PC?", "livePrices": "Preços ao vivo", "samplePrices": "preços de exemplo", "updated": "atualizado", "componentsDb": "componentes no banco de dados", "overBudgetCat": "Acima do orçamento de {x}", "performance": "DESEMPENHO", "pricePerf": "PREÇO / DESEMP", "pros": "PRÓS", "cons": "CONTRAS"}, "fr": {"myRigs": "Mes Configs", "settings": "Réglages", "appearance": "Apparence", "language": "Langue", "theme": "Thème", "dark": "Sombre", "light": "Clair", "back": "Retour", "saveRig": "Enregistrer", "select": "Choisir", "selected": "Choisi", "moreInfo": "Plus d'infos", "hideInfo": "Masquer", "autoForge": "Auto-Forge", "buildYourself": "Faites-le vous-même", "yourBuild": "Votre config", "budgetQ": "Quel est votre budget ?", "useCaseQ": "À quoi servira ce PC ?", "livePrices": "Prix en direct", "samplePrices": "prix indicatifs", "updated": "mis à jour", "componentsDb": "composants dans la base", "overBudgetCat": "Au-dessus du budget {x}", "performance": "PERFORMANCE", "pricePerf": "PRIX / PERF", "pros": "ATOUTS", "cons": "INCONVÉNIENTS"}, "ru": {"myRigs": "Мои сборки", "settings": "Настройки", "appearance": "Вид", "language": "Язык", "theme": "Тема", "dark": "Тёмная", "light": "Светлая", "back": "Назад", "saveRig": "Сохранить", "select": "Выбрать", "selected": "Выбрано", "moreInfo": "Подробнее", "hideInfo": "Скрыть", "autoForge": "Авто-сборка", "buildYourself": "Собрать самому", "yourBuild": "Ваша сборка", "budgetQ": "Каков ваш бюджет?", "useCaseQ": "Для чего этот ПК?", "livePrices": "Цены в реальном времени", "samplePrices": "примерные цены", "updated": "обновлено", "componentsDb": "компонентов в базе", "overBudgetCat": "Сверх бюджета на {x}", "performance": "ПРОИЗВОДИТ.", "pricePerf": "ЦЕНА/КАЧ.", "pros": "ПЛЮСЫ", "cons": "МИНУСЫ"}, "ja": {"myRigs": "マイ構成", "settings": "設定", "appearance": "外観", "language": "言語", "theme": "テーマ", "dark": "ダーク", "light": "ライト", "back": "戻る", "saveRig": "保存", "select": "選択", "selected": "選択済", "moreInfo": "詳細", "hideInfo": "隠す", "autoForge": "自動構成", "buildYourself": "自分で組む", "yourBuild": "あなたの構成", "budgetQ": "予算はいくらですか？", "useCaseQ": "このPCの用途は？", "livePrices": "ライブ価格", "samplePrices": "サンプル価格", "updated": "更新", "componentsDb": "個のパーツを収録", "overBudgetCat": "{x}予算オーバー", "performance": "性能", "pricePerf": "価格性能", "pros": "長所", "cons": "短所"}, "de": {"myRigs": "Meine Builds", "settings": "Einstellungen", "appearance": "Darstellung", "language": "Sprache", "theme": "Thema", "dark": "Dunkel", "light": "Hell", "back": "Zurück", "saveRig": "Speichern", "select": "Wählen", "selected": "Gewählt", "moreInfo": "Mehr Info", "hideInfo": "Verbergen", "autoForge": "Auto-Forge", "buildYourself": "Selbst bauen", "yourBuild": "Dein Build", "budgetQ": "Wie hoch ist dein Budget?", "useCaseQ": "Wofür ist dieser PC?", "livePrices": "Live-Preise", "samplePrices": "Beispielpreise", "updated": "aktualisiert", "componentsDb": "Komponenten in der Datenbank", "overBudgetCat": "Über dem {x}-Budget", "performance": "LEISTUNG", "pricePerf": "PREIS / LEIST", "pros": "VORTEILE", "cons": "NACHTEILE"}};
@@ -2046,6 +2047,159 @@ function MoggerIntro({ round, player, onGo }) {
   );
 }
 
+function MoggerOnline({ onExit }) {
+  const [phase, setPhase] = useState("menu"); // menu|joinentry|host|join|search|starting|intro|build|waiting|result|left
+  const [code, setCode] = useState("");
+  const [joinCode, setJoinCode] = useState("");
+  const [round, setRound] = useState(null);
+  const [oppPresent, setOppPresent] = useState(false);
+  const [oppBuild, setOppBuild] = useState(null);
+  const [aiOpp, setAiOpp] = useState(null);
+  const [status, setStatus] = useState("");
+  const chRef = useRef(null), lobbyRef = useRef(null), myBuildRef = useRef(null), oppRef = useRef(null), startedRef = useRef(false), pairedRef = useRef(false);
+  // host settings
+  const [pick, setPick] = useState(false);
+  const [uc, setUc] = useState(MOGGER_UCS[0]);
+  const [budget, setBudget] = useState(1500);
+  const [timer, setTimer] = useState(0);
+
+  const cleanup = () => { netLeave(chRef.current); netLeave(lobbyRef.current); chRef.current = null; lobbyRef.current = null; };
+  useEffect(() => () => cleanup(), []);
+  useEffect(() => { if (phase === "waiting" && oppBuild) setPhase("result"); }, [oppBuild, phase]);
+
+  const wireRoom = (ch) => {
+    ch.on("broadcast", { event: "round_start" }, ({ payload }) => {
+      const secsLeft = Math.max(8, Math.round(payload.secs - (Date.now() - payload.startAt) / 1000));
+      startedRef.current = true;
+      setRound({ ...payload.round, secs: secsLeft });
+      setPhase("intro");
+    });
+    ch.on("broadcast", { event: "lock_in" }, ({ payload }) => { oppRef.current = payload.build || {}; setOppBuild(payload.build || {}); });
+    ch.on("presence", { event: "sync" }, () => {
+      const st = ch.presenceState();
+      const others = Object.keys(st).filter((k) => k !== netId);
+      setOppPresent(others.length > 0);
+      if (startedRef.current && others.length === 0) setPhase((p) => (p === "result" ? p : "left"));
+    });
+  };
+
+  const beginRound = (manual) => {
+    const useCase = (manual && pick) ? uc : mRand(MOGGER_UCS);
+    const bud = (manual && pick) ? budget : mRand(MOGGER_BUDGETS);
+    const secs = (manual && pick && timer) ? timer : (50 + Math.floor(Math.random() * 370));
+    const r = { useCase, budget: bud, secs };
+    chRef.current.send({ type: "broadcast", event: "round_start", payload: { round: r, startAt: Date.now(), secs } });
+    startedRef.current = true; setRound(r); setPhase("intro");
+  };
+
+  const doHost = () => {
+    const c = netCode(); setCode(c);
+    const ch = netRoom(c); chRef.current = ch; wireRoom(ch);
+    ch.subscribe((s) => { if (s === "SUBSCRIBED") ch.track({ id: netId, role: "host" }); });
+    setPhase("host");
+  };
+  const doJoin = () => {
+    const c = joinCode.trim().toUpperCase(); if (c.length < 4) return;
+    setCode(c);
+    const ch = netRoom(c); chRef.current = ch; wireRoom(ch);
+    ch.subscribe((s) => { if (s === "SUBSCRIBED") ch.track({ id: netId, role: "guest" }); });
+    setStatus("Joined — waiting for the host to start…"); setPhase("join");
+  };
+
+  const joinMatchRoom = (c, role) => {
+    setCode(c);
+    const ch = netRoom(c); chRef.current = ch; wireRoom(ch);
+    ch.subscribe((s) => { if (s === "SUBSCRIBED") ch.track({ id: netId, role }); });
+    setStatus("Matched! Starting…"); setPhase("starting");
+    if (role === "host") setTimeout(() => beginRound(false), 1600);
+  };
+  const startAIFallback = () => {
+    const useCase = mRand(MOGGER_UCS), bud = mRand(MOGGER_BUDGETS), secs = 50 + Math.floor(Math.random() * 370);
+    setAiOpp(moggerAI(useCase, bud, moggerRollTier()));
+    setRound({ useCase, budget: bud, secs }); startedRef.current = true; setPhase("intro");
+  };
+  const doRandom = () => {
+    pairedRef.current = false;
+    const lob = netLobby(); lobbyRef.current = lob;
+    lob.on("broadcast", { event: "match" }, ({ payload }) => {
+      if (pairedRef.current) return;
+      if (payload.a === netId || payload.b === netId) {
+        pairedRef.current = true;
+        const role = payload.a === netId ? "host" : "guest";
+        netLeave(lobbyRef.current); lobbyRef.current = null;
+        joinMatchRoom(payload.code, role);
+      }
+    });
+    lob.on("presence", { event: "sync" }, () => {
+      if (pairedRef.current) return;
+      const st = lob.presenceState();
+      const arr = Object.entries(st).map(([k, m]) => ({ id: k, t: (m[0] && m[0].joinedAt) || 0 })).sort((a, b) => a.t - b.t || (a.id < b.id ? -1 : 1));
+      if (arr.length >= 2 && arr[0].id === netId) {
+        pairedRef.current = true;
+        const partner = arr[1], c = netCode();
+        lob.send({ type: "broadcast", event: "match", payload: { a: netId, b: partner.id, code: c } });
+        netLeave(lobbyRef.current); lobbyRef.current = null;
+        joinMatchRoom(c, "host");
+      }
+    });
+    lob.subscribe((s) => { if (s === "SUBSCRIBED") lob.track({ id: netId, joinedAt: Date.now() }); });
+    setStatus("Searching for an opponent…"); setPhase("search");
+    setTimeout(() => { if (pairedRef.current || startedRef.current) return; pairedRef.current = true; netLeave(lobbyRef.current); lobbyRef.current = null; startAIFallback(); }, 12000);
+  };
+
+  const onBuildDone = (b) => {
+    myBuildRef.current = b;
+    if (aiOpp) { setPhase("result"); return; }
+    try { chRef.current && chRef.current.send({ type: "broadcast", event: "lock_in", payload: { build: b } }); } catch (e) { /* ignore */ }
+    if (oppRef.current) setPhase("result"); else setPhase("waiting");
+  };
+  const reset = () => { cleanup(); startedRef.current = false; pairedRef.current = false; oppRef.current = null; myBuildRef.current = null; setOppBuild(null); setAiOpp(null); setRound(null); setOppPresent(false); setCode(""); setJoinCode(""); setPhase("menu"); };
+
+  const oppName = aiOpp ? "AI Opponent" : "Opponent";
+  if (phase === "intro" && round) return <MoggerIntro round={round} player={null} onGo={() => setPhase("build")} />;
+  if (phase === "build" && round) return <MoggerBuild round={round} player="You" oppLabel={oppName} oppBuild={aiOpp || null} oppIsAI={!!aiOpp} oppLocked={false} onDone={onBuildDone} />;
+  if (phase === "result" && round && myBuildRef.current && (aiOpp || oppBuild)) return <MoggerResult round={round} you={myBuildRef.current} opp={aiOpp || oppBuild} oppName={oppName} onAgain={reset} onMenu={() => { cleanup(); onExit(); }} />;
+
+  return (
+    <div className="pm-card pm-center rf-fade">
+      {phase === "menu" && (<>
+        <h2 className="pm-h2">🌐 Online Multiplayer</h2>
+        <div className="pm-mode-grid">
+          <button className="pm-mode" onClick={doRandom}><span className="pm-mode-icon"><Radio size={22} /></span><span className="pm-mode-name">Find a match</span><span className="pm-mode-sub">Random opponent · AI if none</span></button>
+          <button className="pm-mode" onClick={doHost}><span className="pm-mode-icon"><Plus size={22} /></span><span className="pm-mode-name">Host a room</span><span className="pm-mode-sub">Get a code, play a friend</span></button>
+          <button className="pm-mode" onClick={() => setPhase("joinentry")}><span className="pm-mode-icon"><ChevronRight size={22} /></span><span className="pm-mode-name">Join a room</span><span className="pm-mode-sub">Enter a friend's code</span></button>
+        </div>
+        <button className="rf-ghost pm-exit" onClick={() => { cleanup(); onExit(); }}><ChevronLeft size={15} /> Back</button>
+      </>)}
+
+      {phase === "joinentry" && (<>
+        <h2 className="pm-h2">Join a room</h2>
+        <input className="pm-codein" value={joinCode} maxLength={5} onChange={(e) => setJoinCode(e.target.value.toUpperCase())} placeholder="CODE" />
+        <div className="pm-row"><button className="rf-btn rf-ghost-btn" onClick={reset}><ChevronLeft size={16} /> Back</button><button className="rf-btn" onClick={doJoin}>Join <ChevronRight size={16} /></button></div>
+      </>)}
+
+      {phase === "host" && (<>
+        <h2 className="pm-h2">Your room code</h2>
+        <div className="pm-code">{code}</div>
+        <p className="pm-p">{oppPresent ? "A player joined! Set it up and start." : "Share this code with a friend. Waiting for them to join…"}</p>
+        <label className="pm-toggle"><input type="checkbox" checked={pick} onChange={(e) => setPick(e.target.checked)} /><span>Pick the challenge (off = random)</span></label>
+        {pick && (<div className="pm-setup">
+          <div className="pm-field"><span className="pm-field-l">Use case</span><div className="pm-chips">{MOGGER_UCS.map((k) => <button key={k} className={"pm-chip" + (uc === k ? " on" : "")} onClick={() => setUc(k)}>{USE_CASES[k].label}</button>)}</div></div>
+          <div className="pm-field"><span className="pm-field-l">Budget: {fmt(budget)}</span><input type="range" min="600" max="4000" step="100" value={budget} onChange={(e) => setBudget(+e.target.value)} className="pm-range" /></div>
+          <div className="pm-field"><span className="pm-field-l">Timer: {timer ? timer + "s" : "random"}</span><input type="range" min="0" max="420" step="10" value={timer} onChange={(e) => setTimer(+e.target.value)} className="pm-range" /></div>
+        </div>)}
+        <div className="pm-row"><button className="rf-btn rf-ghost-btn" onClick={reset}><ChevronLeft size={16} /> Cancel</button><button className="rf-btn" disabled={!oppPresent} onClick={() => beginRound(true)}>Start round <ChevronRight size={16} /></button></div>
+      </>)}
+
+      {phase === "join" && (<><h2 className="pm-h2">🔗 Joined room {code}</h2><div className="pm-spinner" /><p className="pm-p">{status}</p><button className="rf-btn rf-ghost-btn" onClick={reset}>Cancel</button></>)}
+      {phase === "search" && (<><h2 className="pm-h2">Finding a match…</h2><div className="pm-spinner" /><p className="pm-p">Looking for another player. If nobody shows up, you will face the AI.</p><button className="rf-btn rf-ghost-btn" onClick={reset}>Cancel</button></>)}
+      {phase === "starting" && (<><h2 className="pm-h2">Matched!</h2><div className="pm-spinner" /><p className="pm-p">{status}</p></>)}
+      {phase === "waiting" && (<><h2 className="pm-h2">🔒 Locked in</h2><div className="pm-spinner" /><p className="pm-p">Waiting for your opponent to finish…</p></>)}
+      {phase === "left" && (<><h2 className="pm-verdict-title win">🏆 YOU WIN</h2><p className="pm-p">Your opponent left the match.</p><div className="pm-row pm-center-row"><button className="rf-btn" onClick={reset}>Back to online menu</button></div></>)}
+    </div>
+  );
+}
+
 function MoggerGame({ onExit }) {
   const [screen, setScreen] = useState("menu");
   const [mode, setMode] = useState("ai");
@@ -2066,12 +2220,12 @@ function MoggerGame({ onExit }) {
           <div className="pm-mode-grid">
             <button className="pm-mode" onClick={() => { setMode("ai"); setScreen("lobby"); }}><span className="pm-mode-icon"><Bot size={24} /></span><span className="pm-mode-name">Play vs AI</span><span className="pm-mode-sub">Solo — out-build the machine</span></button>
             <button className="pm-mode" onClick={() => { setMode("local"); setScreen("lobby"); }}><span className="pm-mode-icon"><Gamepad2 size={24} /></span><span className="pm-mode-name">Pass &amp; Play</span><span className="pm-mode-sub">2 players, one device</span></button>
-            <button className="pm-mode pm-soon" onClick={() => setScreen("online")}><span className="pm-mode-icon">🌐</span><span className="pm-mode-name">Online Multiplayer</span><span className="pm-mode-sub">Host or join · setup needed</span></button>
+            <button className="pm-mode" onClick={() => setScreen("online")}><span className="pm-mode-icon">🌐</span><span className="pm-mode-name">Online Multiplayer</span><span className="pm-mode-sub">Play friends or random people</span></button>
           </div>
           <button className="rf-ghost pm-exit" onClick={onExit}><ChevronLeft size={15} /> Back to builder</button>
         </div>
       )}
-      {screen === "online" && <div className="pm-card rf-fade"><h2 className="pm-h2">🌐 Online Multiplayer</h2><p className="pm-p">Playing friends over the internet needs a small realtime server to sync the lobby, the countdown, and each build — that cannot run on a static host alone. The whole game is built and ready; wiring it to a free realtime backend is the next step. For now, <b>Pass &amp; Play</b> lets you battle a friend on one device.</p><button className="rf-btn" onClick={menu}><ChevronLeft size={16} /> Back to menu</button></div>}
+      {screen === "online" && <MoggerOnline onExit={menu} />}
       {screen === "lobby" && <MoggerLobby mode={mode} onStart={start} onBack={menu} />}
       {screen === "intro" && round && <MoggerIntro round={round} player={mode === "local" ? "Player 1" : null} onGo={() => setScreen("p1")} />}
       {screen === "p1" && round && <MoggerBuild round={round} player={mode === "local" ? "Player 1" : "You"} oppLabel={mode === "ai" ? "AI Opponent" : "Player 2"} oppBuild={mode === "ai" ? opp : null} oppIsAI={mode === "ai"} oppLocked={false} onDone={finishP1} />}
@@ -3539,6 +3693,9 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .pm-spinner{width:46px;height:46px;border-radius:50%;border:4px solid rgba(25,232,219,0.18);border-top-color:var(--c-accent);animation:pmSpin .8s linear infinite;}
 @keyframes pmSpin{to{transform:rotate(360deg);}}
 .pm-loading-text{font-family:'Chakra Petch';font-size:16px;color:var(--c-muted);}
+.pm-code{font-family:'JetBrains Mono';font-weight:700;font-size:48px;letter-spacing:10px;color:var(--c-accent);text-shadow:0 0 24px rgba(25,232,219,0.4);margin:6px 0 4px;padding-left:10px;}
+.pm-codein{width:100%;text-align:center;font-family:'JetBrains Mono';font-weight:700;font-size:34px;letter-spacing:8px;text-transform:uppercase;padding:14px;margin-bottom:16px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid var(--c-border);color:var(--c-text);outline:none;}
+.pm-codein:focus{border-color:var(--c-accent);}
 .pm-vs-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;}
 .pm-vs-word{font-family:'Chakra Petch';font-weight:700;font-size:20px;color:var(--c-text);opacity:.5;}
 .pm-challenge-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
