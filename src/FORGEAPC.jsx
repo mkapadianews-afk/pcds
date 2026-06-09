@@ -1715,65 +1715,80 @@ function moggerScore(build, ucKey, budget) {
   const filled = CATEGORY_ORDER.filter((c) => build[c]).length;
   const completeness = filled / CATEGORY_ORDER.length;
   const issues = [];
-  let hardIncompat = false;
-  if (build.cpu && build.mobo && build.cpu.socket !== build.mobo.socket) { issues.push("CPU and motherboard sockets do not match"); hardIncompat = true; }
-  if (build.cpu && build.cooler && build.cooler.sockets && !build.cooler.sockets.includes(build.cpu.socket)) { issues.push("Cooler does not fit the CPU socket"); hardIncompat = true; }
+  if (build.cpu && build.mobo && build.cpu.socket !== build.mobo.socket) issues.push("CPU and motherboard sockets do not match");
+  if (build.cpu && build.cooler && build.cooler.sockets && !build.cooler.sockets.includes(build.cpu.socket)) issues.push("Cooler does not fit the CPU socket");
   if (build.cpu && build.cooler && build.cooler.tdpRating && build.cooler.tdpRating < build.cpu.tdp) issues.push("Cooler cannot handle the CPU heat");
   const draw = mEstDraw(build);
   if (build.psu && build.psu.watt && build.psu.watt < draw * 1.15) issues.push("Power supply is too weak");
-  // Incompatible parts = automatic 0.
-  if (hardIncompat) return { total: 0, perf: Math.round(perf), value: 0, compat: 0, completeness: Math.round(completeness * 100), spend: total, over: total > budget, overBy: Math.max(0, total - budget), issues, dead: true };
-  const compat = clamp(1 - issues.length * 0.16, 0, 1);
+  if (filled < CATEGORY_ORDER.length) issues.push("Build is incomplete — missing parts");
+  // ANY incompatibility, warning, OR missing part = automatic 0.
+  if (issues.length > 0) return { total: 0, perf: Math.round(perf), value: 0, compat: 0, completeness: Math.round(completeness * 100), spend: total, over: total > budget, overBy: Math.max(0, total - budget), issues, dead: true };
   const value = total > 0 ? clamp((perf / (total / 1000)) / 55, 0, 1) : 0;
   const over = total > budget ? (total - budget) / budget : 0;
   const overPen = clamp(over * 1.4, 0, 0.6);
-  let raw = (perf / 100) * 0.55 + value * 0.2 + compat * 0.15 + completeness * 0.1;
+  let raw = ((perf / 100) * 0.7 + value * 0.3);
   raw = raw * (1 - overPen);
-  return { total: Math.round(raw * 1000), perf: Math.round(perf), value: Math.round(value * 100), compat: Math.round(compat * 100), completeness: Math.round(completeness * 100), spend: total, over: total > budget, overBy: Math.max(0, total - budget), issues };
+  return { total: Math.round(raw * 1000), perf: Math.round(perf), value: Math.round(value * 100), compat: 100, completeness: 100, spend: total, over: total > budget, overBy: Math.max(0, total - budget), issues: [] };
 }
 
-// tier: "elite" (best, compatible, full budget) | "normal" (decent, slightly suboptimal) | "fail" (weak/cheap, may skip or mismatch)
+// tier: "elite" (best valid build, full budget) | "normal" (decent valid build) | "fail" (weak full build, sometimes incompatible)
 function moggerAI(ucKey, budget, tier) {
   const W = USE_CASES[ucKey].alloc;
   const build = {};
   const order = [...CATEGORY_ORDER].sort((a, b) => (W[b] || 0) - (W[a] || 0));
-  const compatOk = (c, o) => {
+  const draw = () => mEstDraw(build);
+  const ok = (c, o) => {
     if (c === "mobo" && build.cpu && o.socket !== build.cpu.socket) return false;
     if (c === "cpu" && build.mobo && o.socket !== build.mobo.socket) return false;
-    if (c === "cooler" && build.cpu && o.sockets && !o.sockets.includes(build.cpu.socket)) return false;
+    if (c === "cooler") { if (build.cpu && o.sockets && !o.sockets.includes(build.cpu.socket)) return false; if (build.cpu && o.tdpRating && o.tdpRating < build.cpu.tdp) return false; }
+    if (c === "psu" && o.watt && o.watt < draw() * 1.18) return false;
     return true;
   };
   if (tier === "fail") {
     let rem = budget;
+    const mismatch = Math.random() < 0.35; // sometimes a doomed (incompatible) build
     for (const c of order) {
-      if ((c === "cooler" || c === "case") && Math.random() < 0.4) continue; // skip some parts
-      const opts = moggerOptions(c).filter((o) => o.price <= rem);
-      if (!opts.length) continue;
+      const opts = moggerOptions(c);
       const weak = [...opts].sort((a, b) => a.perf - b.perf);
-      let pick = weak.find((o) => compatOk(c, o)) || opts[0];
-      if (Math.random() < 0.3) pick = weak[0]; // sometimes ignore compatibility -> mismatch -> may score 0
+      let pick;
+      if (mismatch) pick = weak[0]; // weakest, ignore validity -> likely 0
+      else pick = weak.find((o) => o.price <= rem && ok(c, o)) || weak.find((o) => ok(c, o)) || weak[0];
       build[c] = pick; rem -= pick.price;
     }
     return build;
   }
   const elite = tier === "elite";
-  let rem = budget * (elite ? 1.0 : (0.88 + Math.random() * 0.16));
+  let rem = budget * (elite ? 1.0 : (0.9 + Math.random() * 0.12));
   for (const c of order) {
     const opts = moggerOptions(c);
-    const affordable = opts.filter((o) => o.price <= rem).sort((a, b) => b.perf - a.perf);
+    const valid = opts.filter((o) => ok(c, o)).sort((a, b) => b.perf - a.perf);
+    const affordable = valid.filter((o) => o.price <= rem);
     let pick;
-    if (elite) pick = affordable.find((o) => compatOk(c, o));
-    else { const pool = affordable.filter((o) => compatOk(c, o)).slice(0, 3); pick = pool.length ? pool[Math.floor(Math.random() * pool.length)] : affordable.find((o) => compatOk(c, o)); }
-    if (!pick) pick = [...opts].sort((a, b) => a.price - b.price).find((o) => compatOk(c, o)) || opts[0];
+    if (elite) pick = affordable[0] || valid[0];
+    else { const pool = affordable.slice(0, 3); pick = pool.length ? pool[Math.floor(Math.random() * pool.length)] : (affordable[0] || valid[0]); }
+    if (!pick) pick = opts[0];
     build[c] = pick; rem -= pick.price;
   }
   return build;
 }
 function moggerRollTier() { const r = Math.random(); return r < 0.25 ? "elite" : r < 0.85 ? "normal" : "fail"; }
 
+function moggerSpecs(p, cat) {
+  const s = [];
+  if (cat === "cpu") { if (p.socket) s.push(["Socket", p.socket]); if (p.cores) s.push(["Cores", p.cores]); if (p.tdp) s.push(["TDP", p.tdp + "W"]); if (p.igpu) s.push(["iGPU", "Yes"]); }
+  else if (cat === "gpu") { if (p.vram) s.push(["VRAM", p.vram + "GB"]); if (p.tdp) s.push(["TDP", p.tdp + "W"]); if (p.len) s.push(["Length", p.len + "mm"]); }
+  else if (cat === "ram") { if (p.cap) s.push(["Capacity", p.cap + "GB"]); if (p.ramType) s.push(["Type", p.ramType]); if (p.speed) s.push(["Speed", p.speed + " MT/s"]); }
+  else if (cat === "storage") { if (p.cap) s.push(["Capacity", p.cap >= 1000 ? (p.cap / 1000) + "TB" : p.cap + "GB"]); if (p.iface || p.kind) s.push(["Interface", p.iface || p.kind]); }
+  else if (cat === "mobo") { if (p.socket) s.push(["Socket", p.socket]); if (p.ramType) s.push(["RAM", p.ramType]); if (p.form) s.push(["Form", p.form]); if (p.m2 != null) s.push(["M.2 slots", p.m2]); }
+  else if (cat === "psu") { if (p.watt) s.push(["Wattage", p.watt + "W"]); if (p.eff) s.push(["Rating", "80+ " + p.eff]); }
+  else if (cat === "cooler") { if (p.sockets) s.push(["Sockets", p.sockets.join("/")]); if (p.tdpRating) s.push(["Cools", "up to " + p.tdpRating + "W"]); if (p.type) s.push(["Type", p.type]); if (p.height) s.push(["Height", p.height + "mm"]); }
+  return s;
+}
+
 function MoggerPicker({ cat, current, budget, spent, onPick, onClose }) {
   const all = useMemo(() => moggerOptions(cat), [cat]);
   const [q, setQ] = useState("");
+  const [info, setInfo] = useState(null);
   const opts = useMemo(() => {
     const t = q.trim().toLowerCase();
     if (!t) return all;
@@ -1791,12 +1806,20 @@ function MoggerPicker({ cat, current, budget, spent, onPick, onClose }) {
             const sel = current && current.id === o.id;
             const wouldBe = spent - (current ? current.price : 0) + o.price;
             const blocked = wouldBe > cap && !sel;
+            const showSpecs = info === o.id;
+            const specs = showSpecs ? moggerSpecs(o, cat) : null;
             return (
-              <button key={o.id} className={"pm-opt" + (sel ? " sel" : "") + (blocked ? " blocked" : "")} disabled={blocked} onClick={() => { if (!blocked) onPick(o); }}>
-                <span className="pm-opt-img">{o.img ? <img src={o.img} alt="" loading="lazy" /> : <Icon size={18} />}</span>
-                <span className="pm-opt-main"><span className="pm-opt-name">{o.model || o.name}</span><span className="pm-opt-brand">{o.brand}</span></span>
-                <span className="pm-opt-right"><span className="pm-opt-price">{o.price === 0 ? "Free" : fmt(o.price)}</span>{blocked ? <span className="pm-opt-block">over limit</span> : <span className={"pm-opt-bar" + (wouldBe > budget ? " over" : "")}><i style={{ width: clamp(o.perf, 4, 100) + "%" }} /></span>}</span>
-              </button>
+              <div key={o.id} className="pm-optwrap">
+                <div className={"pm-opt" + (sel ? " sel" : "") + (blocked ? " blocked" : "")}>
+                  <button className="pm-opt-pick" disabled={blocked} onClick={() => { if (!blocked) onPick(o); }}>
+                    <span className="pm-opt-img">{o.img ? <img src={o.img} alt="" loading="lazy" /> : <Icon size={18} />}</span>
+                    <span className="pm-opt-main"><span className="pm-opt-name">{o.model || o.name}</span><span className="pm-opt-brand">{o.brand}</span></span>
+                    <span className="pm-opt-right"><span className="pm-opt-price">{o.price === 0 ? "Free" : fmt(o.price)}</span>{blocked ? <span className="pm-opt-block">over limit</span> : <span className={"pm-opt-bar" + (wouldBe > budget ? " over" : "")}><i style={{ width: clamp(o.perf, 4, 100) + "%" }} /></span>}</span>
+                  </button>
+                  <button className="pm-opt-info" onClick={() => setInfo(showSpecs ? null : o.id)}>{showSpecs ? "Hide" : "Specs"}</button>
+                </div>
+                {showSpecs && <div className="pm-specs">{specs.length ? specs.map(([k, v], i) => <span key={i}><i>{k}</i>{v}</span>) : <span className="pm-specs-none">No specs listed</span>}</div>}
+              </div>
             );
           })}
           {opts.length === 0 && <div className="pm-empty">No matches</div>}
@@ -1843,6 +1866,14 @@ function MoggerBuild({ round, player, oppLabel, oppBuild, oppLocked, oppIsAI, on
   const spent = CATEGORY_ORDER.reduce((s, c) => s + (build[c] ? build[c].price : 0), 0);
   const over = spent > round.budget;
   const filled = CATEGORY_ORDER.filter((c) => build[c]).length;
+  const hasOpp = oppIsAI || !!oppBuild;
+  const mkDecoy = () => { const d = {}; for (const c of CATEGORY_ORDER) { const o = moggerOptions(c); d[c] = o[Math.floor(Math.random() * o.length)]; } return d; };
+  const [decoy, setDecoy] = useState(mkDecoy);
+  useEffect(() => {
+    if (!hasOpp) return;
+    const iv = setInterval(() => setDecoy(mkDecoy()), 1400); // AI's shown parts keep changing while it "builds"
+    return () => clearInterval(iv);
+  }, []);
   const mm = Math.floor(left / 60), ss = String(left % 60).padStart(2, "0");
   const low = left <= 15;
   const UC = USE_CASES[round.useCase];
@@ -1866,29 +1897,27 @@ function MoggerBuild({ round, player, oppLabel, oppBuild, oppLocked, oppIsAI, on
       </div>
       <div className="pm-challenge-row"><span className="pm-uc"><UC.Icon size={16} /> {UC.label}</span><span className="pm-budget">Budget {fmt(round.budget)}</span></div>
       <div className={"pm-spend" + (over ? " over" : "")}>Spent {fmt(spent)} / {fmt(round.budget)}{over && <b> · OVER BUDGET (penalized)</b>} · hard cap {fmt(round.budget + 50)}</div>
-      <div className="pm-buildside">
-        <div className="pm-side-h">YOUR BUILD</div>
-        <div className="pm-partrow">
+      <div className="pm-arena">
+        <div className="pm-col you">
+          <div className="pm-col-h">YOUR BUILD</div>
           {CATEGORY_ORDER.map((c) => { const Icon = CAT_META[c].Icon; const p = build[c]; return (
-            <button key={c} className={"pm-tile" + (p ? " filled" : "")} onClick={() => setOpen(c)}>
-              <span className="pm-tile-img">{p && p.img ? <img src={p.img} alt="" /> : <Icon size={18} />}</span>
-              <span className="pm-tile-cat">{CAT_META[c].label}</span>
-              {p ? <span className="pm-tile-name">{p.model || p.name}</span> : <span className="pm-tile-add">+ Add</span>}
-              {p && <span className="pm-tile-price">{p.price === 0 ? "Free" : fmt(p.price)}</span>}
+            <button key={c} className={"pm-ctile" + (p ? " filled" : "")} onClick={() => setOpen(c)}>
+              <span className="pm-ctile-img">{p && p.img ? <img src={p.img} alt="" /> : <Icon size={17} />}</span>
+              <span className="pm-ctile-body"><span className="pm-ctile-cat">{CAT_META[c].label}</span>{p ? <span className="pm-ctile-name">{p.model || p.name}</span> : <span className="pm-ctile-add">+ Add part</span>}</span>
+              {p && <span className="pm-ctile-price">{p.price === 0 ? "Free" : fmt(p.price)}</span>}
             </button>
           ); })}
         </div>
-      </div>
-      <div className="pm-buildside">
-        <div className="pm-side-h">{oppLabel}{oppIsAI ? " (building…)" : ""}</div>
-        <div className="pm-partrow blur">
-          {CATEGORY_ORDER.map((c) => { const Icon = CAT_META[c].Icon; const p = oppBuild ? oppBuild[c] : null; return (
-            <div key={c} className="pm-tile opp">
-              <span className="pm-tile-img">{p && p.img ? <img src={p.img} alt="" /> : <Icon size={18} />}</span>
-              <span className="pm-tile-cat">{CAT_META[c].label}</span>
-              <span className="pm-tile-name">{p ? (p.model || p.name) : "???"}</span>
-            </div>
-          ); })}
+        <div className="pm-col opp">
+          <div className="pm-col-h">{oppLabel}{oppIsAI ? " · building" : ""}</div>
+          <div className={"pm-col-parts" + (hasOpp ? " blur" : "")}>
+            {CATEGORY_ORDER.map((c) => { const Icon = CAT_META[c].Icon; const p = hasOpp ? decoy[c] : null; return (
+              <div key={c} className="pm-ctile opp">
+                <span className="pm-ctile-img">{p && p.img ? <img src={p.img} alt="" /> : <Icon size={17} />}</span>
+                <span className="pm-ctile-body"><span className="pm-ctile-cat">{CAT_META[c].label}</span><span className="pm-ctile-name">{p ? (p.model || p.name) : "waiting…"}</span></span>
+              </div>
+            ); })}
+          </div>
         </div>
       </div>
       <button className="rf-btn rf-btn-lg pm-lockin" onClick={() => onDone(build)}><Check size={16} /> Lock in build</button>
@@ -3473,6 +3502,26 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .pm-board-sub{font-family:'JetBrains Mono';font-size:11px;color:var(--c-muted);}
 .pm-board-sub.locked{color:var(--c-good);}
 .pm-buildside{margin-bottom:14px;}
+.pm-arena{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;align-items:start;}
+.pm-col{display:flex;flex-direction:column;gap:8px;min-width:0;}
+.pm-col-h{font-family:'JetBrains Mono';font-size:11px;letter-spacing:1.3px;text-transform:uppercase;color:var(--c-muted);margin:0 0 2px 2px;}
+.pm-col.you .pm-col-h{color:var(--c-accent);}
+.pm-col.opp .pm-col-h{color:var(--c-accent2);}
+.pm-col-parts{display:flex;flex-direction:column;gap:8px;}
+.pm-col-parts.blur{filter:blur(5px);opacity:.78;pointer-events:none;}
+.pm-ctile{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:11px;cursor:pointer;text-align:left;color:var(--c-text);background:var(--c-panel);border:1px solid var(--c-border);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:border-color .14s,transform .12s;min-width:0;}
+.pm-ctile.opp{cursor:default;}
+.pm-ctile:not(.opp):hover{border-color:var(--c-accent);transform:translateX(2px);}
+.pm-ctile.filled{border-color:rgba(25,232,219,0.3);}
+.pm-ctile-img{width:38px;height:38px;border-radius:9px;display:grid;place-items:center;background:rgba(255,255,255,0.05);color:var(--c-accent);overflow:hidden;flex-shrink:0;}
+.pm-ctile-img img{width:100%;height:100%;object-fit:contain;}
+.pm-ctile.opp .pm-ctile-img{color:var(--c-accent2);}
+.pm-ctile-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.pm-ctile-cat{font-size:9px;letter-spacing:.6px;text-transform:uppercase;color:var(--c-muted);font-family:'JetBrains Mono';}
+.pm-ctile-name{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pm-ctile-add{font-size:12px;color:var(--c-muted);}
+.pm-ctile-price{font-size:11px;color:var(--c-accent);font-family:'JetBrains Mono';flex-shrink:0;}
+@media(max-width:480px){.pm-arena{grid-template-columns:1fr;}}
 .pm-side-h{font-family:'JetBrains Mono';font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--c-muted);margin:0 0 8px 2px;}
 .pm-partrow{display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin;}
 .pm-partrow.blur{filter:blur(5px);opacity:.78;pointer-events:none;}
@@ -3552,9 +3601,15 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .pm-drawer-head{display:flex;justify-content:space-between;align-items:center;font-family:'Chakra Petch';font-size:18px;margin-bottom:16px;}
 .pm-x{background:none;border:none;color:var(--c-muted);cursor:pointer;}
 .pm-opts{display:flex;flex-direction:column;gap:8px;}
-.pm-opt{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:12px;cursor:pointer;text-align:left;background:rgba(255,255,255,0.03);border:1px solid var(--c-border);color:var(--c-text);transition:border-color .12s;}
-.pm-opt:hover{border-color:var(--c-accent);}
+.pm-optwrap{display:flex;flex-direction:column;}
+.pm-opt{display:flex;align-items:stretch;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid var(--c-border);overflow:hidden;transition:border-color .12s;}
 .pm-opt.sel{border-color:var(--c-accent);background:rgba(25,232,219,0.1);}
+.pm-opt.blocked{opacity:.4;filter:grayscale(.6);}
+.pm-opt-pick{flex:1;min-width:0;display:flex;align-items:center;gap:11px;padding:10px 12px;background:none;border:none;cursor:pointer;text-align:left;color:var(--c-text);}
+.pm-opt-pick:disabled{cursor:not-allowed;}
+.pm-opt:not(.blocked):hover{border-color:var(--c-accent);}
+.pm-opt-info{flex-shrink:0;padding:0 12px;background:rgba(255,255,255,0.04);border:none;border-left:1px solid var(--c-border);color:var(--c-muted);font-family:'JetBrains Mono';font-size:11px;letter-spacing:.5px;cursor:pointer;transition:color .12s,background .12s;}
+.pm-opt-info:hover{color:var(--c-accent);background:rgba(25,232,219,0.08);}
 .pm-opt-img{width:36px;height:36px;border-radius:8px;display:grid;place-items:center;background:rgba(255,255,255,0.05);color:var(--c-accent);flex-shrink:0;overflow:hidden;}
 .pm-opt-img img{width:100%;height:100%;object-fit:contain;}
 .pm-opt-main{flex:1;min-width:0;}
@@ -3565,6 +3620,10 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .pm-opt-bar{display:block;height:5px;border-radius:3px;background:rgba(255,255,255,0.08);overflow:hidden;}
 .pm-opt-bar i{display:block;height:100%;background:var(--c-accent);}
 .pm-opt-bar.over i{background:var(--c-warn);}
+.pm-specs{display:flex;flex-wrap:wrap;gap:6px;padding:8px 4px 12px;}
+.pm-specs span{font-family:'JetBrains Mono';font-size:11px;color:var(--c-text);background:rgba(255,255,255,0.04);border:1px solid var(--c-border);border-radius:8px;padding:4px 9px;}
+.pm-specs span i{font-style:normal;color:var(--c-muted);margin-right:6px;}
+.pm-specs-none{color:var(--c-muted);}
 .pm-verdict-title{text-align:center;font-family:'Chakra Petch';font-weight:700;font-size:38px;margin:6px 0 18px;}
 .pm-verdict-title.win{color:var(--c-good);text-shadow:0 0 24px rgba(70,224,160,0.4);}
 .pm-verdict-title.lose{color:var(--c-bad);text-shadow:0 0 24px rgba(255,92,114,0.4);}
