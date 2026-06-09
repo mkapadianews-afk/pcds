@@ -39,8 +39,15 @@ export function leave(ch) {
 // NOTE: this is light, browser-side auth — convenient, NOT real security.
 // Passwords are stored only as a one-way SHA-256 hash (never in readable form).
 async function sha256(str) {
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+  try {
+    if (crypto && crypto.subtle) {
+      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+    }
+  } catch (e) { /* fall through */ }
+  // fallback (non-crypto) hash if Web Crypto is unavailable — still one-way enough for this game
+  let h = 5381; for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
+  return "f" + (h >>> 0).toString(16);
 }
 
 // password rule: 8+ chars, at least one number, letters & numbers only (no symbols)
@@ -55,26 +62,28 @@ export async function signUp(name, password) {
   const nm = (name || "").trim();
   if (!nm) return { error: "Enter a name." };
   const bad = validatePassword(password); if (bad) return { error: bad };
-  const hash = await sha256(nm.toLowerCase() + "::" + password);
   try {
-    const { data: dup } = await supabase.from("mogger_users").select("id").eq("name", nm).eq("hash", hash).limit(1);
-    if (dup && dup.length) return { error: "That name+password is taken — make a stronger password." };
-    const { data, error } = await supabase.from("mogger_users").insert({ name: nm, hash, elo: 100 }).select().single();
-    if (error) return { error: "Could not create account." };
-    return { user: { id: data.id, name: data.name, elo: data.elo } };
-  } catch (e) { return { error: "Network error — try again." }; }
+    const hash = await sha256(nm.toLowerCase() + "::" + password);
+    const dup = await supabase.from("mogger_users").select("id").eq("name", nm).eq("hash", hash).limit(1);
+    if (dup.error) return { error: dup.error.message || "Database not set up — run the SQL step." };
+    if (dup.data && dup.data.length) return { error: "That name+password is taken — make a stronger password." };
+    const ins = await supabase.from("mogger_users").insert({ name: nm, hash, elo: 100 }).select().single();
+    if (ins.error) return { error: ins.error.message || "Could not create account." };
+    return { user: { id: ins.data.id, name: ins.data.name, elo: ins.data.elo } };
+  } catch (e) { return { error: "Error: " + (e && e.message ? e.message : "try again") }; }
 }
 
 export async function logIn(name, password) {
   const nm = (name || "").trim();
   if (!nm || !password) return { error: "Enter your name and password." };
-  const hash = await sha256(nm.toLowerCase() + "::" + password);
   try {
-    const { data } = await supabase.from("mogger_users").select("*").eq("name", nm).eq("hash", hash).limit(1);
-    if (!data || !data.length) return { error: "Wrong name or password." };
-    const u = data[0];
+    const hash = await sha256(nm.toLowerCase() + "::" + password);
+    const res = await supabase.from("mogger_users").select("*").eq("name", nm).eq("hash", hash).limit(1);
+    if (res.error) return { error: res.error.message || "Database not set up — run the SQL step." };
+    if (!res.data || !res.data.length) return { error: "Wrong name or password." };
+    const u = res.data[0];
     return { user: { id: u.id, name: u.name, elo: u.elo } };
-  } catch (e) { return { error: "Network error — try again." }; }
+  } catch (e) { return { error: "Error: " + (e && e.message ? e.message : "try again") }; }
 }
 
 export async function fetchElo(id) {
