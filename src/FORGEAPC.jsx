@@ -1674,12 +1674,12 @@ export default function RigForge() {
         </div>
       )}
 
-      {!assistantOpen && (
+      {!assistantOpen && view !== "mogger" && (
         <button className="rf-fab" onClick={() => setAssistantOpen(true)}>
           <Sparkles size={18} /> Ask AI
         </button>
       )}
-      <Assistant open={assistantOpen} onClose={() => setAssistantOpen(false)} useCase={useCase} budget={budget} parts={parts} isOnline={isOnline} />
+      {view !== "mogger" && <Assistant open={assistantOpen} onClose={() => setAssistantOpen(false)} useCase={useCase} budget={budget} parts={parts} isOnline={isOnline} />}
 
       {toast && <div className="rf-toast"><Check size={15} /> {toast}</div>}
     </div>
@@ -1750,52 +1750,91 @@ function moggerAI(ucKey, budget) {
 }
 
 function MoggerPicker({ cat, current, budget, spent, onPick, onClose }) {
-  const opts = useMemo(() => moggerOptions(cat), [cat]);
+  const all = useMemo(() => moggerOptions(cat), [cat]);
+  const [q, setQ] = useState("");
+  const opts = useMemo(() => {
+    const t = q.trim().toLowerCase();
+    if (!t) return all;
+    return all.filter((o) => ((o.model || "") + " " + (o.name || "") + " " + (o.brand || "")).toLowerCase().includes(t));
+  }, [all, q]);
+  const cap = budget + 50; // hard limit: cannot go more than $50 over budget
   const Icon = CAT_META[cat].Icon;
   return (
     <div className="pm-drawer-wrap" onClick={onClose}>
       <div className="pm-drawer rf-drawer" onClick={(e) => e.stopPropagation()}>
         <div className="pm-drawer-head"><span>Choose {CAT_META[cat].label}</span><button className="pm-x" onClick={onClose}><X size={18} /></button></div>
+        <div className="pm-search"><Search size={15} /><input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder={"Search " + CAT_META[cat].label.toLowerCase() + "…"} />{q && <button className="pm-search-x" onClick={() => setQ("")}><X size={13} /></button>}</div>
         <div className="pm-opts">
           {opts.map((o) => {
             const sel = current && current.id === o.id;
-            const after = spent - (current ? current.price : 0) + o.price;
+            const wouldBe = spent - (current ? current.price : 0) + o.price;
+            const blocked = wouldBe > cap && !sel;
             return (
-              <button key={o.id} className={"pm-opt" + (sel ? " sel" : "")} onClick={() => onPick(o)}>
+              <button key={o.id} className={"pm-opt" + (sel ? " sel" : "") + (blocked ? " blocked" : "")} disabled={blocked} onClick={() => { if (!blocked) onPick(o); }}>
                 <span className="pm-opt-img">{o.img ? <img src={o.img} alt="" loading="lazy" /> : <Icon size={18} />}</span>
                 <span className="pm-opt-main"><span className="pm-opt-name">{o.model || o.name}</span><span className="pm-opt-brand">{o.brand}</span></span>
-                <span className="pm-opt-right"><span className="pm-opt-price">{o.price === 0 ? "Free" : fmt(o.price)}</span><span className={"pm-opt-bar" + (after > budget ? " over" : "")}><i style={{ width: clamp(o.perf, 4, 100) + "%" }} /></span></span>
+                <span className="pm-opt-right"><span className="pm-opt-price">{o.price === 0 ? "Free" : fmt(o.price)}</span>{blocked ? <span className="pm-opt-block">over limit</span> : <span className={"pm-opt-bar" + (wouldBe > budget ? " over" : "")}><i style={{ width: clamp(o.perf, 4, 100) + "%" }} /></span>}</span>
               </button>
             );
           })}
+          {opts.length === 0 && <div className="pm-empty">No matches</div>}
         </div>
       </div>
     </div>
   );
 }
 
-function MoggerBuild({ round, player, onDone }) {
+function MoggerBuild({ round, player, oppLabel, oppFinalScore, onDone }) {
   const [build, setBuild] = useState({});
   const [open, setOpen] = useState(null);
   const [left, setLeft] = useState(round.secs);
+  const [oppShown, setOppShown] = useState(oppFinalScore == null ? null : 0);
   const ref = useRef(build); ref.current = build;
   useEffect(() => {
     const t = setInterval(() => setLeft((l) => { if (l <= 1) { clearInterval(t); onDone(ref.current); return 0; } return l - 1; }), 1000);
     return () => clearInterval(t);
   }, []);
+  // opponent score climbs live toward its final value (AI "building", or Player 1's locked score)
+  useEffect(() => {
+    if (oppFinalScore == null) return;
+    const dur = Math.min(round.secs, 55) * 1000;
+    const t0 = Date.now();
+    const iv = setInterval(() => {
+      const f = Math.min(1, (Date.now() - t0) / dur);
+      const eased = 1 - Math.pow(1 - f, 2);
+      const jitter = f < 1 ? (Math.random() - 0.5) * 8 : 0;
+      setOppShown(Math.max(0, Math.round(oppFinalScore * eased + jitter)));
+      if (f >= 1) clearInterval(iv);
+    }, 280);
+    return () => clearInterval(iv);
+  }, []);
   const spent = CATEGORY_ORDER.reduce((s, c) => s + (build[c] ? build[c].price : 0), 0);
   const over = spent > round.budget;
+  const myScore = useMemo(() => moggerScore(build, round.useCase, round.budget).total, [build]);
+  const filled = CATEGORY_ORDER.filter((c) => build[c]).length;
   const mm = Math.floor(left / 60), ss = String(left % 60).padStart(2, "0");
   const low = left <= 15;
   const UC = USE_CASES[round.useCase];
   return (
     <div className="pm-game rf-fade">
-      <div className="pm-game-top">
-        <div className="pm-challenge"><span className="pm-uc"><UC.Icon size={18} /> {UC.label}</span><span className="pm-budget">Budget {fmt(round.budget)}</span></div>
-        <div className={"pm-timer" + (low ? " low" : "")}>{mm}:{ss}</div>
+      <div className="pm-vs">
+        <div className="pm-board you">
+          <div className="pm-board-name">{player && player.startsWith("Player") ? player : "YOU"}</div>
+          <div className="pm-board-score">{myScore}</div>
+          <div className="pm-board-sub">{filled}/{CATEGORY_ORDER.length} parts</div>
+        </div>
+        <div className="pm-vs-mid">
+          <div className="pm-vs-word">VS</div>
+          <div className={"pm-timer" + (low ? " low" : "")}>{mm}:{ss}</div>
+        </div>
+        <div className="pm-board opp">
+          <div className="pm-board-name">{oppLabel}</div>
+          <div className="pm-board-score opp">{oppShown == null ? "—" : oppShown}</div>
+          <div className="pm-board-sub">{oppShown == null ? "waiting" : "building…"}</div>
+        </div>
       </div>
-      {player && <div className="pm-turn">{player} — build your rig</div>}
-      <div className={"pm-spend" + (over ? " over" : "")}>Spent {fmt(spent)} / {fmt(round.budget)}{over && <b> · OVER BUDGET (penalized)</b>}</div>
+      <div className="pm-challenge-row"><span className="pm-uc"><UC.Icon size={16} /> {UC.label}</span><span className="pm-budget">Budget {fmt(round.budget)}</span></div>
+      <div className={"pm-spend" + (over ? " over" : "")}>Spent {fmt(spent)} / {fmt(round.budget)}{over && <b> · OVER BUDGET (penalized)</b>} · hard cap {fmt(round.budget + 50)}</div>
       <div className="pm-slots">
         {CATEGORY_ORDER.map((c) => { const Icon = CAT_META[c].Icon; return (
           <button key={c} className={"pm-slot" + (build[c] ? " filled" : "")} onClick={() => setOpen(c)}>
@@ -1919,8 +1958,8 @@ function MoggerGame({ onExit }) {
   const [round, setRound] = useState(null);
   const [you, setYou] = useState(null);
   const [opp, setOpp] = useState(null);
-  const start = (r) => { setRound(r); setScreen("intro"); };
-  const finishP1 = (b) => { setYou(b); if (mode === "ai") { setOpp(moggerAI(round.useCase, round.budget)); setScreen("result"); } else setScreen("handoff"); };
+  const start = (r) => { setRound(r); if (mode === "ai") setOpp(moggerAI(r.useCase, r.budget)); setScreen("intro"); };
+  const finishP1 = (b) => { setYou(b); if (mode === "ai") setScreen("result"); else setScreen("handoff"); };
   const finishP2 = (b) => { setOpp(b); setScreen("result"); };
   const again = () => { setYou(null); setOpp(null); setScreen("lobby"); };
   const menu = () => { setYou(null); setOpp(null); setRound(null); setScreen("menu"); };
@@ -1941,10 +1980,10 @@ function MoggerGame({ onExit }) {
       {screen === "online" && <div className="pm-card rf-fade"><h2 className="pm-h2">🌐 Online Multiplayer</h2><p className="pm-p">Playing friends over the internet needs a small realtime server to sync the lobby, the countdown, and each build — that cannot run on a static host alone. The whole game is built and ready; wiring it to a free realtime backend is the next step. For now, <b>Pass &amp; Play</b> lets you battle a friend on one device.</p><button className="rf-btn" onClick={menu}><ChevronLeft size={16} /> Back to menu</button></div>}
       {screen === "lobby" && <MoggerLobby mode={mode} onStart={start} onBack={menu} />}
       {screen === "intro" && round && <MoggerIntro round={round} player={mode === "local" ? "Player 1" : null} onGo={() => setScreen("p1")} />}
-      {screen === "p1" && round && <MoggerBuild round={round} player={mode === "local" ? "Player 1" : null} onDone={finishP1} />}
+      {screen === "p1" && round && <MoggerBuild round={round} player={mode === "local" ? "Player 1" : "You"} oppLabel={mode === "ai" ? "AI Opponent" : "Player 2"} oppFinalScore={mode === "ai" && opp ? moggerScore(opp, round.useCase, round.budget).total : null} onDone={finishP1} />}
       {screen === "handoff" && <div className="pm-card pm-center rf-fade"><h2 className="pm-h2"><Repeat2 size={20} /> Pass the device</h2><p className="pm-p">Player 1 is locked in. Hand the device to <b>Player 2</b> — same challenge, same clock. No peeking.</p><button className="rf-btn" onClick={() => setScreen("intro2")}>I am Player 2 — start <ChevronRight size={16} /></button></div>}
       {screen === "intro2" && round && <MoggerIntro round={round} player="Player 2" onGo={() => setScreen("p2")} />}
-      {screen === "p2" && round && <MoggerBuild round={round} player="Player 2" onDone={finishP2} />}
+      {screen === "p2" && round && <MoggerBuild round={round} player="Player 2" oppLabel="Player 1" oppFinalScore={you ? moggerScore(you, round.useCase, round.budget).total : null} onDone={finishP2} />}
       {screen === "result" && round && you && opp && <MoggerResult round={round} you={you} opp={opp} oppName={mode === "ai" ? "AI Opponent" : "Player 2"} onAgain={again} onMenu={menu} />}
     </div>
   );
@@ -3356,6 +3395,48 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .pm-chip.on{background:rgba(25,232,219,0.14);border-color:var(--c-accent);color:var(--c-accent);}
 .pm-range{width:100%;accent-color:var(--c-accent);}
 .pm-game-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.pm-vs{display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch;gap:10px;margin-bottom:16px;}
+.pm-board{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:16px 12px;border-radius:16px;background:var(--c-panel);border:1px solid var(--c-border);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);box-shadow:inset 0 1px 0 rgba(255,255,255,0.08);}
+.pm-board.you{border-color:rgba(25,232,219,0.35);}
+.pm-board.opp{border-color:rgba(124,92,255,0.35);}
+.pm-board-name{font-family:'Chakra Petch';font-weight:600;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;}
+.pm-board.you .pm-board-name{color:var(--c-accent);}
+.pm-board.opp .pm-board-name{color:var(--c-accent2);}
+.pm-board-score{font-family:'JetBrains Mono';font-weight:700;font-size:40px;line-height:1;color:var(--c-accent);}
+.pm-board-score.opp{color:var(--c-accent2);}
+.pm-board-sub{font-family:'JetBrains Mono';font-size:11px;color:var(--c-muted);}
+.pm-vs-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;}
+.pm-vs-word{font-family:'Chakra Petch';font-weight:700;font-size:20px;color:var(--c-text);opacity:.5;}
+.pm-challenge-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.pm-search{display:flex;align-items:center;gap:8px;padding:9px 12px;margin-bottom:14px;border-bottom:1px solid var(--c-border);color:var(--c-muted);}
+.pm-search input{flex:1;background:transparent;border:none;outline:none;color:var(--c-text);font-family:'Sora',sans-serif;font-size:14px;}
+.pm-search-x{background:none;border:none;color:var(--c-muted);cursor:pointer;display:flex;}
+.pm-opt.blocked{opacity:.4;cursor:not-allowed;filter:grayscale(.6);}
+.pm-opt-block{display:block;font-family:'JetBrains Mono';font-size:10px;color:var(--c-bad);letter-spacing:.5px;}
+.pm-empty{text-align:center;color:var(--c-muted);padding:30px 0;font-size:14px;}
+@media(max-width:560px){
+  .pm-slots{grid-template-columns:1fr;}
+  .pm-scorecols{grid-template-columns:1fr;}
+  .pm-verdict-title{font-size:30px;}
+  .rf-mogger-cta{margin-left:0;margin-top:10px;}
+  .pm-mtitle{font-size:32px;}
+  .pm-intro-uc{font-size:28px;}
+  .pm-intro-count{font-size:56px;}
+  .pm-vs{gap:6px;}
+  .pm-board{padding:12px 8px;}
+  .pm-board-score{font-size:30px;}
+  .pm-board-name{font-size:11px;letter-spacing:1px;}
+  .pm-vs-word{font-size:16px;}
+  .pm-timer{font-size:26px;}
+  .pm-card{padding:20px;}
+  .pm-uc{font-size:16px;}
+  .pm-drawer{width:100%;}
+}
+@media(max-width:380px){
+  .pm-board-name{font-size:10px;letter-spacing:.5px;}
+  .pm-board-score{font-size:26px;}
+  .pm-spend{font-size:12px;}
+}
 .pm-challenge{display:flex;flex-direction:column;gap:3px;}
 .pm-uc{font-family:'Chakra Petch';font-weight:600;font-size:19px;display:flex;align-items:center;gap:8px;}
 .pm-budget{color:var(--c-muted);font-size:13px;font-family:'JetBrains Mono';}
