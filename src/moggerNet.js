@@ -107,6 +107,20 @@ export async function leaderboard(limit = 100) {
   catch (e) { return []; }
 }
 
+// ---- admin ----
+export async function allUsers() {
+  try { const { data, error } = await supabase.from("mogger_users").select("id,name,elo").order("elo", { ascending: false }); if (error) return { error: error.message }; return { rows: data || [] }; }
+  catch (e) { return { error: "Could not load accounts." }; }
+}
+export async function deleteUser(id) {
+  try {
+    await supabase.from("mogger_builds").delete().eq("user_id", id); // clean up their saved builds too
+    const { error } = await supabase.from("mogger_users").delete().eq("id", id);
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+  } catch (e) { return { ok: false, error: "Delete failed." }; }
+}
+
 // ---- account-stored builds (table: mogger_builds) ----
 export async function listBuilds(userId) {
   try { const { data } = await supabase.from("mogger_builds").select("*").eq("user_id", userId); return (data || []).map((r) => ({ ...(r.data || {}), _cloud: true })); }
