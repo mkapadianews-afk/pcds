@@ -2553,7 +2553,7 @@ function MoggerAuth({ onClose, onAuth }) {
     setBusy(false);
   };
   return (
-    <div className="pm-drawer-wrap" onClick={onClose}>
+    <div className="pm-modal-wrap" onClick={onClose}>
       <div className="pm-card pm-auth" onClick={(e) => e.stopPropagation()}>
         <div className="pm-auth-tabs"><button className={tab === "login" ? "on" : ""} onClick={() => { setTab("login"); setErr(""); }}>Log in</button><button className={tab === "signup" ? "on" : ""} onClick={() => { setTab("signup"); setErr(""); }}>Sign up</button></div>
         <input className="pm-namein" value={name} maxLength={14} onChange={(e) => setName(e.target.value)} placeholder="Name" />
@@ -4105,6 +4105,8 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .pm-acct-btn{background:rgba(255,255,255,0.05);border:1px solid var(--c-border);color:var(--c-muted);border-radius:999px;padding:5px 12px;font-size:12px;cursor:pointer;}
 .pm-acct-btn:hover{color:var(--c-accent);border-color:var(--c-accent);}
 .pm-auth{max-width:380px;}
+.pm-modal-wrap{position:fixed;inset:0;z-index:130;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;padding:16px;}
+.pm-modal-wrap .pm-auth{margin:0;width:100%;}
 .pm-auth-tabs{display:flex;gap:8px;margin-bottom:16px;}
 .pm-auth-tabs button{flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid var(--c-border);color:var(--c-muted);font-family:'Chakra Petch';font-weight:600;cursor:pointer;}
 .pm-auth-tabs button.on{background:rgba(25,232,219,0.12);border-color:var(--c-accent);color:var(--c-accent);}
