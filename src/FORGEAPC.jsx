@@ -1894,13 +1894,32 @@ function MoggerLobby({ mode, onStart, onBack }) {
   );
 }
 
+function MoggerIntro({ round, player, onGo }) {
+  const [n, setN] = useState(3);
+  const UC = USE_CASES[round.useCase];
+  useEffect(() => {
+    if (n <= 0) { const t = setTimeout(onGo, 650); return () => clearTimeout(t); }
+    const t = setTimeout(() => setN(n - 1), 850);
+    return () => clearTimeout(t);
+  }, [n]);
+  return (
+    <div className="pm-intro">
+      {player && <div className="pm-intro-player">{player}</div>}
+      <div className="pm-intro-label">YOUR CHALLENGE</div>
+      <div className="pm-intro-uc" key={"uc"}><UC.Icon size={36} /> {UC.label}</div>
+      <div className="pm-intro-budget">{fmt(round.budget)} budget</div>
+      <div className="pm-intro-count" key={n}>{n > 0 ? n : "BUILD!"}</div>
+    </div>
+  );
+}
+
 function MoggerGame({ onExit }) {
   const [screen, setScreen] = useState("menu");
   const [mode, setMode] = useState("ai");
   const [round, setRound] = useState(null);
   const [you, setYou] = useState(null);
   const [opp, setOpp] = useState(null);
-  const start = (r) => { setRound(r); setScreen("p1"); };
+  const start = (r) => { setRound(r); setScreen("intro"); };
   const finishP1 = (b) => { setYou(b); if (mode === "ai") { setOpp(moggerAI(round.useCase, round.budget)); setScreen("result"); } else setScreen("handoff"); };
   const finishP2 = (b) => { setOpp(b); setScreen("result"); };
   const again = () => { setYou(null); setOpp(null); setScreen("lobby"); };
@@ -1921,8 +1940,10 @@ function MoggerGame({ onExit }) {
       )}
       {screen === "online" && <div className="pm-card rf-fade"><h2 className="pm-h2">🌐 Online Multiplayer</h2><p className="pm-p">Playing friends over the internet needs a small realtime server to sync the lobby, the countdown, and each build — that cannot run on a static host alone. The whole game is built and ready; wiring it to a free realtime backend is the next step. For now, <b>Pass &amp; Play</b> lets you battle a friend on one device.</p><button className="rf-btn" onClick={menu}><ChevronLeft size={16} /> Back to menu</button></div>}
       {screen === "lobby" && <MoggerLobby mode={mode} onStart={start} onBack={menu} />}
+      {screen === "intro" && round && <MoggerIntro round={round} player={mode === "local" ? "Player 1" : null} onGo={() => setScreen("p1")} />}
       {screen === "p1" && round && <MoggerBuild round={round} player={mode === "local" ? "Player 1" : null} onDone={finishP1} />}
-      {screen === "handoff" && <div className="pm-card pm-center rf-fade"><h2 className="pm-h2"><Repeat2 size={20} /> Pass the device</h2><p className="pm-p">Player 1 is locked in. Hand the device to <b>Player 2</b> — same challenge, same clock. No peeking.</p><button className="rf-btn" onClick={() => setScreen("p2")}>I am Player 2 — start <ChevronRight size={16} /></button></div>}
+      {screen === "handoff" && <div className="pm-card pm-center rf-fade"><h2 className="pm-h2"><Repeat2 size={20} /> Pass the device</h2><p className="pm-p">Player 1 is locked in. Hand the device to <b>Player 2</b> — same challenge, same clock. No peeking.</p><button className="rf-btn" onClick={() => setScreen("intro2")}>I am Player 2 — start <ChevronRight size={16} /></button></div>}
+      {screen === "intro2" && round && <MoggerIntro round={round} player="Player 2" onGo={() => setScreen("p2")} />}
       {screen === "p2" && round && <MoggerBuild round={round} player="Player 2" onDone={finishP2} />}
       {screen === "result" && round && you && opp && <MoggerResult round={round} you={you} opp={opp} oppName={mode === "ai" ? "AI Opponent" : "Player 2"} onAgain={again} onMenu={menu} />}
     </div>
@@ -3401,6 +3422,15 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .pm-blur{filter:blur(11px);pointer-events:none;user-select:none;opacity:.6;transition:filter .5s ease,opacity .5s ease;}
 .pm-reveal-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;}
 .pm-reveal-text{font-family:'Chakra Petch';font-size:16px;color:var(--c-text);margin:0;}
+.pm-intro{min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;}
+.pm-intro-player{font-family:'Chakra Petch';font-weight:600;font-size:18px;color:var(--c-accent2);margin-bottom:6px;}
+.pm-intro-label{font-family:'JetBrains Mono';font-size:12px;letter-spacing:4px;color:var(--c-muted);}
+.pm-intro-uc{font-family:'Chakra Petch';font-weight:700;font-size:38px;display:flex;align-items:center;gap:14px;color:var(--c-text);animation:pmPop .5s var(--ease) both;}
+.pm-intro-uc svg{color:var(--c-accent);}
+.pm-intro-budget{font-family:'JetBrains Mono';font-size:20px;color:var(--c-accent);margin-bottom:18px;animation:pmPop .5s .1s var(--ease) both;}
+.pm-intro-count{font-family:'Chakra Petch';font-weight:700;font-size:72px;color:var(--c-accent);text-shadow:0 0 30px rgba(25,232,219,0.5);animation:pmCount .85s ease both;}
+@keyframes pmPop{from{opacity:0;transform:translateY(10px) scale(.96);}to{opacity:1;transform:none;}}
+@keyframes pmCount{0%{opacity:0;transform:scale(1.6);}30%{opacity:1;transform:scale(1);}100%{opacity:.5;transform:scale(.9);}}
 @media(max-width:560px){.pm-slots{grid-template-columns:1fr;}.pm-scorecols{grid-template-columns:1fr;}.pm-verdict-title{font-size:30px;}.rf-mogger-cta{margin-left:0;margin-top:10px;}}
 `}</style>
   );
