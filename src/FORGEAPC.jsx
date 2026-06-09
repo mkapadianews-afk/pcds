@@ -1841,8 +1841,11 @@ function MoggerBuild({ round, player, oppLabel, oppBuild, oppLocked, oppIsAI, on
     const t = setInterval(() => setLeft((l) => { if (l <= 1) { clearInterval(t); onDone(ref.current); return 0; } return l - 1; }), 1000);
     return () => clearInterval(t);
   }, []);
+  const hasOpp = oppIsAI || !!oppBuild;
+  const mkDecoy = () => { const d = {}; for (const c of CATEGORY_ORDER) { const o = moggerOptions(c); d[c] = o[Math.floor(Math.random() * o.length)]; } return d; };
+  const [decoy, setDecoy] = useState(mkDecoy);
   // AI opponent: score fluctuates upward (chunky +50-120, occasional -50-120), then locks in.
-  // Even if its true final is low/0, show a believable climbing number, then snap to real at lock.
+  // Each score tick swaps exactly ONE part in its (blurred) build — not all at once.
   useEffect(() => {
     if (oppFinal == null || oppLocked) return;
     const lockAt = round.secs * (0.55 + Math.random() * 0.3); // seconds elapsed when AI locks
@@ -1850,6 +1853,7 @@ function MoggerBuild({ round, player, oppLabel, oppBuild, oppLocked, oppIsAI, on
     const t0 = Date.now();
     let cur = 0;
     let iv;
+    const swapOne = () => setDecoy((prev) => { const c = CATEGORY_ORDER[Math.floor(Math.random() * CATEGORY_ORDER.length)]; const o = moggerOptions(c); return { ...prev, [c]: o[Math.floor(Math.random() * o.length)] }; });
     const step = () => {
       const elapsed = (Date.now() - t0) / 1000;
       if (elapsed >= lockAt) { setOppShown(oppFinal); setOppDone(true); return; }
@@ -1860,6 +1864,7 @@ function MoggerBuild({ round, player, oppLabel, oppBuild, oppLocked, oppIsAI, on
       else d = (50 + Math.random() * 70);
       cur = Math.max(0, Math.min(ceiling, cur + d));
       setOppShown(Math.round(cur));
+      swapOne(); // one part changes, in sync with the score
       iv = setTimeout(step, 1700 + Math.random() * 1100);
     };
     iv = setTimeout(step, 900);
@@ -1868,14 +1873,6 @@ function MoggerBuild({ round, player, oppLabel, oppBuild, oppLocked, oppIsAI, on
   const spent = CATEGORY_ORDER.reduce((s, c) => s + (build[c] ? build[c].price : 0), 0);
   const over = spent > round.budget;
   const filled = CATEGORY_ORDER.filter((c) => build[c]).length;
-  const hasOpp = oppIsAI || !!oppBuild;
-  const mkDecoy = () => { const d = {}; for (const c of CATEGORY_ORDER) { const o = moggerOptions(c); d[c] = o[Math.floor(Math.random() * o.length)]; } return d; };
-  const [decoy, setDecoy] = useState(mkDecoy);
-  useEffect(() => {
-    if (!hasOpp || oppLocked) return; // locked opponent isn't "building" — no flicker
-    const iv = setInterval(() => setDecoy(mkDecoy()), 1400); // AI's shown parts keep changing while it "builds"
-    return () => clearInterval(iv);
-  }, []);
   const mm = Math.floor(left / 60), ss = String(left % 60).padStart(2, "0");
   const low = left <= 15;
   const UC = USE_CASES[round.useCase];
