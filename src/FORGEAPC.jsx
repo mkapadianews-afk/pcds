@@ -1745,8 +1745,13 @@ function moggerScore(build, ucKey, budget) {
   return { total: Math.round(raw * 1000), perf: Math.round(perf), value: Math.round(value * 100), compat: 100, completeness: 100, spend: total, over: total > budget, overBy: Math.max(0, total - budget), issues: [] };
 }
 
-// tier: "elite" (best valid in-budget build) | "normal" (decent valid build) | "fail" (weak, sometimes incompatible)
-function moggerAI(ucKey, budget, tier) {
+// elo-driven AI. Higher elo => stronger, more consistent builds.
+//  - mistake chance curve: ~13% at low elo -> ~0.05% at 3000 (a mistake = a weaker but still COMPATIBLE pick)
+//  - only the lowest levels (elo < 400) can build something incompatible, at 5%
+function moggerAI(ucKey, budget, elo) {
+  elo = (typeof elo === "number" && isFinite(elo)) ? clamp(elo, 0, 3000) : 600;
+  const pMistake = Math.max(0.0005, 0.13 * Math.pow(1 - elo / 3000, 2));
+  const pIncompat = elo < 400 ? 0.05 : 0;
   const W = USE_CASES[ucKey].alloc;
   const build = {};
   const order = [...CATEGORY_ORDER].sort((a, b) => (W[b] || 0) - (W[a] || 0));
@@ -1760,29 +1765,22 @@ function moggerAI(ucKey, budget, tier) {
   };
   const spent = () => CATEGORY_ORDER.reduce((s, c) => s + (build[c] ? build[c].price : 0), 0);
 
-  if (tier === "fail") {
-    let rem = budget;
-    const mismatch = Math.random() < 0.35;
-    for (const c of order) {
-      const opts = moggerOptions(c);
-      const weak = [...opts].sort((a, b) => a.perf - b.perf);
-      let pick;
-      if (mismatch) pick = weak[0];
-      else pick = weak.find((o) => o.price <= rem && ok(c, o)) || weak.find((o) => ok(c, o)) || weak[0];
-      build[c] = pick; rem -= pick.price;
-    }
+  // lowest-level fumble: deliberately incompatible build (scores 0)
+  if (Math.random() < pIncompat) {
+    for (const c of order) { const opts = [...moggerOptions(c)].sort((a, b) => a.price - b.price); build[c] = opts[0]; }
+    if (build.cpu) { const wrong = moggerOptions("mobo").find((m) => m.socket !== build.cpu.socket); if (wrong) build.mobo = wrong; }
     return build;
   }
 
-  // 1) Valid, complete, cheap base — guarantees an in-budget starting point.
+  // 1) Valid, complete, cheap base.
   for (const c of order) { const opts = [...moggerOptions(c)].sort((a, b) => a.price - b.price); build[c] = opts.find((o) => ok(c, o)) || opts[0]; }
 
-  const elite = tier === "elite";
-  const cap = elite ? budget * 0.94 : budget * (0.8 + Math.random() * 0.1); // leave headroom for an adequate PSU/cooler
+  // 2) Quality scales with elo: weak players aim lower, strong players use the full budget optimally.
+  const cap = budget * (elo >= 2800 ? 0.94 : clamp(0.5 + (elo / 3000) * 0.5, 0.5, 0.94));
   const cheapestMobo = (sock) => moggerOptions("mobo").filter((m) => m.socket === sock).sort((a, b) => a.price - b.price)[0];
   const cheapestCooler = (cpu) => moggerOptions("cooler").filter((cl) => (!cl.sockets || cl.sockets.includes(cpu.socket)) && (!cl.tdpRating || cl.tdpRating >= cpu.tdp)).sort((a, b) => a.price - b.price)[0];
 
-  // 2) Greedy upgrade pass: repeatedly take the best weighted perf-per-extra-dollar upgrade that still fits.
+  // 3) Greedy upgrade pass: best weighted perf-per-extra-dollar upgrade that still fits.
   let guard = 0, improved = true;
   while (improved && guard++ < 500) {
     improved = false;
@@ -1797,7 +1795,6 @@ function moggerAI(ucKey, budget, tier) {
         if (!best || gain > best.gain) best = { kind: "one", c, part: o, gain };
       }
     }
-    // platform swap: a stronger CPU on another socket, plus its cheapest compatible mobo + cooler
     if (build.cpu) {
       for (const cpu of moggerOptions("cpu")) {
         if (cpu.perf <= build.cpu.perf) continue;
@@ -1814,7 +1811,7 @@ function moggerAI(ucKey, budget, tier) {
     if (best) { improved = true; if (best.kind === "one") build[best.c] = best.part; else { build.cpu = best.cpu; build.mobo = best.mobo; build.cooler = best.cooler; } }
   }
 
-  // 3) Ensure cooler/PSU are adequate (cheapest that works), then trim back under budget if needed.
+  // 4) Ensure cooler/PSU adequate, then trim under budget.
   const fixValid = () => {
     if (build.cpu) { const cl = cheapestCooler(build.cpu); if (cl && (!build.cooler || (build.cooler.tdpRating && build.cooler.tdpRating < build.cpu.tdp) || (build.cooler.sockets && !build.cooler.sockets.includes(build.cpu.socket)))) build.cooler = cl; }
     const d = mEstDraw(build); const psu = moggerOptions("psu").filter((p) => p.watt && p.watt >= d * 1.18).sort((a, b) => a.price - b.price)[0];
@@ -1836,13 +1833,27 @@ function moggerAI(ucKey, budget, tier) {
     build[bestSwap.c] = bestSwap.part;
   }
 
-  // normal: nudge one part down for a touch of imperfection (kept valid + in budget)
-  if (!elite && Math.random() < 0.6) {
-    const c = order[Math.floor(Math.random() * Math.min(3, order.length))];
-    const cheaper = moggerOptions(c).filter((o) => ok(c, o) && build[c] && o.perf < build[c].perf).sort((a, b) => b.perf - a.perf)[0];
-    if (cheaper) build[c] = cheaper;
+  // 5) Mistake (compatible downgrade only — never makes it incompatible).
+  if (Math.random() < pMistake) {
+    const n = 1 + (Math.random() < 0.4 ? 1 : 0);
+    for (let i = 0; i < n; i++) {
+      const c = order[Math.floor(Math.random() * order.length)];
+      const cur = build[c];
+      const cheaper = moggerOptions(c).filter((o) => ok(c, o) && cur && o.perf < cur.perf).sort((a, b) => b.perf - a.perf)[0];
+      if (cheaper) build[c] = cheaper;
+    }
   }
   return build;
+}
+// Player rank name from elo.
+function moggerRank(elo) {
+  const e = typeof elo === "number" && isFinite(elo) ? elo : 0;
+  if (e >= 2500) return { name: "God Tier", cls: "god", icon: "👑", color: "#ffc24b" };
+  if (e >= 1500) return { name: "Elite Tier", cls: "elite", icon: "💎", color: "#7c5cff" };
+  if (e >= 1300) return { name: "Slightly High Tier", cls: "shigh", icon: "🔷", color: "#5ec8ff" };
+  if (e >= 950) return { name: "High Tier", cls: "high", icon: "⚡", color: "#19e8db" };
+  if (e >= 650) return { name: "Mid Tier", cls: "mid", icon: "🔧", color: "#46e0a0" };
+  return { name: "Low Tier", cls: "low", icon: "🔩", color: "#8aa0b4" };
 }
 function moggerRollTier() { const r = Math.random(); return r < 0.62 ? "elite" : r < 0.93 ? "normal" : "fail"; }
 // AI difficulty by elo: higher elo -> stronger, more consistent builds.
@@ -1937,7 +1948,7 @@ function MoggerBuild({ round, player, oppLabel, oppBuild, oppLocked, oppIsAI, li
   useEffect(() => {
     if (oppFinal == null || oppLocked) return;
     const lockAt = round.secs * (0.55 + Math.random() * 0.3); // seconds elapsed when AI locks
-    const ceiling = Math.max(oppFinal, 600 + Math.random() * 250); // decoy climbs toward a plausible number
+    const ceiling = Math.max(0, oppFinal); // climb toward the AI's real score (0 if its build is incompatible)
     const t0 = Date.now();
     let cur = 0;
     let iv;
@@ -2016,12 +2027,13 @@ function MoggerBuild({ round, player, oppLabel, oppBuild, oppLocked, oppIsAI, li
   );
 }
 
-function MoggerScoreCol({ title, build, s, win, shown }) {
+function MoggerScoreCol({ title, build, s, win, shown, rank }) {
   const big = shown == null ? s.total : shown;
   return (
     <div className={"pm-scorecol" + (win ? " win" : "")}>
       <div className="pm-scorecol-head"><span className="pm-scorecol-title">{title}</span>{win && <span className="pm-crown">WINNER</span>}</div>
-      <div className="pm-bigscore">{big}<small>/1000</small></div>
+      {rank && <div className={"pm-rank pm-rank-" + rank.cls + " pm-rank-col"}>{rank.icon} {rank.name}</div>}
+      <div className="pm-bigscore" style={rank ? { color: rank.color } : undefined}>{big}<small>/1000</small></div>
       <div className="pm-metrics"><span>Performance <b>{s.perf}</b></span><span>Value <b>{s.value}</b></span><span>Compatibility <b>{s.compat}</b></span><span>Spent <b className={s.over ? "pm-red" : ""}>{fmt(s.spend)}</b></span></div>
       {s.issues.length > 0 && <div className="pm-issues">{s.issues.map((i, n) => <span key={n}><AlertTriangle size={11} /> {i}</span>)}</div>}
       <div className="pm-buildlist">{CATEGORY_ORDER.map((c) => <span key={c}><i>{CAT_META[c].label}</i>{build[c] ? (build[c].model || build[c].name) : "—"}</span>)}</div>
@@ -2029,9 +2041,11 @@ function MoggerScoreCol({ title, build, s, win, shown }) {
   );
 }
 
-function MoggerResult({ round, you, opp, oppName, oppElo, eloMsg, onAgain, onMenu }) {
+function MoggerResult({ round, you, opp, oppName, oppElo, myElo, eloMsg, onAgain, onMenu }) {
   const sy = useMemo(() => moggerScore(you, round.useCase, round.budget), []);
   const so = useMemo(() => moggerScore(opp, round.useCase, round.budget), []);
+  const myRank = myElo != null ? moggerRank(myElo) : null;
+  const oppRank = oppElo != null ? moggerRank(oppElo) : null;
   const youWin = sy.total >= so.total;
   const [phase, setPhase] = useState("loading"); // loading -> reveal
   const [ay, setAy] = useState(0);
@@ -2083,8 +2097,8 @@ function MoggerResult({ round, you, opp, oppName, oppElo, eloMsg, onAgain, onMen
       <div className="pm-verdict-box"><span className="pm-verdict-tag"><Sparkles size={12} /> AI JUDGE</span>{busy && !verdict ? <p className="pm-dim">Writing the verdict…</p> : <p>{verdict}</p>}</div>
       {eloMsg && <div className={"pm-elo-result " + (eloMsg.delta > 0 ? "up" : eloMsg.delta < 0 ? "down" : "")}>{eloMsg.delta > 0 ? "+" : ""}{eloMsg.delta} elo · now {eloMsg.newElo}</div>}
       <div className="pm-scorecols">
-        <MoggerScoreCol title="You" build={you} s={sy} win={youWin} shown={ay} />
-        <MoggerScoreCol title={oppName} build={opp} s={so} win={!youWin} shown={ao} />
+        <MoggerScoreCol title="You" build={you} s={sy} win={youWin} shown={ay} rank={myRank} />
+        <MoggerScoreCol title={oppName} build={opp} s={so} win={!youWin} shown={ao} rank={oppRank} />
       </div>
       <div className="pm-row pm-center-row"><button className="rf-btn rf-ghost-btn" onClick={onMenu}>Menu</button><button className="rf-btn" onClick={onAgain}><Repeat2 size={16} /> Play again</button></div>
     </div>
@@ -2175,7 +2189,7 @@ function MoggerTournament({ onExit }) {
     if (m) {
       const opp = m.a === netId ? m.b : m.a;
       setMyOpp(opp);
-      cosmeticRef.current = moggerAI(ch.useCase, ch.budget, moggerRollTier());
+      cosmeticRef.current = moggerAI(ch.useCase, ch.budget, 400 + Math.random() * 1100);
       myBuildRef.current = null;
       setPhase("intro");
     } else { setMyOpp(null); setPhase("eliminated"); }
@@ -2222,7 +2236,7 @@ function MoggerTournament({ onExit }) {
     if (resolveTimer.current) { clearTimeout(resolveTimer.current); resolveTimer.current = null; }
     aiTimersRef.current.forEach(clearTimeout); aiTimersRef.current = [];
     const ch = challengeRef.current || {};
-    const scoreOf = (id) => { if (tourIsAI(id)) { const b = moggerAI(ch.useCase, ch.budget, moggerRollTier()); return moggerScore(b, ch.useCase, ch.budget).total; } const r = reportsRef.current[id]; return r ? r.score : 0; };
+    const scoreOf = (id) => { if (tourIsAI(id)) { const b = moggerAI(ch.useCase, ch.budget, 400 + Math.random() * 1100); return moggerScore(b, ch.useCase, ch.budget).total; } const r = reportsRef.current[id]; return r ? r.score : 0; };
     const res = matchesRef.current.map((m) => { const a = scoreOf(m.a), b = scoreOf(m.b); return { a: m.a, b: m.b, aScore: a, bScore: b, winner: a >= b ? m.a : m.b }; });
     const winners = res.map((r) => r.winner);
     chRef.current.send({ type: "broadcast", event: "tour_results", payload: { round: roundNumRef.current, results: res, winners } });
@@ -2444,9 +2458,9 @@ function MoggerOnline({ onExit, user, setUser, onNeedAuth }) {
   };
   const startAIFallback = () => {
     const useCase = mRand(MOGGER_UCS), bud = mRand(MOGGER_BUDGETS), secs = 50 + Math.floor(Math.random() * 370);
-    const aiElo = 200 + Math.floor(Math.random() * 800);
+    const aiElo = 400 + Math.random() * 1100;
     setAiOppElo(aiElo);
-    setAiOpp(moggerAI(useCase, bud, moggerTierFromElo(aiElo)));
+    setAiOpp(moggerAI(useCase, bud, aiElo));
     roundRef.current = { useCase, budget: bud, secs };
     setRound({ useCase, budget: bud, secs }); startedRef.current = true; setPhase("intro");
   };
@@ -2492,7 +2506,7 @@ function MoggerOnline({ onExit, user, setUser, onNeedAuth }) {
   if (phase === "tournament") return <MoggerTournament onExit={() => setPhase("menu")} />;
   if (phase === "intro" && round) return <MoggerIntro round={round} player={null} onGo={() => setPhase("build")} />;
   if (phase === "build" && round) return <MoggerBuild round={round} player="You" oppLabel={oppName} oppBuild={aiOpp || null} oppIsAI={!!aiOpp} oppLocked={false} liveOpp={!aiOpp} oppLiveScore={oppLiveScore} oppLiveDone={!!oppBuild} onMyScore={aiOpp ? undefined : broadcastScore} myElo={myElo} oppElo={aiOpp ? aiOppElo : oppElo} onDone={onBuildDone} />;
-  if (phase === "result" && round && myBuildRef.current && (aiOpp || oppBuild)) return <MoggerResult round={round} you={myBuildRef.current} opp={aiOpp || oppBuild} oppName={oppName} eloMsg={eloMsg} onAgain={reset} onMenu={() => { cleanup(); onExit(); }} />;
+  if (phase === "result" && round && myBuildRef.current && (aiOpp || oppBuild)) return <MoggerResult round={round} you={myBuildRef.current} opp={aiOpp || oppBuild} oppName={oppName} oppElo={aiOpp ? aiOppElo : oppElo} myElo={myElo} eloMsg={eloMsg} onAgain={reset} onMenu={() => { cleanup(); onExit(); }} />;
 
   return (
     <div className="pm-card pm-center rf-fade">
@@ -2580,7 +2594,7 @@ function MoggerLeaderboard({ onBack, meName }) {
           {rows.map((r, i) => (
             <div key={i} className={"pm-lb-row" + (r.name === meName ? " me" : "")}>
               <span className="pm-lb-rank">{i + 1}</span>
-              <span className="pm-lb-name">{r.name}</span>
+              <span className="pm-lb-name">{r.name}<span className={"pm-rank pm-rank-" + moggerRank(r.elo).cls}>{moggerRank(r.elo).icon} {moggerRank(r.elo).name}</span></span>
               <span className="pm-lb-elo">{r.elo}</span>
             </div>
           ))}
@@ -2601,6 +2615,7 @@ function MoggerGame({ onExit }) {
   const [showAuth, setShowAuth] = useState(false);
   const [aiElo, setAiElo] = useState(550);
   const [aiHidden, setAiHidden] = useState(false);
+  const [practice, setPractice] = useState(false);
   const [custom, setCustom] = useState(1500);
   const [eloMsg, setEloMsg] = useState(null);
   const eloAppliedRef = useRef(false);
@@ -2614,7 +2629,7 @@ function MoggerGame({ onExit }) {
     else { setAiElo(d.elo); setAiHidden(false); }
     setScreen("lobby");
   };
-  const start = (r) => { setRound(r); eloAppliedRef.current = false; setEloMsg(null); if (mode === "ai") setOpp(moggerAI(r.useCase, r.budget, moggerTierFromElo(aiElo))); setScreen("intro"); };
+  const start = (r) => { setRound(r); eloAppliedRef.current = false; setEloMsg(null); if (mode === "ai") setOpp(moggerAI(r.useCase, r.budget, aiElo)); setScreen("intro"); };
   const finishP1 = (b) => { setYou(b); if (mode === "ai") setScreen("result"); else setScreen("handoff"); };
   const finishP2 = (b) => { setOpp(b); setScreen("result"); };
   const again = () => { setYou(null); setOpp(null); setEloMsg(null); eloAppliedRef.current = false; setScreen(mode === "ai" ? "diff" : "lobby"); };
@@ -2622,7 +2637,7 @@ function MoggerGame({ onExit }) {
 
   // apply elo after a vs-AI result
   useEffect(() => {
-    if (screen !== "result" || mode !== "ai" || !user || !you || !opp || eloAppliedRef.current) return;
+    if (screen !== "result" || mode !== "ai" || practice || !user || !you || !opp || eloAppliedRef.current) return;
     eloAppliedRef.current = true;
     const sy = moggerScore(you, round.useCase, round.budget).total;
     const so = moggerScore(opp, round.useCase, round.budget).total;
@@ -2639,11 +2654,11 @@ function MoggerGame({ onExit }) {
     <div className="pm-mogger rf-fade">
       {screen === "menu" && (
         <div className="pm-menu">
-          <div className="pm-account">{user ? <><span className="pm-acct-name">{user.name}</span><span className="pm-acct-elo">{user.elo} elo</span><button className="pm-acct-btn" onClick={() => persist(null)}>Log out</button></> : <button className="pm-acct-btn" onClick={() => setShowAuth(true)}>Log in / Sign up</button>}</div>
+          <div className="pm-account">{user ? <><span className="pm-acct-name">{user.name}</span><span className={"pm-rank pm-rank-" + moggerRank(user.elo).cls}>{moggerRank(user.elo).icon} {moggerRank(user.elo).name}</span><span className="pm-acct-elo">{user.elo} elo</span><button className="pm-acct-btn" onClick={() => persist(null)}>Log out</button></> : <button className="pm-acct-btn" onClick={() => setShowAuth(true)}>Log in / Sign up</button>}</div>
           <div className="pm-mtitle">PC <span className="rf-accent">MOGGER</span></div>
           <p className="pm-tag">Build the best PC for the challenge. AI judges. One winner.</p>
           <div className="pm-mode-grid">
-            <button className="pm-mode" onClick={() => { setMode("ai"); setScreen("diff"); }}><span className="pm-mode-icon"><Bot size={24} /></span><span className="pm-mode-name">Play vs AI</span><span className="pm-mode-sub">Pick a difficulty · ranked</span></button>
+            <button className="pm-mode" onClick={() => { setMode("ai"); setScreen("diff"); }}><span className="pm-mode-icon"><Bot size={24} /></span><span className="pm-mode-name">Play vs AI</span><span className="pm-mode-sub">Ranked or practice</span></button>
             <button className="pm-mode" onClick={() => { setMode("local"); setScreen("lobby"); }}><span className="pm-mode-icon"><Gamepad2 size={24} /></span><span className="pm-mode-name">Pass &amp; Play</span><span className="pm-mode-sub">2 players, one device</span></button>
             <button className="pm-mode" onClick={() => setScreen("online")}><span className="pm-mode-icon">🌐</span><span className="pm-mode-name">Online Multiplayer</span><span className="pm-mode-sub">Play friends or random people</span></button>
             <button className="pm-mode" onClick={() => setScreen("leaderboard")}><span className="pm-mode-icon">🏆</span><span className="pm-mode-name">Leaderboard</span><span className="pm-mode-sub">Global elo rankings</span></button>
@@ -2655,7 +2670,11 @@ function MoggerGame({ onExit }) {
       {screen === "diff" && (
         <div className="pm-card pm-center rf-fade">
           <h2 className="pm-h2"><Bot size={20} /> Choose AI difficulty</h2>
-          {!user && <p className="pm-p">Tip: <button className="pm-inline-link" onClick={() => setShowAuth(true)}>log in</button> to earn elo from ranked AI matches.</p>}
+          <div className="pm-seg">
+            <button className={!practice ? "on" : ""} onClick={() => setPractice(false)}>Ranked</button>
+            <button className={practice ? "on" : ""} onClick={() => setPractice(true)}>Practice</button>
+          </div>
+          <p className="pm-seg-note">{practice ? "Practice — your elo never changes, win or lose." : (user ? "Ranked — win to gain elo, lose to drop it." : <>Ranked — <button className="pm-inline-link" onClick={() => setShowAuth(true)}>log in</button> to save elo changes.</>)}</p>
           <div className="pm-diff-grid">
             {DIFFS.map((d) => <button key={d.k} className="pm-diff" onClick={() => chooseDiff(d)}><span className="pm-diff-name">{d.label}</span><span className="pm-diff-elo">{d.k === "random" ? "? elo" : d.k === "custom" ? custom + " elo" : d.elo + " elo"}</span></button>)}
           </div>
@@ -2673,11 +2692,11 @@ function MoggerGame({ onExit }) {
       ))}
       {screen === "lobby" && <MoggerLobby mode={mode} onStart={start} onBack={menu} />}
       {screen === "intro" && round && <MoggerIntro round={round} player={mode === "local" ? "Player 1" : null} onGo={() => setScreen("p1")} />}
-      {screen === "p1" && round && <MoggerBuild round={round} player={mode === "local" ? "Player 1" : "You"} oppLabel={mode === "ai" ? "AI Opponent" : "Player 2"} oppBuild={mode === "ai" ? opp : null} oppIsAI={mode === "ai"} oppLocked={false} myElo={mode === "ai" && user ? user.elo : null} oppElo={mode === "ai" ? (aiHidden ? "?" : aiElo) : null} onDone={finishP1} />}
+      {screen === "p1" && round && <MoggerBuild round={round} player={mode === "local" ? "Player 1" : "You"} oppLabel={mode === "ai" ? "AI Opponent" : "Player 2"} oppBuild={mode === "ai" ? opp : null} oppIsAI={mode === "ai"} oppLocked={false} myElo={mode === "ai" && user ? user.elo : null} oppElo={mode === "ai" ? aiElo : null} onDone={finishP1} />}
       {screen === "handoff" && <div className="pm-card pm-center rf-fade"><h2 className="pm-h2"><Repeat2 size={20} /> Pass the device</h2><p className="pm-p">Player 1 is locked in. Hand the device to <b>Player 2</b> — same challenge, same clock. No peeking.</p><button className="rf-btn" onClick={() => setScreen("intro2")}>I am Player 2 — start <ChevronRight size={16} /></button></div>}
       {screen === "intro2" && round && <MoggerIntro round={round} player="Player 2" onGo={() => setScreen("p2")} />}
       {screen === "p2" && round && <MoggerBuild round={round} player="Player 2" oppLabel="Player 1" oppBuild={you} oppIsAI={false} oppLocked={true} onDone={finishP2} />}
-      {screen === "result" && round && you && opp && <MoggerResult round={round} you={you} opp={opp} oppName={mode === "ai" ? "AI Opponent" : "Player 2"} oppElo={mode === "ai" && !aiHidden ? aiElo : (mode === "ai" && aiHidden ? aiElo : null)} eloMsg={eloMsg} onAgain={again} onMenu={menu} />}
+      {screen === "result" && round && you && opp && <MoggerResult round={round} you={you} opp={opp} oppName={mode === "ai" ? "AI Opponent" : "Player 2"} oppElo={mode === "ai" ? aiElo : null} myElo={mode === "ai" && user ? user.elo : null} eloMsg={eloMsg} onAgain={again} onMenu={menu} />}
     </div>
   );
 }
@@ -4110,6 +4129,20 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .pm-auth-tabs{display:flex;gap:8px;margin-bottom:16px;}
 .pm-auth-tabs button{flex:1;padding:10px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid var(--c-border);color:var(--c-muted);font-family:'Chakra Petch';font-weight:600;cursor:pointer;}
 .pm-auth-tabs button.on{background:rgba(25,232,219,0.12);border-color:var(--c-accent);color:var(--c-accent);}
+.pm-seg{display:flex;gap:8px;margin:4px auto 8px;max-width:300px;}
+.pm-seg button{flex:1;padding:9px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid var(--c-border);color:var(--c-muted);font-family:'Chakra Petch';font-weight:600;cursor:pointer;}
+.pm-seg button.on{background:rgba(25,232,219,0.12);border-color:var(--c-accent);color:var(--c-accent);}
+.pm-seg-note{font-size:13px;color:var(--c-muted);margin:0 0 14px;text-align:center;}
+.pm-rank{display:inline-block;font-family:'Chakra Petch';font-weight:700;font-size:11px;letter-spacing:0.02em;padding:2px 8px;border-radius:999px;border:1px solid currentColor;line-height:1.3;white-space:nowrap;}
+.pm-rank-low{color:#8aa0b4;}
+.pm-rank-mid{color:#46e0a0;}
+.pm-rank-high{color:#19e8db;}
+.pm-rank-shigh{color:#5ec8ff;}
+.pm-rank-elite{color:#7c5cff;}
+.pm-rank-god{color:#ffc24b;background:rgba(255,194,75,0.1);box-shadow:0 0 12px rgba(255,194,75,0.35);}
+.pm-lb-name{display:flex;align-items:center;gap:8px;}
+.pm-lb-name .pm-rank{font-size:10px;padding:1px 6px;}
+.pm-rank-col{margin:0 auto 4px;width:fit-content;}
 .pm-auth-hint{font-size:12px;color:var(--c-muted);margin:0 0 10px;}
 .pm-auth-err{font-size:13px;color:var(--c-bad);margin:0 0 10px;}
 .pm-auth-note{font-size:11px;color:var(--c-muted);margin:14px 0 0;opacity:.8;}
