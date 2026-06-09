@@ -1745,7 +1745,7 @@ function moggerScore(build, ucKey, budget) {
   return { total: Math.round(raw * 1000), perf: Math.round(perf), value: Math.round(value * 100), compat: 100, completeness: 100, spend: total, over: total > budget, overBy: Math.max(0, total - budget), issues: [] };
 }
 
-// tier: "elite" (best valid build, full budget) | "normal" (decent valid build) | "fail" (weak full build, sometimes incompatible)
+// tier: "elite" (best valid in-budget build) | "normal" (decent valid build) | "fail" (weak, sometimes incompatible)
 function moggerAI(ucKey, budget, tier) {
   const W = USE_CASES[ucKey].alloc;
   const build = {};
@@ -1758,30 +1758,89 @@ function moggerAI(ucKey, budget, tier) {
     if (c === "psu" && o.watt && o.watt < draw() * 1.18) return false;
     return true;
   };
+  const spent = () => CATEGORY_ORDER.reduce((s, c) => s + (build[c] ? build[c].price : 0), 0);
+
   if (tier === "fail") {
     let rem = budget;
-    const mismatch = Math.random() < 0.35; // sometimes a doomed (incompatible) build
+    const mismatch = Math.random() < 0.35;
     for (const c of order) {
       const opts = moggerOptions(c);
       const weak = [...opts].sort((a, b) => a.perf - b.perf);
       let pick;
-      if (mismatch) pick = weak[0]; // weakest, ignore validity -> likely 0
+      if (mismatch) pick = weak[0];
       else pick = weak.find((o) => o.price <= rem && ok(c, o)) || weak.find((o) => ok(c, o)) || weak[0];
       build[c] = pick; rem -= pick.price;
     }
     return build;
   }
+
+  // 1) Valid, complete, cheap base — guarantees an in-budget starting point.
+  for (const c of order) { const opts = [...moggerOptions(c)].sort((a, b) => a.price - b.price); build[c] = opts.find((o) => ok(c, o)) || opts[0]; }
+
   const elite = tier === "elite";
-  let rem = budget * (elite ? 1.0 : (0.9 + Math.random() * 0.12));
-  for (const c of order) {
-    const opts = moggerOptions(c);
-    const valid = opts.filter((o) => ok(c, o)).sort((a, b) => b.perf - a.perf);
-    const affordable = valid.filter((o) => o.price <= rem);
-    let pick;
-    if (elite) pick = affordable[0] || valid[0];
-    else { const pool = affordable.slice(0, 3); pick = pool.length ? pool[Math.floor(Math.random() * pool.length)] : (affordable[0] || valid[0]); }
-    if (!pick) pick = opts[0];
-    build[c] = pick; rem -= pick.price;
+  const cap = elite ? budget * 0.94 : budget * (0.8 + Math.random() * 0.1); // leave headroom for an adequate PSU/cooler
+  const cheapestMobo = (sock) => moggerOptions("mobo").filter((m) => m.socket === sock).sort((a, b) => a.price - b.price)[0];
+  const cheapestCooler = (cpu) => moggerOptions("cooler").filter((cl) => (!cl.sockets || cl.sockets.includes(cpu.socket)) && (!cl.tdpRating || cl.tdpRating >= cpu.tdp)).sort((a, b) => a.price - b.price)[0];
+
+  // 2) Greedy upgrade pass: repeatedly take the best weighted perf-per-extra-dollar upgrade that still fits.
+  let guard = 0, improved = true;
+  while (improved && guard++ < 500) {
+    improved = false;
+    let best = null;
+    for (const c of order) {
+      const w = W[c] || 0.02, cur = build[c];
+      for (const o of moggerOptions(c)) {
+        if (!ok(c, o) || !cur || o.perf <= cur.perf) continue;
+        const delta = o.price - cur.price; if (delta <= 0) continue;
+        if (spent() - cur.price + o.price > cap) continue;
+        const gain = (o.perf - cur.perf) * w / delta;
+        if (!best || gain > best.gain) best = { kind: "one", c, part: o, gain };
+      }
+    }
+    // platform swap: a stronger CPU on another socket, plus its cheapest compatible mobo + cooler
+    if (build.cpu) {
+      for (const cpu of moggerOptions("cpu")) {
+        if (cpu.perf <= build.cpu.perf) continue;
+        const mobo = cheapestMobo(cpu.socket), cooler = cheapestCooler(cpu);
+        if (!mobo || !cooler) continue;
+        const oldCost = build.cpu.price + (build.mobo ? build.mobo.price : 0) + (build.cooler ? build.cooler.price : 0);
+        const newCost = cpu.price + mobo.price + cooler.price, delta = newCost - oldCost;
+        if (delta <= 0) continue;
+        if (spent() - oldCost + newCost > cap) continue;
+        const gain = (cpu.perf - build.cpu.perf) * (W.cpu || 0.1) / delta;
+        if (!best || gain > best.gain) best = { kind: "platform", cpu, mobo, cooler, gain };
+      }
+    }
+    if (best) { improved = true; if (best.kind === "one") build[best.c] = best.part; else { build.cpu = best.cpu; build.mobo = best.mobo; build.cooler = best.cooler; } }
+  }
+
+  // 3) Ensure cooler/PSU are adequate (cheapest that works), then trim back under budget if needed.
+  const fixValid = () => {
+    if (build.cpu) { const cl = cheapestCooler(build.cpu); if (cl && (!build.cooler || (build.cooler.tdpRating && build.cooler.tdpRating < build.cpu.tdp) || (build.cooler.sockets && !build.cooler.sockets.includes(build.cpu.socket)))) build.cooler = cl; }
+    const d = mEstDraw(build); const psu = moggerOptions("psu").filter((p) => p.watt && p.watt >= d * 1.18).sort((a, b) => a.price - b.price)[0];
+    if (psu && (!build.psu || (build.psu.watt && build.psu.watt < d * 1.18))) build.psu = psu;
+  };
+  fixValid();
+  let tg = 0;
+  while (spent() > budget && tg++ < 200) {
+    let bestSwap = null;
+    for (const c of order) {
+      const cur = build[c]; if (!cur) continue;
+      const cheaper = moggerOptions(c).filter((o) => ok(c, o) && o.price < cur.price).sort((a, b) => b.perf - a.perf)[0];
+      if (!cheaper) continue;
+      const save = cur.price - cheaper.price; if (save <= 0) continue;
+      const loss = (cur.perf - cheaper.perf) * (W[c] || 0.02) / save;
+      if (!bestSwap || loss < bestSwap.loss) bestSwap = { c, part: cheaper, loss };
+    }
+    if (!bestSwap) break;
+    build[bestSwap.c] = bestSwap.part;
+  }
+
+  // normal: nudge one part down for a touch of imperfection (kept valid + in budget)
+  if (!elite && Math.random() < 0.6) {
+    const c = order[Math.floor(Math.random() * Math.min(3, order.length))];
+    const cheaper = moggerOptions(c).filter((o) => ok(c, o) && build[c] && o.perf < build[c].perf).sort((a, b) => b.perf - a.perf)[0];
+    if (cheaper) build[c] = cheaper;
   }
   return build;
 }
@@ -2483,11 +2542,15 @@ function MoggerAuth({ onClose, onAuth }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const submit = async () => {
+    if (busy) return;
     setBusy(true); setErr("");
-    const res = await (tab === "login" ? netLogIn : netSignUp)(name, pw);
+    try {
+      const res = await (tab === "login" ? netLogIn : netSignUp)(name, pw);
+      if (res && res.error) { setErr(res.error); setBusy(false); return; }
+      if (res && res.user) { onAuth(res.user); return; }
+      setErr("Something went wrong — try again.");
+    } catch (e) { setErr("Error: " + (e && e.message ? e.message : "try again")); }
     setBusy(false);
-    if (res.error) { setErr(res.error); return; }
-    onAuth(res.user);
   };
   return (
     <div className="pm-drawer-wrap" onClick={onClose}>
