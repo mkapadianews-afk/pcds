@@ -1771,7 +1771,7 @@ function moggerAI(ucKey, budget, tier) {
   }
   return build;
 }
-function moggerRollTier() { const r = Math.random(); return r < 0.25 ? "elite" : r < 0.85 ? "normal" : "fail"; }
+function moggerRollTier() { const r = Math.random(); return r < 0.62 ? "elite" : r < 0.93 ? "normal" : "fail"; }
 
 function moggerSpecs(p, cat) {
   const s = [];
@@ -1841,10 +1841,12 @@ function MoggerBuild({ round, player, oppLabel, oppBuild, oppLocked, oppIsAI, on
     const t = setInterval(() => setLeft((l) => { if (l <= 1) { clearInterval(t); onDone(ref.current); return 0; } return l - 1; }), 1000);
     return () => clearInterval(t);
   }, []);
-  // AI opponent: score fluctuates upward (chunky +50-120, occasional -50-120), then locks in
+  // AI opponent: score fluctuates upward (chunky +50-120, occasional -50-120), then locks in.
+  // Even if its true final is low/0, show a believable climbing number, then snap to real at lock.
   useEffect(() => {
     if (oppFinal == null || oppLocked) return;
     const lockAt = round.secs * (0.55 + Math.random() * 0.3); // seconds elapsed when AI locks
+    const ceiling = Math.max(oppFinal, 600 + Math.random() * 250); // decoy climbs toward a plausible number
     const t0 = Date.now();
     let cur = 0;
     let iv;
@@ -1856,7 +1858,7 @@ function MoggerBuild({ round, player, oppLabel, oppBuild, oppLocked, oppIsAI, on
       if (roll < 0.18) d = -(50 + Math.random() * 70);
       else if (roll < 0.30) d = (120 + Math.random() * 80);
       else d = (50 + Math.random() * 70);
-      cur = Math.max(0, Math.min(oppFinal, cur + d));
+      cur = Math.max(0, Math.min(ceiling, cur + d));
       setOppShown(Math.round(cur));
       iv = setTimeout(step, 1700 + Math.random() * 1100);
     };
@@ -1870,7 +1872,7 @@ function MoggerBuild({ round, player, oppLabel, oppBuild, oppLocked, oppIsAI, on
   const mkDecoy = () => { const d = {}; for (const c of CATEGORY_ORDER) { const o = moggerOptions(c); d[c] = o[Math.floor(Math.random() * o.length)]; } return d; };
   const [decoy, setDecoy] = useState(mkDecoy);
   useEffect(() => {
-    if (!hasOpp) return;
+    if (!hasOpp || oppLocked) return; // locked opponent isn't "building" — no flicker
     const iv = setInterval(() => setDecoy(mkDecoy()), 1400); // AI's shown parts keep changing while it "builds"
     return () => clearInterval(iv);
   }, []);
@@ -1909,7 +1911,7 @@ function MoggerBuild({ round, player, oppLabel, oppBuild, oppLocked, oppIsAI, on
           ); })}
         </div>
         <div className="pm-col opp">
-          <div className="pm-col-h">{oppLabel}{oppIsAI ? " · building" : ""}</div>
+          <div className="pm-col-h">{oppLabel}{oppLocked ? " · locked in" : oppIsAI ? " · building" : ""}</div>
           <div className={"pm-col-parts" + (hasOpp ? " blur" : "")}>
             {CATEGORY_ORDER.map((c) => { const Icon = CAT_META[c].Icon; const p = hasOpp ? decoy[c] : null; return (
               <div key={c} className="pm-ctile opp">
