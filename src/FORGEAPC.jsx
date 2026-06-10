@@ -2507,6 +2507,7 @@ function MoggerTournament({ onExit }) {
     <div className="pm-card pm-center rf-fade">
       {phase === "entry" && (<>
         <h2 className="pm-h2">🏆 Tournament</h2>
+        <div className="pm-unranked-tag">Unranked — ranked isn't allowed for tournaments</div>
         <p className="pm-p">A live bracket — winners advance through consecutive rounds until one champion remains. Empty seats are filled by AI.</p>
         <input className="pm-namein" value={name} maxLength={14} onChange={(e) => setName(e.target.value)} placeholder="Enter your name" />
         <div className="pm-mode-grid">
@@ -2719,9 +2720,11 @@ function MoggerOnline({ onExit, user, setUser, onNeedAuth }) {
         <p className="pm-seg-note">{onlineRanked ? "Ranked — Find a match puts your elo on the line." : "Unranked — play casually, your elo won't change."}</p>
         <div className="pm-mode-grid">
           <button className="pm-mode" onClick={doRandom}><span className="pm-mode-icon"><Radio size={22} /></span><span className="pm-mode-name">Find a match</span><span className="pm-mode-sub">{onlineRanked ? "Ranked · random opponent" : "Casual · random opponent"}</span></button>
-          <button className="pm-mode" onClick={doHost}><span className="pm-mode-icon"><Plus size={22} /></span><span className="pm-mode-name">Host a room</span><span className="pm-mode-sub">Get a code, play a friend · Unranked</span></button>
-          <button className="pm-mode" onClick={() => setPhase("joinentry")}><span className="pm-mode-icon"><ChevronRight size={22} /></span><span className="pm-mode-name">Join a room</span><span className="pm-mode-sub">Enter a friend's code · Unranked</span></button>
-          <button className="pm-mode" onClick={() => setPhase("tournament")}><span className="pm-mode-icon">🏆</span><span className="pm-mode-name">Tournament</span><span className="pm-mode-sub">Bracket · 3+ players, AI fills seats</span></button>
+          {!onlineRanked && (<>
+            <button className="pm-mode" onClick={doHost}><span className="pm-mode-icon"><Plus size={22} /></span><span className="pm-mode-name">Host a room</span><span className="pm-mode-sub">Get a code, play a friend · Unranked</span></button>
+            <button className="pm-mode" onClick={() => setPhase("joinentry")}><span className="pm-mode-icon"><ChevronRight size={22} /></span><span className="pm-mode-name">Join a room</span><span className="pm-mode-sub">Enter a friend's code · Unranked</span></button>
+            <button className="pm-mode" onClick={() => setPhase("tournament")}><span className="pm-mode-icon">🏆</span><span className="pm-mode-name">Tournament</span><span className="pm-mode-sub">Bracket · 3+ players, AI fills seats · Unranked</span></button>
+          </>)}
         </div>
         <button className="rf-ghost pm-exit" onClick={() => { cleanup(); onExit(); }}><ChevronLeft size={15} /> Back</button>
       </>)}
