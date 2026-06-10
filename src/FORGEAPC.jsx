@@ -2987,15 +2987,25 @@ function MoggerGame({ onExit }) {
 function Home({ saved, loading, onNew, onOpen, onDelete, priceInfo, onMogger }) {
   return (
     <div className="rf-fade">
-      <div className="rf-hero">
+      <div className="rf-hero rf-hero-flash">
         <div className="rf-eyebrow">PART PICKER · COMPATIBILITY · SCORING</div>
-        <h1>Forge the perfect rig<br /><span className="rf-accent">for what you actually do.</span></h1>
+        <h1 className="rf-hero-title">How to forge the<br /><span className="rf-accent rf-hero-grad">perfect computer.</span></h1>
         <p className="rf-muted rf-hero-sub">
           Tell us your use case and budget. We score every part, auto-assemble a balanced build,
           check full compatibility, and grade the result out of 100.
         </p>
-        <button className="rf-btn rf-btn-lg" onClick={onNew}><Plus size={18} /> {t("startBuild")}</button>
-        {onMogger && <button className="rf-btn rf-btn-lg rf-mogger-cta" onClick={onMogger}><Gamepad2 size={18} /> Play PC Mogger</button>}
+        <div className="rf-cta-grid">
+          <div className="rf-cta-card">
+            <button className="rf-btn rf-btn-lg" onClick={onNew}><Plus size={18} /> {t("startBuild")}</button>
+            <span className="rf-cta-desc">Answer two quick questions — we auto-pick balanced, compatible parts for your budget and grade the result out of 100.</span>
+          </div>
+          {onMogger && (
+            <div className="rf-cta-card">
+              <button className="rf-btn rf-btn-lg rf-mogger-cta" onClick={onMogger}><Gamepad2 size={18} /> Play PC Mogger</button>
+              <span className="rf-cta-desc">A head-to-head build-off game — assemble the best PC for a budget and use case, then beat players or AI to climb the elo leaderboard.</span>
+            </div>
+          )}
+        </div>
         <div className="rf-price-status">
           <span className="rf-db-count"><Boxes size={13} /> {CATALOG_COUNT} {t("componentsDb")}</span>
           <span className="rf-dot-sep">·</span>
@@ -3997,7 +4007,17 @@ h3{font-family:'Chakra Petch';font-weight:600;font-size:18px;margin:0 0 6px;}
 
 /* HERO */
 .rf-hero{padding:34px 0 14px;}
+.rf-hero-flash{position:relative;}
+.rf-hero-flash::before{content:"";position:absolute;left:-10%;top:-40px;width:120%;height:340px;z-index:-1;pointer-events:none;background:radial-gradient(620px 300px at 28% 30%,rgba(25,232,219,0.16),transparent 70%),radial-gradient(520px 260px at 75% 10%,rgba(124,92,255,0.16),transparent 70%);filter:blur(6px);animation:rfBreathe 6s ease-in-out infinite;}
+.rf-hero-title{font-size:clamp(34px,6vw,60px);line-height:1.04;letter-spacing:-0.01em;margin:6px 0 16px;font-family:'Chakra Petch';font-weight:700;}
+.rf-hero-grad{background:linear-gradient(100deg,var(--c-accent) 0%,#7ad8ff 40%,var(--c-accent2) 80%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;background-size:220% auto;animation:rfShine 6s linear infinite;filter:drop-shadow(0 0 18px rgba(25,232,219,0.35));}
+@keyframes rfShine{to{background-position:220% center;}}
 .rf-hero-sub{max-width:560px;font-size:15px;line-height:1.6;margin:0 0 26px;}
+.rf-cta-grid{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:6px;}
+.rf-cta-card{display:flex;flex-direction:column;align-items:flex-start;gap:10px;flex:1;min-width:240px;max-width:340px;padding:16px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid var(--c-border);backdrop-filter:blur(8px);transition:border-color .2s,transform .2s;}
+.rf-cta-card:hover{border-color:rgba(25,232,219,0.5);transform:translateY(-2px);}
+.rf-cta-card .rf-btn-lg{width:100%;justify-content:center;}
+.rf-cta-desc{font-size:13px;line-height:1.5;color:var(--c-muted);}
 .rf-price-status{display:flex;align-items:center;gap:8px;margin-top:16px;font-size:12px;color:var(--c-muted);font-family:'JetBrains Mono';letter-spacing:0.3px;flex-wrap:wrap;}
 .rf-db-count{display:inline-flex;align-items:center;gap:6px;color:var(--c-accent);}
 .rf-dot-sep{opacity:0.5;}
