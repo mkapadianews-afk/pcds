@@ -4181,7 +4181,7 @@ box-shadow:0 6px 22px rgba(25,232,219,0.28);transition:transform .25s var(--ease
 .rf-btn-lg{font-size:15.5px;padding:14px 26px;border-radius:13px;}
 .rf-ghost{display:inline-flex;align-items:center;gap:6px;background:var(--c-panel);border:1px solid var(--c-border);
 color:var(--c-text);font-family:'Sora';font-size:13.5px;padding:9px 15px;border-radius:10px;cursor:pointer;transition:.18s;}
-.rf-ghost:hover{background:var(--c-panel-2);border-color:var(--c-hover);}
+.rf-ghost:hover{background:var(--c-panel-2);border-color:rgba(25,232,219,0.45);transform:translateY(-1px);box-shadow:0 6px 18px -8px rgba(25,232,219,0.5);}
 .rf-icon-btn{background:transparent;border:none;color:var(--c-muted);cursor:pointer;padding:6px;border-radius:8px;transition:.15s;display:grid;place-items:center;}
 .rf-icon-btn:hover{color:var(--c-bad);background:rgba(255,92,114,0.1);}
 
@@ -4350,7 +4350,7 @@ background:var(--c-panel);border:1px solid var(--c-border);border-radius:20px;pa
 .rf-gauge{position:relative;display:grid;place-items:center;}
 .rf-gauge svg{transform:rotate(0);}
 .rf-gauge-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.rf-gauge-num{font-family:'JetBrains Mono';font-weight:700;font-size:34px;line-height:1;}
+.rf-gauge-num{font-family:'JetBrains Mono';font-weight:700;font-size:34px;line-height:1;text-shadow:0 0 18px currentColor;}
 .rf-gauge-label{font-size:9.5px;letter-spacing:1.8px;color:var(--c-muted);margin-top:5px;}
 .rf-verdict-tag{display:inline-flex;align-items:center;gap:7px;font-family:'JetBrains Mono';font-size:11px;letter-spacing:1px;color:var(--c-accent2);margin-bottom:9px;}
 .rf-hybrid{font-size:9px;background:rgba(124,92,255,0.16);border:1px solid rgba(124,92,255,0.3);color:var(--c-accent2);padding:1px 6px;border-radius:20px;letter-spacing:1px;}
@@ -4522,15 +4522,16 @@ background:#0d1620;border:1px solid rgba(70,224,160,0.4);color:var(--c-good);pad
 font-size:14px;box-shadow:0 10px 40px rgba(0,0,0,0.5);animation:rfToast .5s var(--ease);}
 
 /* ANIMATIONS */
-@keyframes rfFade{from{opacity:0}to{opacity:1}}
-@keyframes rfUp{from{opacity:0;transform:translateY(11px)}to{opacity:1;transform:translateY(0)}}
+@keyframes rfFade{from{opacity:0;transform:translateY(12px) scale(0.995);}to{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes rfUp{from{opacity:0;transform:translateY(14px) scale(0.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes rfPop{from{opacity:0;transform:scale(.99) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
 @keyframes rfSlideR{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}
 @keyframes rfSlideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes rfToast{from{opacity:0;transform:translateX(-50%) translateY(14px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-.rf-fade{animation:rfFade .45s var(--ease);}
-.rf-pop{animation:rfUp .72s var(--ease) backwards;will-change:transform,opacity;}
+.rf-fade{animation:rfFade .5s var(--ease-spring) both;}
+.rf-pop{animation:rfUp .66s var(--ease-spring) backwards;will-change:transform,opacity;}
 .rf-slidein{animation:rfSlideDown .28s cubic-bezier(.2,.8,.2,1);}
+@media (prefers-reduced-motion:reduce){.rf-fade,.rf-pop{animation:rfFadeRM .3s ease both;}@keyframes rfFadeRM{from{opacity:0}to{opacity:1}}.rf-ghost:hover{transform:none;}}
 
 /* FORGE MODE BUTTONS */
 .rf-forge-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:24px auto 0;}

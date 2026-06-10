@@ -1,3 +1,4 @@
 * { box-sizing: border-box; }
 html, body, #root { height: 100%; }
-body { margin: 0; background: #070a0f; }
+html, body { margin: 0; background: #070a0f; }
+html { overscroll-behavior: none; }
