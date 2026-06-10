@@ -1336,6 +1336,7 @@ export default function RigForge() {
   const [settingsTab, setSettingsTab] = useState("appearance");
   const [hdrUser, setHdrUser] = useState(() => { try { const s = localStorage.getItem("mogger_user"); return s ? JSON.parse(s) : null; } catch (e) { return null; } });
   const [hdrAuth, setHdrAuth] = useState(false);
+  const [hdrLogoutAsk, setHdrLogoutAsk] = useState(false);
   const [lang, setLang] = useState("en");
   CUR_LANG = lang;
 
@@ -1615,7 +1616,7 @@ export default function RigForge() {
             <div className="rf-acct-chip">
               <span className="rf-acct-name">{hdrUser.name}</span>
               <RankBadge rank={moggerRank(hdrUser.elo, hdrUser.crank)} />
-              <button className="rf-acct-out" onClick={hdrLogout} title="Log out"><X size={13} /></button>
+              <button className="rf-acct-out" onClick={() => setHdrLogoutAsk(true)} title="Log out"><X size={13} /></button>
             </div>
           ) : (
             <button className="rf-ghost rf-login-btn" onClick={() => setHdrAuth(true)}>Log in</button>
@@ -1658,6 +1659,18 @@ export default function RigForge() {
       </header>
 
       {hdrAuth && <MoggerAuth onClose={() => setHdrAuth(false)} onAuth={(u) => { try { localStorage.setItem("mogger_user", JSON.stringify(u)); } catch (e) {} setHdrUser(u); setHdrAuth(false); }} />}
+      {hdrLogoutAsk && (
+        <div className="rf-modal-overlay" onClick={() => setHdrLogoutAsk(false)}>
+          <div className="rf-confirm" onClick={(e) => e.stopPropagation()}>
+            <h3 className="rf-confirm-title">Log out?</h3>
+            <p className="rf-confirm-msg">Are you sure you want to log out?</p>
+            <div className="rf-confirm-btns">
+              <button className="rf-confirm-yes" onClick={() => { hdrLogout(); setHdrLogoutAsk(false); }}>Yes, log out</button>
+              <button className="rf-confirm-no" onClick={() => setHdrLogoutAsk(false)}>No</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <main className="rf-main">
         {view === "home" && (
@@ -2904,6 +2917,7 @@ function MoggerGame({ onExit }) {
   const [aiElo, setAiElo] = useState(550);
   const [aiHidden, setAiHidden] = useState(false);
   const [practice, setPractice] = useState(false);
+  const [rankedAsk, setRankedAsk] = useState(false);
   const [custom, setCustom] = useState(1500);
   const [eloMsg, setEloMsg] = useState(null);
   const eloAppliedRef = useRef(false);
@@ -2969,10 +2983,21 @@ function MoggerGame({ onExit }) {
         <div className="pm-card pm-center rf-fade">
           <h2 className="pm-h2"><Bot size={20} /> Choose AI difficulty</h2>
           <div className="pm-seg">
-            <button className={!practice ? "on" : ""} onClick={() => setPractice(false)}>Ranked</button>
-            <button className={practice ? "on" : ""} onClick={() => setPractice(true)}>Practice</button>
+            <button className={(!practice && user ? "on" : "") + (!user ? " pm-seg-disabled" : "")} onClick={() => { if (!user) { setRankedAsk(true); } else { setPractice(false); setRankedAsk(false); } }}>Ranked</button>
+            <button className={(practice || !user) ? "on" : ""} onClick={() => { setPractice(true); setRankedAsk(false); }}>Practice</button>
           </div>
-          <p className="pm-seg-note">{practice ? "Practice — your elo never changes, win or lose." : (user ? "Ranked — win to gain elo, lose to drop it." : <>Ranked — <button className="pm-inline-link" onClick={() => setShowAuth(true)}>log in</button> to save elo changes.</>)}</p>
+          {!user ? (
+            rankedAsk ? (
+              <div className="pm-seg-note pm-ranked-prompt">
+                <span>To play ranked you have to log in / sign up.</span>
+                <button className="rf-btn" onClick={() => setShowAuth(true)}>Log in / Sign up</button>
+              </div>
+            ) : (
+              <p className="pm-seg-note">Practice — your elo never changes. Log in to play Ranked.</p>
+            )
+          ) : (
+            <p className="pm-seg-note">{practice ? "Practice — your elo never changes, win or lose." : "Ranked — win to gain elo, lose to drop it."}</p>
+          )}
           <div className="pm-diff-grid">
             {DIFFS.map((d) => <button key={d.k} className="pm-diff" onClick={() => chooseDiff(d)}><span className="pm-diff-name">{d.label}</span><span className="pm-diff-elo">{d.k === "random" ? "? elo" : d.k === "custom" ? custom + " elo" : d.elo + " elo"}</span></button>)}
           </div>
@@ -4617,6 +4642,18 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .pm-seg button{flex:1;padding:9px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid var(--c-border);color:var(--c-muted);font-family:'Chakra Petch';font-weight:600;cursor:pointer;}
 .pm-seg button.on{background:rgba(25,232,219,0.12);border-color:var(--c-accent);color:var(--c-accent);}
 .pm-seg-note{font-size:13px;color:var(--c-muted);margin:0 0 14px;text-align:center;}
+.pm-seg-disabled{opacity:0.45;cursor:not-allowed;filter:grayscale(0.6);}
+.pm-ranked-prompt{display:flex;flex-direction:column;align-items:center;gap:12px;margin:4px auto 16px;padding:14px 16px;max-width:320px;border-radius:14px;background:rgba(124,92,255,0.08);border:1px solid rgba(124,92,255,0.3);}
+.pm-ranked-prompt span{color:var(--c-text);font-size:13.5px;}
+.rf-modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(2,4,8,0.72);backdrop-filter:blur(5px);display:grid;place-items:center;padding:20px;animation:rfFade .22s var(--ease);}
+.rf-confirm{width:min(360px,100%);background:#0c1119;border:1px solid var(--c-border);border-radius:18px;padding:24px;text-align:center;animation:rfPop .4s var(--ease);}
+.rf-confirm-title{font-family:'Chakra Petch';font-size:20px;font-weight:700;margin:0 0 8px;color:var(--c-text);}
+.rf-confirm-msg{font-size:14px;color:var(--c-muted);margin:0 0 20px;}
+.rf-confirm-btns{display:flex;gap:10px;justify-content:center;}
+.rf-confirm-yes{flex:1;padding:11px 16px;border-radius:11px;border:none;cursor:pointer;font-family:'Sora';font-weight:600;font-size:14px;color:#fff;background:linear-gradient(135deg,#ff5c72,#e23a52);box-shadow:0 6px 20px rgba(226,58,82,0.35);transition:filter .18s,transform .18s;}
+.rf-confirm-yes:hover{filter:brightness(1.08);transform:translateY(-1px);}
+.rf-confirm-no{flex:1;padding:11px 16px;border-radius:11px;cursor:pointer;font-family:'Sora';font-weight:600;font-size:14px;color:var(--c-text);background:#161c26;border:1px solid var(--c-border);transition:background .18s,transform .18s;}
+.rf-confirm-no:hover{background:#1e2632;transform:translateY(-1px);}
 .pm-rank{display:inline-block;font-family:'Chakra Petch';font-weight:700;font-size:11px;letter-spacing:0.02em;padding:2px 8px;border-radius:999px;border:1px solid currentColor;line-height:1.3;white-space:nowrap;}
 .pm-rank-low{color:#8aa0b4;}
 .pm-rank-mid{color:#46e0a0;}
