@@ -66,10 +66,10 @@ export async function signUp(name, password) {
     const hash = await sha256(nm.toLowerCase() + "::" + password);
     const dup = await supabase.from("mogger_users").select("id").eq("name", nm).eq("hash", hash).limit(1);
     if (dup.error) return { error: dup.error.message || "Database not set up — run the SQL step." };
-    if (dup.data && dup.data.length) return { error: "That name+password is taken — make a stronger password." };
+    if (dup.data && dup.data.length) return { error: "Please choose a stronger password." };
     const ins = await supabase.from("mogger_users").insert({ name: nm, hash, elo: 100 }).select().single();
     if (ins.error) return { error: ins.error.message || "Could not create account." };
-    return { user: { id: ins.data.id, name: ins.data.name, elo: ins.data.elo } };
+    return { user: { id: ins.data.id, name: ins.data.name, elo: ins.data.elo, crank: ins.data.crank || null } };
   } catch (e) { return { error: "Error: " + (e && e.message ? e.message : "try again") }; }
 }
 
@@ -82,7 +82,7 @@ export async function logIn(name, password) {
     if (res.error) return { error: res.error.message || "Database not set up — run the SQL step." };
     if (!res.data || !res.data.length) return { error: "Wrong name or password." };
     const u = res.data[0];
-    return { user: { id: u.id, name: u.name, elo: u.elo } };
+    return { user: { id: u.id, name: u.name, elo: u.elo, crank: u.crank || null } };
   } catch (e) { return { error: "Error: " + (e && e.message ? e.message : "try again") }; }
 }
 
@@ -103,14 +103,18 @@ export function eloGain(myElo, oppElo) {
 }
 
 export async function leaderboard(limit = 100) {
-  try { const { data } = await supabase.from("mogger_users").select("name,elo").order("elo", { ascending: false }).limit(limit); return data || []; }
+  try { const { data } = await supabase.from("mogger_users").select("name,elo,crank").order("elo", { ascending: false }).limit(limit); return data || []; }
   catch (e) { return []; }
 }
 
 // ---- admin ----
 export async function allUsers() {
-  try { const { data, error } = await supabase.from("mogger_users").select("id,name,elo").order("elo", { ascending: false }); if (error) return { error: error.message }; return { rows: data || [] }; }
+  try { const { data, error } = await supabase.from("mogger_users").select("id,name,elo,hash,crank").order("elo", { ascending: false }); if (error) return { error: error.message }; return { rows: data || [] }; }
   catch (e) { return { error: "Could not load accounts." }; }
+}
+export async function setCustomRank(id, crank) {
+  try { const v = (crank || "").trim(); const { error } = await supabase.from("mogger_users").update({ crank: v ? v.slice(0, 24) : null }).eq("id", id); if (error) return { ok: false, error: error.message }; return { ok: true }; }
+  catch (e) { return { ok: false, error: "Could not set rank." }; }
 }
 export async function deleteUser(id) {
   try {
@@ -119,6 +123,20 @@ export async function deleteUser(id) {
     if (error) return { ok: false, error: error.message };
     return { ok: true };
   } catch (e) { return { ok: false, error: "Delete failed." }; }
+}
+export async function setElo(id, elo) {
+  try { const { error } = await supabase.from("mogger_users").update({ elo }).eq("id", id); if (error) return { ok: false, error: error.message }; return { ok: true }; }
+  catch (e) { return { ok: false, error: "Could not update elo." }; }
+}
+// admin reset: set a brand-new password (we still only store its one-way hash)
+export async function resetPassword(id, name, newPw) {
+  const bad = validatePassword(newPw); if (bad) return { ok: false, error: bad };
+  try {
+    const hash = await sha256((name || "").trim().toLowerCase() + "::" + newPw);
+    const { error } = await supabase.from("mogger_users").update({ hash }).eq("id", id);
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+  } catch (e) { return { ok: false, error: "Could not reset password." }; }
 }
 
 // ---- account-stored builds (table: mogger_builds) ----

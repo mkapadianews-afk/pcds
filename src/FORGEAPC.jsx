@@ -6,7 +6,7 @@ import {
   ChevronLeft, Zap, DollarSign, RotateCcw, ShieldCheck, ShieldAlert, Repeat2, Wrench, Send, Bot, MessageCircle, Maximize, Minimize, Settings, Sun, Moon, Search
 } from "lucide-react";
 import { MEDIA, MEDIA_NE } from "../data/part-media.js";
-import { myId as netId, makeCode as netCode, roomChannel as netRoom, lobbyChannel as netLobby, leave as netLeave, signUp as netSignUp, logIn as netLogIn, fetchElo as netFetchElo, saveElo as netSaveElo, eloGain as netEloGain, leaderboard as netLeaderboard, listBuilds as netListBuilds, syncBuild as netSyncBuild, deleteBuildCloud as netDeleteBuild, allUsers as netAllUsers, deleteUser as netDeleteUser } from "./moggerNet.js";
+import { myId as netId, makeCode as netCode, roomChannel as netRoom, lobbyChannel as netLobby, leave as netLeave, signUp as netSignUp, logIn as netLogIn, fetchElo as netFetchElo, saveElo as netSaveElo, eloGain as netEloGain, leaderboard as netLeaderboard, listBuilds as netListBuilds, syncBuild as netSyncBuild, deleteBuildCloud as netDeleteBuild, allUsers as netAllUsers, deleteUser as netDeleteUser, setElo as netSetElo, resetPassword as netResetPassword, setCustomRank as netSetCustomRank } from "./moggerNet.js";
 /* ----------------------------- i18n ----------------------------- */
 const LANGS = [{"code": "en", "name": "English"}, {"code": "es", "name": "Español"}, {"code": "zh", "name": "中文"}, {"code": "hi", "name": "हिन्दी"}, {"code": "ar", "name": "العربية"}, {"code": "pt", "name": "Português"}, {"code": "fr", "name": "Français"}, {"code": "ru", "name": "Русский"}, {"code": "ja", "name": "日本語"}, {"code": "de", "name": "Deutsch"}];
 const I18N = {"en": {"myRigs": "My Rigs", "settings": "Settings", "appearance": "Appearance", "language": "Language", "theme": "Theme", "dark": "Dark", "light": "Light", "back": "Back", "saveRig": "Save rig", "select": "Select", "selected": "Selected", "moreInfo": "More info", "hideInfo": "Hide info", "autoForge": "Auto-Forge", "buildYourself": "Build It Yourself", "yourBuild": "Your build", "budgetQ": "What's your budget?", "useCaseQ": "What will this PC be for?", "livePrices": "Live prices", "samplePrices": "sample prices", "updated": "updated", "componentsDb": "components in the database", "overBudgetCat": "Over your {x} budget", "performance": "PERFORMANCE", "pricePerf": "PRICE / PERF", "pros": "PROS", "cons": "CONS"}, "es": {"myRigs": "Mis Equipos", "settings": "Ajustes", "appearance": "Apariencia", "language": "Idioma", "theme": "Tema", "dark": "Oscuro", "light": "Claro", "back": "Atrás", "saveRig": "Guardar", "select": "Elegir", "selected": "Elegido", "moreInfo": "Más info", "hideInfo": "Ocultar", "autoForge": "Auto-Forjar", "buildYourself": "Hazlo tú mismo", "yourBuild": "Tu equipo", "budgetQ": "¿Cuál es tu presupuesto?", "useCaseQ": "¿Para qué será este PC?", "livePrices": "Precios en vivo", "samplePrices": "precios de muestra", "updated": "actualizado", "componentsDb": "componentes en la base de datos", "overBudgetCat": "Supera tu presupuesto de {x}", "performance": "RENDIMIENTO", "pricePerf": "PRECIO / REND", "pros": "PROS", "cons": "CONTRAS"}, "zh": {"myRigs": "我的配置", "settings": "设置", "appearance": "外观", "language": "语言", "theme": "主题", "dark": "深色", "light": "浅色", "back": "返回", "saveRig": "保存配置", "select": "选择", "selected": "已选", "moreInfo": "更多信息", "hideInfo": "隐藏", "autoForge": "自动配置", "buildYourself": "自己组装", "yourBuild": "你的配置", "budgetQ": "你的预算是多少？", "useCaseQ": "这台电脑用来做什么？", "livePrices": "实时价格", "samplePrices": "示例价格", "updated": "更新于", "componentsDb": "个组件已入库", "overBudgetCat": "超出{x}预算", "performance": "性能", "pricePerf": "性价比", "pros": "优点", "cons": "缺点"}, "hi": {"myRigs": "मेरे रिग", "settings": "सेटिंग्स", "appearance": "रूप", "language": "भाषा", "theme": "थीम", "dark": "गहरा", "light": "हल्का", "back": "वापस", "saveRig": "सहेजें", "select": "चुनें", "selected": "चयनित", "moreInfo": "और जानकारी", "hideInfo": "छिपाएं", "autoForge": "ऑटो-फोर्ज", "buildYourself": "खुद बनाएं", "yourBuild": "आपका बिल्ड", "budgetQ": "आपका बजट क्या है?", "useCaseQ": "यह पीसी किसलिए होगा?", "livePrices": "लाइव कीमतें", "samplePrices": "नमूना कीमतें", "updated": "अपडेट", "componentsDb": "घटक डेटाबेस में", "overBudgetCat": "{x} बजट से अधिक", "performance": "प्रदर्शन", "pricePerf": "मूल्य/प्रदर्शन", "pros": "फायदे", "cons": "नुकसान"}, "ar": {"myRigs": "أجهزتي", "settings": "الإعدادات", "appearance": "المظهر", "language": "اللغة", "theme": "السمة", "dark": "داكن", "light": "فاتح", "back": "رجوع", "saveRig": "حفظ", "select": "اختيار", "selected": "محدد", "moreInfo": "المزيد", "hideInfo": "إخفاء", "autoForge": "تجميع تلقائي", "buildYourself": "اصنعه بنفسك", "yourBuild": "تجميعتك", "budgetQ": "ما هي ميزانيتك؟", "useCaseQ": "لأي غرض هذا الحاسوب؟", "livePrices": "أسعار حية", "samplePrices": "أسعار تجريبية", "updated": "محدّث", "componentsDb": "مكوّن في قاعدة البيانات", "overBudgetCat": "يتجاوز ميزانية {x}", "performance": "الأداء", "pricePerf": "السعر/الأداء", "pros": "الإيجابيات", "cons": "السلبيات"}, "pt": {"myRigs": "Meus PCs", "settings": "Configurações", "appearance": "Aparência", "language": "Idioma", "theme": "Tema", "dark": "Escuro", "light": "Claro", "back": "Voltar", "saveRig": "Salvar", "select": "Selecionar", "selected": "Selecionado", "moreInfo": "Mais info", "hideInfo": "Ocultar", "autoForge": "Auto-Forjar", "buildYourself": "Faça você mesmo", "yourBuild": "Sua build", "budgetQ": "Qual é o seu orçamento?", "useCaseQ": "Para que será este PC?", "livePrices": "Preços ao vivo", "samplePrices": "preços de exemplo", "updated": "atualizado", "componentsDb": "componentes no banco de dados", "overBudgetCat": "Acima do orçamento de {x}", "performance": "DESEMPENHO", "pricePerf": "PREÇO / DESEMP", "pros": "PRÓS", "cons": "CONTRAS"}, "fr": {"myRigs": "Mes Configs", "settings": "Réglages", "appearance": "Apparence", "language": "Langue", "theme": "Thème", "dark": "Sombre", "light": "Clair", "back": "Retour", "saveRig": "Enregistrer", "select": "Choisir", "selected": "Choisi", "moreInfo": "Plus d'infos", "hideInfo": "Masquer", "autoForge": "Auto-Forge", "buildYourself": "Faites-le vous-même", "yourBuild": "Votre config", "budgetQ": "Quel est votre budget ?", "useCaseQ": "À quoi servira ce PC ?", "livePrices": "Prix en direct", "samplePrices": "prix indicatifs", "updated": "mis à jour", "componentsDb": "composants dans la base", "overBudgetCat": "Au-dessus du budget {x}", "performance": "PERFORMANCE", "pricePerf": "PRIX / PERF", "pros": "ATOUTS", "cons": "INCONVÉNIENTS"}, "ru": {"myRigs": "Мои сборки", "settings": "Настройки", "appearance": "Вид", "language": "Язык", "theme": "Тема", "dark": "Тёмная", "light": "Светлая", "back": "Назад", "saveRig": "Сохранить", "select": "Выбрать", "selected": "Выбрано", "moreInfo": "Подробнее", "hideInfo": "Скрыть", "autoForge": "Авто-сборка", "buildYourself": "Собрать самому", "yourBuild": "Ваша сборка", "budgetQ": "Каков ваш бюджет?", "useCaseQ": "Для чего этот ПК?", "livePrices": "Цены в реальном времени", "samplePrices": "примерные цены", "updated": "обновлено", "componentsDb": "компонентов в базе", "overBudgetCat": "Сверх бюджета на {x}", "performance": "ПРОИЗВОДИТ.", "pricePerf": "ЦЕНА/КАЧ.", "pros": "ПЛЮСЫ", "cons": "МИНУСЫ"}, "ja": {"myRigs": "マイ構成", "settings": "設定", "appearance": "外観", "language": "言語", "theme": "テーマ", "dark": "ダーク", "light": "ライト", "back": "戻る", "saveRig": "保存", "select": "選択", "selected": "選択済", "moreInfo": "詳細", "hideInfo": "隠す", "autoForge": "自動構成", "buildYourself": "自分で組む", "yourBuild": "あなたの構成", "budgetQ": "予算はいくらですか？", "useCaseQ": "このPCの用途は？", "livePrices": "ライブ価格", "samplePrices": "サンプル価格", "updated": "更新", "componentsDb": "個のパーツを収録", "overBudgetCat": "{x}予算オーバー", "performance": "性能", "pricePerf": "価格性能", "pros": "長所", "cons": "短所"}, "de": {"myRigs": "Meine Builds", "settings": "Einstellungen", "appearance": "Darstellung", "language": "Sprache", "theme": "Thema", "dark": "Dunkel", "light": "Hell", "back": "Zurück", "saveRig": "Speichern", "select": "Wählen", "selected": "Gewählt", "moreInfo": "Mehr Info", "hideInfo": "Verbergen", "autoForge": "Auto-Forge", "buildYourself": "Selbst bauen", "yourBuild": "Dein Build", "budgetQ": "Wie hoch ist dein Budget?", "useCaseQ": "Wofür ist dieser PC?", "livePrices": "Live-Preise", "samplePrices": "Beispielpreise", "updated": "aktualisiert", "componentsDb": "Komponenten in der Datenbank", "overBudgetCat": "Über dem {x}-Budget", "performance": "LEISTUNG", "pricePerf": "PREIS / LEIST", "pros": "VORTEILE", "cons": "NACHTEILE"}};
@@ -1711,38 +1711,49 @@ const mRand = (a) => a[Math.floor(Math.random() * a.length)];
 
 // deduped, cheapest-per-model options for a category (uses live prices)
 function moggerOptions(cat) {
+  const pool = CATALOG[cat];
+  // Only parts with REAL (live) prices are stocked. Sample-priced parts are out of stock —
+  // unless the whole category has zero live prices, then fall back to sample so the game stays playable.
+  const live = PRICE_LIVE ? pool.filter((p) => p._live === true) : pool;
+  const usable = live.length ? live : pool;
   const byModel = {};
-  for (const p of CATALOG[cat]) {
+  for (const p of usable) {
     const k = p.model || p.name;
     if (!byModel[k] || p.price < byModel[k].price) byModel[k] = p;
   }
   return Object.values(byModel).sort((a, b) => a.price - b.price);
 }
+// Picker display list: includes out-of-stock models (flagged _oos) so the player sees them greyed out.
+function moggerOptionsAll(cat) {
+  const byModel = {};
+  for (const p of CATALOG[cat]) {
+    const oos = partOOS(p);
+    const k = p.model || p.name;
+    const cur = byModel[k];
+    if (!cur) { byModel[k] = { p, oos }; continue; }
+    if (cur.oos && !oos) { byModel[k] = { p, oos }; continue; } // in-stock beats out-of-stock
+    if (cur.oos === oos && p.price < cur.p.price) byModel[k] = { p, oos };
+  }
+  const list = Object.values(byModel);
+  const allOOS = list.length > 0 && list.every((e) => e.oos);
+  // whole category out of stock => sample fallback (matches moggerOptions)
+  return list.map((e) => ({ ...e.p, _oos: allOOS ? false : e.oos })).sort((a, b) => a.price - b.price);
+}
 function mEstDraw(b) { let d = 90; if (b.cpu) d += b.cpu.tdp || 65; if (b.gpu) d += b.gpu.tdp || 0; return d; }
 
 function moggerScore(build, ucKey, budget) {
-  const W = USE_CASES[ucKey].alloc;
-  let perf = 0, wsum = 0;
-  for (const c of CATEGORY_ORDER) { const w = W[c] || 0; wsum += w; perf += (build[c] ? build[c].perf : 0) * w; }
-  perf = wsum ? perf / wsum : 0;
-  const total = CATEGORY_ORDER.reduce((s, c) => s + (build[c] ? build[c].price : 0), 0);
+  // Runs on the same engine FORGEAPC uses: checkCompat + use-case-normalized
+  // performance (analyzeBuild). Mogger rule on top: any issue OR missing part = 0.
+  const a = analyzeBuild(build, ucKey, budget);
   const filled = CATEGORY_ORDER.filter((c) => build[c]).length;
-  const completeness = filled / CATEGORY_ORDER.length;
-  const issues = [];
-  if (build.cpu && build.mobo && build.cpu.socket !== build.mobo.socket) issues.push("CPU and motherboard sockets do not match");
-  if (build.cpu && build.cooler && build.cooler.sockets && !build.cooler.sockets.includes(build.cpu.socket)) issues.push("Cooler does not fit the CPU socket");
-  if (build.cpu && build.cooler && build.cooler.tdpRating && build.cooler.tdpRating < build.cpu.tdp) issues.push("Cooler cannot handle the CPU heat");
-  const draw = mEstDraw(build);
-  if (build.psu && build.psu.watt && build.psu.watt < draw * 1.15) issues.push("Power supply is too weak");
+  const issues = [...a.compat.issues];
   if (filled < CATEGORY_ORDER.length) issues.push("Build is incomplete — missing parts");
-  // ANY incompatibility, warning, OR missing part = automatic 0.
-  if (issues.length > 0) return { total: 0, perf: Math.round(perf), value: 0, compat: 0, completeness: Math.round(completeness * 100), spend: total, over: total > budget, overBy: Math.max(0, total - budget), issues, dead: true };
-  const value = total > 0 ? clamp((perf / (total / 1000)) / 55, 0, 1) : 0;
-  const over = total > budget ? (total - budget) / budget : 0;
-  const overPen = clamp(over * 1.4, 0, 0.6);
-  let raw = ((perf / 100) * 0.7 + value * 0.3);
-  raw = raw * (1 - overPen);
-  return { total: Math.round(raw * 1000), perf: Math.round(perf), value: Math.round(value * 100), compat: 100, completeness: 100, spend: total, over: total > budget, overBy: Math.max(0, total - budget), issues: [] };
+  const spend = a.total, over = spend > budget, overBy = Math.max(0, spend - budget);
+  const perfPct = Math.round(a.fitNorm * 100);
+  if (issues.length > 0) return { total: 0, perf: perfPct, value: 0, compat: 0, completeness: Math.round((filled / CATEGORY_ORDER.length) * 100), spend, over, overBy, issues, dead: true };
+  // Engine composite: performance + price/perf value + budget use + cpu/gpu balance
+  const raw = (a.score / 1000) * 0.6 + (a.ppScore / 100) * 0.2 + (a.budgetAdh / 100) * 0.15 + (a.balance / 100) * 0.05;
+  return { total: Math.round(clamp(raw, 0, 1) * 1000), perf: perfPct, value: a.ppScore, compat: 100, completeness: 100, spend, over, overBy, issues: [] };
 }
 
 // elo-driven AI. Higher elo => stronger, more consistent builds.
@@ -1760,10 +1771,11 @@ function moggerAI(ucKey, budget, elo) {
     if (c === "mobo" && build.cpu && o.socket !== build.cpu.socket) return false;
     if (c === "cpu" && build.mobo && o.socket !== build.mobo.socket) return false;
     if (c === "cooler") { if (build.cpu && o.sockets && !o.sockets.includes(build.cpu.socket)) return false; if (build.cpu && o.tdpRating && o.tdpRating < build.cpu.tdp) return false; }
-    if (c === "psu" && o.watt && o.watt < draw() * 1.18) return false;
+    if (c === "psu" && o.watt && o.watt < requiredWatts(build) * 1.25) return false;
     return true;
   };
   const spent = () => CATEGORY_ORDER.reduce((s, c) => s + (build[c] ? build[c].price : 0), 0);
+  const up = (c, o) => ucPerf(c, o, ucKey); // engine's use-case-adjusted perf — the thing that's actually scored
 
   // lowest-level fumble: deliberately incompatible build (scores 0)
   if (Math.random() < pIncompat) {
@@ -1788,23 +1800,23 @@ function moggerAI(ucKey, budget, elo) {
     for (const c of order) {
       const w = W[c] || 0.02, cur = build[c];
       for (const o of moggerOptions(c)) {
-        if (!ok(c, o) || !cur || o.perf <= cur.perf) continue;
+        if (!ok(c, o) || !cur || up(c, o) <= up(c, cur)) continue;
         const delta = o.price - cur.price; if (delta <= 0) continue;
         if (spent() - cur.price + o.price > cap) continue;
-        const gain = (o.perf - cur.perf) * w / delta;
+        const gain = (up(c, o) - up(c, cur)) * w / delta;
         if (!best || gain > best.gain) best = { kind: "one", c, part: o, gain };
       }
     }
     if (build.cpu) {
       for (const cpu of moggerOptions("cpu")) {
-        if (cpu.perf <= build.cpu.perf) continue;
+        if (up("cpu", cpu) <= up("cpu", build.cpu)) continue;
         const mobo = cheapestMobo(cpu.socket), cooler = cheapestCooler(cpu);
         if (!mobo || !cooler) continue;
         const oldCost = build.cpu.price + (build.mobo ? build.mobo.price : 0) + (build.cooler ? build.cooler.price : 0);
         const newCost = cpu.price + mobo.price + cooler.price, delta = newCost - oldCost;
         if (delta <= 0) continue;
         if (spent() - oldCost + newCost > cap) continue;
-        const gain = (cpu.perf - build.cpu.perf) * (W.cpu || 0.1) / delta;
+        const gain = (up("cpu", cpu) - up("cpu", build.cpu)) * (W.cpu || 0.1) / delta;
         if (!best || gain > best.gain) best = { kind: "platform", cpu, mobo, cooler, gain };
       }
     }
@@ -1814,19 +1826,57 @@ function moggerAI(ucKey, budget, elo) {
   // 4) Ensure cooler/PSU adequate, then trim under budget.
   const fixValid = () => {
     if (build.cpu) { const cl = cheapestCooler(build.cpu); if (cl && (!build.cooler || (build.cooler.tdpRating && build.cooler.tdpRating < build.cpu.tdp) || (build.cooler.sockets && !build.cooler.sockets.includes(build.cpu.socket)))) build.cooler = cl; }
-    const d = mEstDraw(build); const psu = moggerOptions("psu").filter((p) => p.watt && p.watt >= d * 1.18).sort((a, b) => a.price - b.price)[0];
-    if (psu && (!build.psu || (build.psu.watt && build.psu.watt < d * 1.18))) build.psu = psu;
+    const d = requiredWatts(build) * 1.25; const psu = moggerOptions("psu").filter((p) => p.watt && p.watt >= d).sort((a, b) => a.price - b.price)[0];
+    if (psu && (!build.psu || (build.psu.watt && build.psu.watt < d))) build.psu = psu;
   };
   fixValid();
+
+  // 4b) Coerce RAM type + case fit so the build is never incompatible on those axes.
+  const fixCompat = () => {
+    // RAM must match the motherboard's type and capacity limit
+    if (build.mobo) {
+      const need = build.mobo.ramType, maxR = build.mobo.maxRam;
+      const ramOk = (r) => (!need || !r.ramType || r.ramType === need) && (!maxR || !r.cap || r.cap <= maxR);
+      if (!build.ram || !ramOk(build.ram)) {
+        const cands = moggerOptions("ram").filter(ramOk).sort((a, b) => up("ram", b) - up("ram", a) || a.price - b.price);
+        if (cands.length) { const within = cands.filter((r) => spent() - (build.ram ? build.ram.price : 0) + r.price <= budget); build.ram = within[0] || cands[cands.length - 1]; }
+      }
+    }
+    // Case must fit the motherboard form, the GPU length, and the cooler height
+    const caseFits = (cs) => (!build.mobo || !cs.forms || !build.mobo.form || cs.forms.includes(build.mobo.form))
+      && (!build.gpu || !cs.maxGpu || !build.gpu.len || build.gpu.len <= cs.maxGpu)
+      && (!build.cooler || !cs.maxCool || !build.cooler.height || build.cooler.height <= cs.maxCool);
+    if (build.case && !caseFits(build.case)) {
+      const cands = moggerOptions("case").filter(caseFits).sort((a, b) => a.price - b.price);
+      if (cands.length) { const within = cands.filter((cs) => spent() - build.case.price + cs.price <= budget); build.case = within[0] || cands[0]; }
+      else if (build.gpu) { // no case fits the GPU — take the roomiest case and shrink the GPU to fit
+        const roomy = [...moggerOptions("case")].sort((a, b) => (b.maxGpu || 0) - (a.maxGpu || 0))[0];
+        if (roomy) { build.case = roomy; const g = moggerOptions("gpu").filter((x) => !roomy.maxGpu || !x.len || x.len <= roomy.maxGpu).sort((a, b) => up("gpu", b) - up("gpu", a))[0]; if (g) build.gpu = g; }
+      }
+    }
+  };
+  fixCompat();
+
+  // stricter check that also respects RAM/case fit — used once mobo/gpu/cooler are settled
+  const fullOk = (c, o) => {
+    if (!ok(c, o)) return false;
+    if (c === "ram" && build.mobo) { if (build.mobo.ramType && o.ramType && o.ramType !== build.mobo.ramType) return false; if (build.mobo.maxRam && o.cap && o.cap > build.mobo.maxRam) return false; }
+    if (c === "mobo") { if (build.ram && build.ram.ramType && o.ramType && o.ramType !== build.ram.ramType) return false; if (build.case && build.case.forms && o.form && !build.case.forms.includes(o.form)) return false; }
+    if (c === "case") { if (build.mobo && build.mobo.form && o.forms && !o.forms.includes(build.mobo.form)) return false; if (build.gpu && build.gpu.len && o.maxGpu && build.gpu.len > o.maxGpu) return false; if (build.cooler && build.cooler.height && o.maxCool && build.cooler.height > o.maxCool) return false; }
+    if (c === "gpu" && build.case && build.case.maxGpu && o.len && o.len > build.case.maxGpu) return false;
+    if (c === "cooler" && build.case && build.case.maxCool && o.height && o.height > build.case.maxCool) return false;
+    return true;
+  };
+
   let tg = 0;
   while (spent() > budget && tg++ < 200) {
     let bestSwap = null;
     for (const c of order) {
       const cur = build[c]; if (!cur) continue;
-      const cheaper = moggerOptions(c).filter((o) => ok(c, o) && o.price < cur.price).sort((a, b) => b.perf - a.perf)[0];
+      const cheaper = moggerOptions(c).filter((o) => fullOk(c, o) && o.price < cur.price).sort((a, b) => up(c, b) - up(c, a))[0];
       if (!cheaper) continue;
       const save = cur.price - cheaper.price; if (save <= 0) continue;
-      const loss = (cur.perf - cheaper.perf) * (W[c] || 0.02) / save;
+      const loss = (up(c, cur) - up(c, cheaper)) * (W[c] || 0.02) / save;
       if (!bestSwap || loss < bestSwap.loss) bestSwap = { c, part: cheaper, loss };
     }
     if (!bestSwap) break;
@@ -1839,14 +1889,16 @@ function moggerAI(ucKey, budget, elo) {
     for (let i = 0; i < n; i++) {
       const c = order[Math.floor(Math.random() * order.length)];
       const cur = build[c];
-      const cheaper = moggerOptions(c).filter((o) => ok(c, o) && cur && o.perf < cur.perf).sort((a, b) => b.perf - a.perf)[0];
+      const cheaper = moggerOptions(c).filter((o) => fullOk(c, o) && cur && up(c, o) < up(c, cur)).sort((a, b) => up(c, b) - up(c, a))[0];
       if (cheaper) build[c] = cheaper;
     }
   }
   return build;
 }
-// Player rank name from elo.
-function moggerRank(elo) {
+// Player rank from elo, or a custom override (set by admin).
+function moggerRank(elo, custom) {
+  const c = typeof custom === "string" ? custom.trim() : "";
+  if (c) return { name: c, cls: "custom", icon: "⭐", color: "#ff7ae0", custom: true };
   const e = typeof elo === "number" && isFinite(elo) ? elo : 0;
   if (e >= 2500) return { name: "God Tier", cls: "god", icon: "👑", color: "#ffc24b" };
   if (e >= 1500) return { name: "Elite Tier", cls: "elite", icon: "💎", color: "#7c5cff" };
@@ -1878,15 +1930,54 @@ function moggerSpecs(p, cat) {
   return s;
 }
 
+const MOGGER_FILTERS = {
+  cpu: [{ k: "socket", label: "Socket" }],
+  gpu: [{ k: "vram", label: "VRAM", fmt: (v) => v + "GB" }],
+  mobo: [{ k: "socket", label: "Socket" }, { k: "ramType", label: "RAM" }, { k: "form", label: "Form" }],
+  ram: [{ k: "ramType", label: "Type" }, { k: "cap", label: "Size", fmt: (v) => v + "GB" }],
+  storage: [{ k: "kind", label: "Type" }, { k: "cap", label: "Size", fmt: (v) => (v >= 1000 ? v / 1000 + "TB" : v + "GB") }],
+  psu: [{ k: "watt", label: "Watts", fmt: (v) => v + "W" }, { k: "eff", label: "Rating" }],
+  case: [{ k: "forms", label: "Fits", arr: true }],
+  cooler: [{ k: "sockets", label: "Socket", arr: true }, { k: "type", label: "Type", fmt: (v) => (v === "aio" ? "AIO liquid" : "Air") }],
+};
+const MOGGER_SORTS = [
+  { k: "price-asc", label: "Price ↑" },
+  { k: "price-desc", label: "Price ↓" },
+  { k: "perf-desc", label: "Performance" },
+  { k: "name-asc", label: "Name A–Z" },
+];
+
 function MoggerPicker({ cat, current, budget, spent, onPick, onClose }) {
-  const all = useMemo(() => moggerOptions(cat), [cat]);
+  const all = useMemo(() => moggerOptionsAll(cat), [cat]);
   const [q, setQ] = useState("");
   const [info, setInfo] = useState(null);
+  const [sort, setSort] = useState("price-asc");
+  const [flt, setFlt] = useState({});
+  const filters = MOGGER_FILTERS[cat] || [];
+  const filterVals = useMemo(() => {
+    const out = {};
+    for (const f of filters) {
+      const set = new Set();
+      for (const o of all) { const v = o[f.k]; if (v == null) continue; if (f.arr) { for (const x of v) set.add(x); } else set.add(v); }
+      out[f.k] = [...set].sort((a, b) => (typeof a === "number" && typeof b === "number" ? a - b : String(a).localeCompare(String(b))));
+    }
+    return out;
+  }, [all, cat]);
   const opts = useMemo(() => {
     const t = q.trim().toLowerCase();
-    if (!t) return all;
-    return all.filter((o) => ((o.model || "") + " " + (o.name || "") + " " + (o.brand || "")).toLowerCase().includes(t));
-  }, [all, q]);
+    let list = !t ? all : all.filter((o) => ((o.model || "") + " " + (o.name || "") + " " + (o.brand || "")).toLowerCase().includes(t));
+    for (const f of filters) {
+      const sel = flt[f.k];
+      if (sel == null || sel === "") continue;
+      list = list.filter((o) => { const v = o[f.k]; if (v == null) return false; return f.arr ? v.map(String).includes(sel) : String(v) === sel; });
+    }
+    const arr = [...list];
+    if (sort === "price-asc") arr.sort((a, b) => a.price - b.price);
+    else if (sort === "price-desc") arr.sort((a, b) => b.price - a.price);
+    else if (sort === "perf-desc") arr.sort((a, b) => (b.perf || 0) - (a.perf || 0));
+    else if (sort === "name-asc") arr.sort((a, b) => (a.model || a.name || "").localeCompare(b.model || b.name || ""));
+    return arr;
+  }, [all, q, sort, flt, cat]);
   const cap = budget + 50; // hard limit: cannot go more than $50 over budget
   const Icon = CAT_META[cat].Icon;
   return (
@@ -1894,20 +1985,31 @@ function MoggerPicker({ cat, current, budget, spent, onPick, onClose }) {
       <div className="pm-drawer rf-drawer" onClick={(e) => e.stopPropagation()}>
         <div className="pm-drawer-head"><span>Choose {CAT_META[cat].label}</span><button className="pm-x" onClick={onClose}><X size={18} /></button></div>
         <div className="pm-search"><Search size={15} /><input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder={"Search " + CAT_META[cat].label.toLowerCase() + "…"} />{q && <button className="pm-search-x" onClick={() => setQ("")}><X size={13} /></button>}</div>
+        <div className="pm-filters">
+          <select className="pm-fsel" value={sort} onChange={(e) => setSort(e.target.value)}>{MOGGER_SORTS.map((s) => <option key={s.k} value={s.k}>{s.label}</option>)}</select>
+          {filters.map((f) => (
+            <select key={f.k} className={"pm-fsel" + (flt[f.k] ? " on" : "")} value={flt[f.k] || ""} onChange={(e) => setFlt((p) => ({ ...p, [f.k]: e.target.value }))}>
+              <option value="">{f.label}: all</option>
+              {(filterVals[f.k] || []).map((v) => <option key={String(v)} value={String(v)}>{f.fmt ? f.fmt(v) : String(v)}</option>)}
+            </select>
+          ))}
+          {(Object.values(flt).some(Boolean)) && <button className="pm-fclear" onClick={() => setFlt({})}>Clear</button>}
+        </div>
         <div className="pm-opts">
           {opts.map((o) => {
             const sel = current && current.id === o.id;
+            const oos = !!o._oos;
             const wouldBe = spent - (current ? current.price : 0) + o.price;
-            const blocked = wouldBe > cap && !sel;
+            const blocked = (oos || wouldBe > cap) && !sel;
             const showSpecs = info === o.id;
             const specs = showSpecs ? moggerSpecs(o, cat) : null;
             return (
               <div key={o.id} className="pm-optwrap">
-                <div className={"pm-opt" + (sel ? " sel" : "") + (blocked ? " blocked" : "")}>
+                <div className={"pm-opt" + (sel ? " sel" : "") + (blocked ? " blocked" : "") + (oos ? " oos" : "")}>
                   <button className="pm-opt-pick" disabled={blocked} onClick={() => { if (!blocked) onPick(o); }}>
                     <span className="pm-opt-img">{o.img ? <img src={o.img} alt="" loading="lazy" /> : <Icon size={18} />}</span>
                     <span className="pm-opt-main"><span className="pm-opt-name">{o.model || o.name}</span><span className="pm-opt-brand">{o.brand}</span></span>
-                    <span className="pm-opt-right"><span className="pm-opt-price">{o.price === 0 ? "Free" : fmt(o.price)}</span>{blocked ? <span className="pm-opt-block">over limit</span> : <span className={"pm-opt-bar" + (wouldBe > budget ? " over" : "")}><i style={{ width: clamp(o.perf, 4, 100) + "%" }} /></span>}</span>
+                    <span className="pm-opt-right">{oos ? <span className="pm-opt-oos">Out of stock</span> : <><span className="pm-opt-price">{o.price === 0 ? "Free" : fmt(o.price)}</span>{blocked ? <span className="pm-opt-block">over limit</span> : <span className={"pm-opt-bar" + (wouldBe > budget ? " over" : "")}><i style={{ width: clamp(o.perf, 4, 100) + "%" }} /></span>}</>}</span>
                   </button>
                   <button className="pm-opt-info" onClick={() => setInfo(showSpecs ? null : o.id)}>{showSpecs ? "Hide" : "Specs"}</button>
                 </div>
@@ -2041,10 +2143,10 @@ function MoggerScoreCol({ title, build, s, win, shown, rank }) {
   );
 }
 
-function MoggerResult({ round, you, opp, oppName, oppElo, myElo, eloMsg, onAgain, onMenu }) {
+function MoggerResult({ round, you, opp, oppName, oppElo, myElo, myCrank, eloMsg, onAgain, onMenu }) {
   const sy = useMemo(() => moggerScore(you, round.useCase, round.budget), []);
   const so = useMemo(() => moggerScore(opp, round.useCase, round.budget), []);
-  const myRank = myElo != null ? moggerRank(myElo) : null;
+  const myRank = myElo != null ? moggerRank(myElo, myCrank) : null;
   const oppRank = oppElo != null ? moggerRank(oppElo) : null;
   const youWin = sy.total >= so.total;
   const [phase, setPhase] = useState("loading"); // loading -> reveal
@@ -2506,7 +2608,7 @@ function MoggerOnline({ onExit, user, setUser, onNeedAuth }) {
   if (phase === "tournament") return <MoggerTournament onExit={() => setPhase("menu")} />;
   if (phase === "intro" && round) return <MoggerIntro round={round} player={null} onGo={() => setPhase("build")} />;
   if (phase === "build" && round) return <MoggerBuild round={round} player="You" oppLabel={oppName} oppBuild={aiOpp || null} oppIsAI={!!aiOpp} oppLocked={false} liveOpp={!aiOpp} oppLiveScore={oppLiveScore} oppLiveDone={!!oppBuild} onMyScore={aiOpp ? undefined : broadcastScore} myElo={myElo} oppElo={aiOpp ? aiOppElo : oppElo} onDone={onBuildDone} />;
-  if (phase === "result" && round && myBuildRef.current && (aiOpp || oppBuild)) return <MoggerResult round={round} you={myBuildRef.current} opp={aiOpp || oppBuild} oppName={oppName} oppElo={aiOpp ? aiOppElo : oppElo} myElo={myElo} eloMsg={eloMsg} onAgain={reset} onMenu={() => { cleanup(); onExit(); }} />;
+  if (phase === "result" && round && myBuildRef.current && (aiOpp || oppBuild)) return <MoggerResult round={round} you={myBuildRef.current} opp={aiOpp || oppBuild} oppName={oppName} oppElo={aiOpp ? aiOppElo : oppElo} myElo={myElo} myCrank={user ? user.crank : null} eloMsg={eloMsg} onAgain={reset} onMenu={() => { cleanup(); onExit(); }} />;
 
   return (
     <div className="pm-card pm-center rf-fade">
@@ -2592,6 +2694,11 @@ function MoggerAdmin({ onBack }) {
   const [err, setErr] = useState("");
   const [confirmId, setConfirmId] = useState(null);
   const [busyId, setBusyId] = useState(null);
+  const [expanded, setExpanded] = useState(null);
+  const [eloDraft, setEloDraft] = useState("");
+  const [pwDraft, setPwDraft] = useState("");
+  const [rankDraft, setRankDraft] = useState("");
+  const [msg, setMsg] = useState("");
   const load = async () => { setRows(null); const r = await netAllUsers(); if (r.error) { setErr(r.error); setRows([]); } else { setErr(""); setRows(r.rows); } };
   const tryAuth = () => { if (pw === ADMIN_PASS) { setAuthed(true); load(); } else setErr("Wrong admin password."); };
   const del = async (id) => {
@@ -2600,6 +2707,30 @@ function MoggerAdmin({ onBack }) {
     setBusyId(null); setConfirmId(null);
     if (!r.ok) { setErr(r.error || "Delete failed — did you run the delete-permission SQL?"); return; }
     setRows((prev) => (prev || []).filter((u) => u.id !== id));
+  };
+  const openRow = (u) => { if (expanded === u.id) { setExpanded(null); return; } setExpanded(u.id); setEloDraft(String(u.elo)); setPwDraft(""); setRankDraft(u.crank || ""); setMsg(""); setErr(""); };
+  const saveElo = async (u) => {
+    const v = parseInt(eloDraft, 10);
+    if (isNaN(v) || v < 0 || v > 100000) { setErr("Enter a whole number between 0 and 100000."); return; }
+    setBusyId(u.id); const r = await netSetElo(u.id, v); setBusyId(null);
+    if (!r.ok) { setErr(r.error || "Could not update elo."); return; }
+    setRows((prev) => (prev || []).map((x) => x.id === u.id ? { ...x, elo: v } : x).sort((a, b) => b.elo - a.elo));
+    setMsg("Elo updated.");
+  };
+  const resetPw = async (u) => {
+    setMsg(""); setErr("");
+    setBusyId(u.id); const r = await netResetPassword(u.id, u.name, pwDraft); setBusyId(null);
+    if (!r.ok) { setErr(r.error || "Could not reset password."); return; }
+    setRows((prev) => (prev || []).map((x) => x.id === u.id ? { ...x, hash: "(updated)" } : x));
+    setPwDraft(""); setMsg("Password reset. Tell the user their new password: " + pwDraft);
+  };
+  const saveRank = async (u) => {
+    setMsg(""); setErr("");
+    setBusyId(u.id); const r = await netSetCustomRank(u.id, rankDraft); setBusyId(null);
+    if (!r.ok) { setErr(r.error || "Could not set rank."); return; }
+    const v = rankDraft.trim().slice(0, 24) || null;
+    setRows((prev) => (prev || []).map((x) => x.id === u.id ? { ...x, crank: v } : x));
+    setMsg(v ? "Custom rank set to “" + v + "”." : "Custom rank cleared — back to elo rank.");
   };
   if (!authed) {
     return (
@@ -2616,16 +2747,28 @@ function MoggerAdmin({ onBack }) {
     <div className="pm-card pm-center rf-fade">
       <h2 className="pm-h2">🔒 Admin · Accounts</h2>
       {err && <div className="pm-auth-err">{err}</div>}
+      {msg && <div className="pm-admin-msg">{msg}</div>}
       {rows == null ? <div className="pm-spinner" /> : rows.length === 0 ? <p className="pm-p">No accounts found.</p> : (
         <div className="pm-lb pm-admin-list">
           {rows.map((u) => (
-            <div key={u.id} className="pm-lb-row pm-admin-row">
-              <span className="pm-lb-name">{u.name}<span className={"pm-rank pm-rank-" + moggerRank(u.elo).cls}>{moggerRank(u.elo).icon} {moggerRank(u.elo).name}</span></span>
-              <span className="pm-lb-elo">{u.elo}</span>
-              {confirmId === u.id ? (
-                <span className="pm-admin-confirm"><button className="pm-del-yes" disabled={busyId === u.id} onClick={() => del(u.id)}>{busyId === u.id ? "…" : "Delete"}</button><button className="pm-del-no" onClick={() => setConfirmId(null)}>Cancel</button></span>
-              ) : (
-                <button className="pm-del-btn" onClick={() => { setErr(""); setConfirmId(u.id); }}><X size={14} /></button>
+            <div key={u.id} className="pm-admin-item">
+              <div className="pm-lb-row pm-admin-row">
+                <button className="pm-admin-open" onClick={() => openRow(u)}><span className="pm-lb-name">{u.name}{(() => { const rk = moggerRank(u.elo, u.crank); return <span className={"pm-rank pm-rank-" + rk.cls}>{rk.icon} {rk.name}</span>; })()}</span></button>
+                <span className="pm-lb-elo">{u.elo}</span>
+                {confirmId === u.id ? (
+                  <span className="pm-admin-confirm"><button className="pm-del-yes" disabled={busyId === u.id} onClick={() => del(u.id)}>{busyId === u.id ? "…" : "Delete"}</button><button className="pm-del-no" onClick={() => setConfirmId(null)}>Cancel</button></span>
+                ) : (
+                  <button className="pm-del-btn" onClick={() => { setErr(""); setConfirmId(u.id); }}><X size={14} /></button>
+                )}
+              </div>
+              {expanded === u.id && (
+                <div className="pm-admin-edit">
+                  <div className="pm-admin-line"><span className="pm-admin-l">Elo</span><input className="pm-admin-in" value={eloDraft} onChange={(e) => setEloDraft(e.target.value.replace(/[^0-9]/g, ""))} inputMode="numeric" /><button className="pm-admin-save" disabled={busyId === u.id} onClick={() => saveElo(u)}>Save</button></div>
+                  <div className="pm-admin-line"><span className="pm-admin-l">Custom rank</span><input className="pm-admin-in" value={rankDraft} maxLength={24} onChange={(e) => setRankDraft(e.target.value)} placeholder="blank = elo rank" /><button className="pm-admin-save" disabled={busyId === u.id} onClick={() => saveRank(u)}>{rankDraft.trim() ? "Set" : "Clear"}</button></div>
+                  <div className="pm-admin-line"><span className="pm-admin-l">New password</span><input className="pm-admin-in" value={pwDraft} onChange={(e) => setPwDraft(e.target.value)} placeholder="set a new one" /><button className="pm-admin-save" disabled={busyId === u.id || !pwDraft} onClick={() => resetPw(u)}>Reset</button></div>
+                  <div className="pm-admin-hash"><span className="pm-admin-l">Stored hash</span><code>{u.hash}</code></div>
+                  <p className="pm-admin-hint">Passwords aren't stored — only this one-way hash, so the real password can't be shown. Use “Reset” to set a new one.</p>
+                </div>
               )}
             </div>
           ))}
@@ -2647,7 +2790,7 @@ function MoggerLeaderboard({ onBack, meName }) {
           {rows.map((r, i) => (
             <div key={i} className={"pm-lb-row" + (r.name === meName ? " me" : "")}>
               <span className="pm-lb-rank">{i + 1}</span>
-              <span className="pm-lb-name">{r.name}<span className={"pm-rank pm-rank-" + moggerRank(r.elo).cls}>{moggerRank(r.elo).icon} {moggerRank(r.elo).name}</span></span>
+              <span className="pm-lb-name">{r.name}{(() => { const rk = moggerRank(r.elo, r.crank); return <span className={"pm-rank pm-rank-" + rk.cls}>{rk.icon} {rk.name}</span>; })()}</span>
               <span className="pm-lb-elo">{r.elo}</span>
             </div>
           ))}
@@ -2707,7 +2850,7 @@ function MoggerGame({ onExit }) {
     <div className="pm-mogger rf-fade">
       {screen === "menu" && (
         <div className="pm-menu">
-          <div className="pm-account">{user ? <><span className="pm-acct-name">{user.name}</span><span className={"pm-rank pm-rank-" + moggerRank(user.elo).cls}>{moggerRank(user.elo).icon} {moggerRank(user.elo).name}</span><span className="pm-acct-elo">{user.elo} elo</span><button className="pm-acct-btn" onClick={() => persist(null)}>Log out</button></> : <button className="pm-acct-btn" onClick={() => setShowAuth(true)}>Log in / Sign up</button>}</div>
+          <div className="pm-account">{user ? <><span className="pm-acct-name">{user.name}</span>{(() => { const rk = moggerRank(user.elo, user.crank); return <span className={"pm-rank pm-rank-" + rk.cls}>{rk.icon} {rk.name}</span>; })()}<span className="pm-acct-elo">{user.elo} elo</span><button className="pm-acct-btn" onClick={() => persist(null)}>Log out</button></> : <button className="pm-acct-btn" onClick={() => setShowAuth(true)}>Log in / Sign up</button>}</div>
           <div className="pm-mtitle">PC <span className="rf-accent">MOGGER</span></div>
           <p className="pm-tag">Build the best PC for the challenge. AI judges. One winner.</p>
           <div className="pm-mode-grid">
@@ -2750,7 +2893,7 @@ function MoggerGame({ onExit }) {
       {screen === "handoff" && <div className="pm-card pm-center rf-fade"><h2 className="pm-h2"><Repeat2 size={20} /> Pass the device</h2><p className="pm-p">Player 1 is locked in. Hand the device to <b>Player 2</b> — same challenge, same clock. No peeking.</p><button className="rf-btn" onClick={() => setScreen("intro2")}>I am Player 2 — start <ChevronRight size={16} /></button></div>}
       {screen === "intro2" && round && <MoggerIntro round={round} player="Player 2" onGo={() => setScreen("p2")} />}
       {screen === "p2" && round && <MoggerBuild round={round} player="Player 2" oppLabel="Player 1" oppBuild={you} oppIsAI={false} oppLocked={true} onDone={finishP2} />}
-      {screen === "result" && round && you && opp && <MoggerResult round={round} you={you} opp={opp} oppName={mode === "ai" ? "AI Opponent" : "Player 2"} oppElo={mode === "ai" ? aiElo : null} myElo={mode === "ai" && user ? user.elo : null} eloMsg={eloMsg} onAgain={again} onMenu={menu} />}
+      {screen === "result" && round && you && opp && <MoggerResult round={round} you={you} opp={opp} oppName={mode === "ai" ? "AI Opponent" : "Player 2"} oppElo={mode === "ai" ? aiElo : null} myElo={mode === "ai" && user ? user.elo : null} myCrank={user ? user.crank : null} eloMsg={eloMsg} onAgain={again} onMenu={menu} />}
     </div>
   );
 }
@@ -4194,6 +4337,7 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .pm-rank-shigh{color:#5ec8ff;}
 .pm-rank-elite{color:#7c5cff;}
 .pm-rank-god{color:#ffc24b;background:rgba(255,194,75,0.1);box-shadow:0 0 12px rgba(255,194,75,0.35);}
+.pm-rank-custom{color:#ff7ae0;background:rgba(255,122,224,0.12);box-shadow:0 0 12px rgba(255,122,224,0.35);}
 .pm-lb-name{display:flex;align-items:center;gap:8px;}
 .pm-lb-name .pm-rank{font-size:10px;padding:1px 6px;}
 .pm-rank-col{margin:0 auto 4px;width:fit-content;}
@@ -4204,6 +4348,18 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .pm-admin-confirm{display:flex;gap:6px;}
 .pm-del-yes{padding:5px 10px;border-radius:8px;background:var(--c-bad);border:none;color:#fff;font-family:'Chakra Petch';font-weight:600;cursor:pointer;}
 .pm-del-no{padding:5px 10px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid var(--c-border);color:var(--c-text);font-family:'Chakra Petch';cursor:pointer;}
+.pm-admin-item{border-radius:10px;overflow:hidden;}
+.pm-admin-open{flex:1;min-width:0;text-align:left;background:none;border:none;cursor:pointer;padding:0;}
+.pm-admin-msg{background:rgba(70,224,160,0.12);border:1px solid var(--c-good);color:var(--c-good);border-radius:10px;padding:9px 12px;font-size:13px;margin-bottom:10px;word-break:break-word;}
+.pm-admin-edit{background:rgba(255,255,255,0.03);border:1px solid var(--c-border);border-top:none;border-radius:0 0 10px 10px;padding:12px;display:flex;flex-direction:column;gap:9px;margin-top:-4px;}
+.pm-admin-line{display:flex;align-items:center;gap:8px;}
+.pm-admin-l{font-family:'Chakra Petch';font-size:12px;color:var(--c-muted);min-width:96px;}
+.pm-admin-in{flex:1;min-width:0;padding:7px 10px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid var(--c-border);color:var(--c-text);font-family:'JetBrains Mono';font-size:13px;}
+.pm-admin-save{padding:7px 14px;border-radius:8px;background:var(--c-accent);border:none;color:#04141a;font-family:'Chakra Petch';font-weight:700;cursor:pointer;}
+.pm-admin-save:disabled{opacity:0.5;cursor:default;}
+.pm-admin-hash{display:flex;align-items:flex-start;gap:8px;}
+.pm-admin-hash code{flex:1;min-width:0;font-family:'JetBrains Mono';font-size:10.5px;color:var(--c-muted);word-break:break-all;background:rgba(0,0,0,0.3);padding:6px 8px;border-radius:6px;}
+.pm-admin-hint{font-size:11.5px;color:var(--c-muted);margin:2px 0 0;}
 .pm-auth-hint{font-size:12px;color:var(--c-muted);margin:0 0 10px;}
 .pm-auth-err{font-size:13px;color:var(--c-bad);margin:0 0 10px;}
 .pm-auth-note{font-size:11px;color:var(--c-muted);margin:14px 0 0;opacity:.8;}
@@ -4288,7 +4444,15 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .pm-vs-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;}
 .pm-vs-word{font-family:'Chakra Petch';font-weight:700;font-size:20px;color:var(--c-text);opacity:.5;}
 .pm-challenge-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
-.pm-search{display:flex;align-items:center;gap:8px;padding:9px 12px;margin-bottom:14px;border-bottom:1px solid var(--c-border);color:var(--c-muted);}
+.pm-search{display:flex;align-items:center;gap:8px;padding:9px 12px;margin-bottom:8px;border-bottom:1px solid var(--c-border);color:var(--c-muted);}
+.pm-filters{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 10px;border-bottom:1px solid var(--c-border);margin-bottom:10px;}
+.pm-fsel{appearance:none;-webkit-appearance:none;padding:6px 22px 6px 10px;border-radius:8px;background:rgba(255,255,255,0.05) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%238aa0b4' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>") no-repeat right 8px center;border:1px solid var(--c-border);color:var(--c-text);font-family:'Chakra Petch';font-size:12px;cursor:pointer;max-width:46%;}
+.pm-fsel.on{border-color:var(--c-accent);color:var(--c-accent);}
+.pm-fsel option{background:#0d1320;color:var(--c-text);}
+.pm-fclear{padding:6px 10px;border-radius:8px;background:transparent;border:1px solid var(--c-border);color:var(--c-muted);font-family:'Chakra Petch';font-size:12px;cursor:pointer;}
+.pm-opt.oos{opacity:0.55;}
+.pm-opt.oos .pm-opt-img{filter:grayscale(1);}
+.pm-opt-oos{font-family:'Chakra Petch';font-weight:600;font-size:11.5px;color:var(--c-bad);white-space:nowrap;}
 .pm-search input{flex:1;background:transparent;border:none;outline:none;color:var(--c-text);font-family:'Sora',sans-serif;font-size:14px;}
 .pm-search-x{background:none;border:none;color:var(--c-muted);cursor:pointer;display:flex;}
 .pm-opt.blocked{opacity:.4;cursor:not-allowed;filter:grayscale(.6);}
