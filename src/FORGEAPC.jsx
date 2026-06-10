@@ -4524,6 +4524,7 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .pm-namein{width:100%;text-align:center;font-family:'Sora',sans-serif;font-size:18px;padding:13px;margin-bottom:16px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid var(--c-border);color:var(--c-text);outline:none;}
 .pm-input{width:100%;max-width:320px;text-align:center;font-family:'Chakra Petch';font-size:16px;padding:12px 14px;margin:4px auto 16px;display:block;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid var(--c-border);color:var(--c-text);outline:none;}
 .pm-input::placeholder{color:var(--c-muted);}
+.pm-input::-ms-reveal,.pm-input::-ms-clear,.pm-namein::-ms-reveal,.pm-admin-in::-ms-reveal{filter:invert(1) brightness(2);}
 .pm-input:focus{border-color:var(--c-accent);box-shadow:0 0 0 2px rgba(25,232,219,0.18);}
 .pm-namein:focus{border-color:var(--c-accent);}
 .pm-mode:disabled{opacity:.4;cursor:not-allowed;}
