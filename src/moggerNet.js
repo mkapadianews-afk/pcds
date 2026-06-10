@@ -90,6 +90,11 @@ export async function fetchElo(id) {
   try { const { data } = await supabase.from("mogger_users").select("elo").eq("id", id).single(); return data ? data.elo : null; }
   catch (e) { return null; }
 }
+// full refresh of the logged-in user (elo + custom rank), so admin changes show up
+export async function fetchUser(id) {
+  try { const { data } = await supabase.from("mogger_users").select("id,name,elo,crank").eq("id", id).single(); return data || null; }
+  catch (e) { return null; }
+}
 export async function saveElo(id, elo) {
   try { await supabase.from("mogger_users").update({ elo }).eq("id", id); } catch (e) { /* ignore */ }
 }
