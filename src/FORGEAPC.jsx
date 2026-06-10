@@ -764,8 +764,9 @@ function ucPerf(cat, part, uc) {
         return part.perf * 0.6 + (Math.min(part.cores, 16) / 16) * 100 * 0.4;
       // gaming / streaming: large-cache X3D chips punch far above their base rating —
       // a 7600X3D out-games a Core Ultra 5 / non-X3D Ryzen despite a lower MT score.
+      // No 100 cap here, so a 9800X3D still edges out a 7800X3D at the very top.
       if ((uc === "gaming" || uc === "streaming") && /X3D/i.test(part.name || part.model || ""))
-        return Math.min(100, part.perf + 10);
+        return part.perf + 10;
       return part.perf;
     case "gpu":
       if (uc === "ai") return part.perf * 0.5 + (Math.min(part.vram, 32) / 32) * 100 * 0.5;
@@ -1333,6 +1334,8 @@ export default function RigForge() {
   const [theme, setTheme] = useState("dark"); // default dark mode
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsTab, setSettingsTab] = useState("appearance");
+  const [hdrUser, setHdrUser] = useState(() => { try { const s = localStorage.getItem("mogger_user"); return s ? JSON.parse(s) : null; } catch (e) { return null; } });
+  const [hdrAuth, setHdrAuth] = useState(false);
   const [lang, setLang] = useState("en");
   CUR_LANG = lang;
 
@@ -1467,6 +1470,8 @@ export default function RigForge() {
   };
 
   const acct = () => { try { const s = localStorage.getItem("mogger_user"); return s ? JSON.parse(s) : null; } catch (e) { return null; } };
+  useEffect(() => { setHdrUser(acct()); }, [view]);
+  const hdrLogout = () => { try { localStorage.removeItem("mogger_user"); } catch (e) {} setHdrUser(null); };
   const refreshSaved = useCallback(async () => {
     setLoadingSaved(true);
     const keys = await sList("build:");
@@ -1606,6 +1611,15 @@ export default function RigForge() {
               <ChevronLeft size={16} /> {t("myRigs")}
             </button>
           )}
+          {hdrUser ? (
+            <div className="rf-acct-chip">
+              <span className="rf-acct-name">{hdrUser.name}</span>
+              <RankBadge rank={moggerRank(hdrUser.elo, hdrUser.crank)} />
+              <button className="rf-acct-out" onClick={hdrLogout} title="Log out"><X size={13} /></button>
+            </div>
+          ) : (
+            <button className="rf-ghost rf-login-btn" onClick={() => setHdrAuth(true)}>Log in</button>
+          )}
           <div className="rf-settings-wrap">
             <button className="rf-ghost rf-fs-btn" onClick={(e) => { e.stopPropagation(); setSettingsOpen((o) => !o); }} title="Settings"><Settings size={16} /></button>
             {settingsOpen && (
@@ -1642,6 +1656,8 @@ export default function RigForge() {
           </button>
         </div>
       </header>
+
+      {hdrAuth && <MoggerAuth onClose={() => setHdrAuth(false)} onAuth={(u) => { try { localStorage.setItem("mogger_user", JSON.stringify(u)); } catch (e) {} setHdrUser(u); setHdrAuth(false); }} />}
 
       <main className="rf-main">
         {view === "home" && (
@@ -4067,8 +4083,20 @@ padding:8px 10px;border-radius:8px;cursor:pointer;transition:.15s;}
 .rf-brand{display:flex;align-items:center;gap:10px;font-family:'Chakra Petch';font-weight:700;
 font-size:20px;letter-spacing:1px;cursor:pointer;}
 .rf-logo{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;color:#04110f;
-background:linear-gradient(135deg,var(--c-accent),#19b89f);box-shadow:0 0 18px rgba(25,232,219,0.5);}
+background:linear-gradient(135deg,var(--c-accent),#19b89f);box-shadow:0 0 18px rgba(25,232,219,0.5);animation:rfLogoGlow 3.4s ease-in-out infinite;}
+@keyframes rfLogoGlow{0%,100%{box-shadow:0 0 16px rgba(25,232,219,0.45);}50%{box-shadow:0 0 26px rgba(25,232,219,0.85),0 0 40px rgba(124,92,255,0.35);}}
+/* extra flash: animated sheen sweep across primary buttons */
+.rf-btn{position:relative;overflow:hidden;}
+.rf-btn::after{content:"";position:absolute;top:0;left:-60%;width:45%;height:100%;background:linear-gradient(105deg,transparent,rgba(255,255,255,0.55),transparent);transform:skewX(-18deg);animation:rfSheen 4.5s ease-in-out infinite;pointer-events:none;}
+@keyframes rfSheen{0%,72%{left:-60%;}86%{left:130%;}100%{left:130%;}}
+.rf-btn:hover{filter:brightness(1.08) saturate(1.1);}
+@media (prefers-reduced-motion:reduce){.rf-logo,.rf-btn::after{animation:none;}.rf-btn::after{display:none;}}
 .rf-accent{color:var(--c-accent);}
+.rf-login-btn{font-weight:600;}
+.rf-acct-chip{display:inline-flex;align-items:center;gap:8px;padding:5px 8px 5px 12px;border-radius:11px;background:rgba(255,255,255,0.05);border:1px solid var(--c-border);}
+.rf-acct-name{font-family:'Chakra Petch';font-weight:600;font-size:13.5px;color:var(--c-text);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rf-acct-out{display:grid;place-items:center;width:22px;height:22px;border-radius:7px;border:none;cursor:pointer;background:rgba(255,255,255,0.06);color:var(--c-muted);transition:background .15s,color .15s;}
+.rf-acct-out:hover{background:rgba(255,92,114,0.18);color:var(--c-bad);}
 .rf-main{position:relative;z-index:2;max-width:1080px;margin:0 auto;padding:8px 26px 90px;}
 .rf-muted{color:var(--c-muted);}
 .rf-sm{font-size:12.5px;}
@@ -4103,39 +4131,36 @@ h3{font-family:'Chakra Petch';font-weight:600;font-size:18px;margin:0 0 6px;}
 .rf-forge-art svg{width:100%;height:auto;display:block;overflow:visible;}
 @media (max-width:860px){.rf-forge-art{display:none;}}
 .fa-core,.fa-piece,.fa-coreglow,.fa-ring,.fa-ring2,.fa-flash,.fa-pc,.fa-blades,.fa-sparks,.fa-ingot{transform-box:fill-box;transform-origin:center;}
-.fa-coreglow{animation:faPulse 8s ease-in-out infinite;}
-@keyframes faPulse{0%,100%{opacity:0.4;transform:scale(0.85);}20%{opacity:0.6;transform:scale(0.92);}28%{opacity:1;transform:scale(1.2);}70%{opacity:0.9;transform:scale(1.08);}}
+.fa-coreglow{animation:faPulse 5s ease-in-out infinite;}
+@keyframes faPulse{0%,100%{opacity:0.6;transform:scale(0.95);}50%{opacity:0.95;transform:scale(1.08);}}
 .fa-ring{animation:faSpin 30s linear infinite;}
 .fa-ring2{animation:faSpin 22s linear infinite reverse;}
 @keyframes faSpin{to{transform:rotate(360deg);}}
-.fa-flash{opacity:0;animation:faBurst 8s ease-out infinite;}
-@keyframes faBurst{0%,24%{opacity:0;transform:scale(0.25);}28%{opacity:1;transform:scale(1.15);}40%{opacity:0;transform:scale(1.6);}100%{opacity:0;transform:scale(1.6);}}
+/* the forge plays through ONCE on load, then the finished PC just stays */
+.fa-flash{opacity:0;animation:faBurst 3.6s ease-out 1 both;}
+@keyframes faBurst{0%,55%{opacity:0;transform:scale(0.25);}64%{opacity:1;transform:scale(1.15);}88%{opacity:0;transform:scale(1.6);}100%{opacity:0;transform:scale(1.6);}}
 /* the glowing ingot, consumed at the moment of the strike */
-.fa-ingot{animation:faIngot 8s ease-in-out infinite;}
-@keyframes faIngot{0%,18%{opacity:0.9;transform:scale(1);}26%{opacity:1;transform:scale(1.12);}30%{opacity:0;transform:scale(0.6);}88%{opacity:0;transform:scale(0.6);}100%{opacity:0.9;transform:scale(1);}}
+.fa-ingot{animation:faIngot 3.6s ease-in-out 1 both;}
+@keyframes faIngot{0%,42%{opacity:0.9;transform:scale(1);}60%{opacity:1;transform:scale(1.12);}70%,100%{opacity:0;transform:scale(0.6);}}
 /* sparks fly outward on impact */
-.fa-sparks{opacity:0;transform-origin:200px 190px;animation:faSparks 8s ease-out infinite;}
-@keyframes faSparks{0%,24%{opacity:0;transform:scale(0.15);}27%{opacity:1;transform:scale(0.6);}34%{opacity:0.7;transform:scale(1.15);}42%{opacity:0;transform:scale(1.4);}100%{opacity:0;}}
-/* the pickaxe winds up, strikes at ~26%, recoils, then lifts and waits */
-.fa-pick{transform-box:view-box;transform-origin:252px 96px;animation:faSwing 8s infinite;}
+.fa-sparks{opacity:0;transform-origin:200px 190px;animation:faSparks 3.6s ease-out 1 both;}
+@keyframes faSparks{0%,55%{opacity:0;transform:scale(0.15);}63%{opacity:1;transform:scale(0.6);}78%{opacity:0.7;transform:scale(1.15);}96%,100%{opacity:0;transform:scale(1.4);}}
+/* the pickaxe winds up, strikes, recoils, then disappears for good */
+.fa-pick{transform-box:view-box;transform-origin:252px 96px;animation:faSwing 3.6s 1 both;}
 @keyframes faSwing{
   0%{transform:rotate(-50deg);opacity:1;animation-timing-function:cubic-bezier(.4,0,.2,1);}
-  16%{transform:rotate(-62deg);opacity:1;animation-timing-function:cubic-bezier(.7,0,.95,.3);}
-  26%{transform:rotate(7deg);opacity:1;animation-timing-function:cubic-bezier(.2,0,.3,1);}
-  31%{transform:rotate(-6deg);opacity:1;animation-timing-function:cubic-bezier(.3,0,.4,1);}
-  40%{transform:rotate(-46deg);opacity:0;}
-  88%{transform:rotate(-50deg);opacity:0;}
-  100%{transform:rotate(-50deg);opacity:1;}
+  38%{transform:rotate(-62deg);opacity:1;animation-timing-function:cubic-bezier(.7,0,.95,.3);}
+  60%{transform:rotate(7deg);opacity:1;animation-timing-function:cubic-bezier(.2,0,.3,1);}
+  68%{transform:rotate(-6deg);opacity:1;animation-timing-function:cubic-bezier(.3,0,.4,1);}
+  82%,100%{transform:rotate(-44deg);opacity:0;}
 }
-/* the fish-tank PC is forged into being at the strike, then grows a bit, holds, eases away */
-.fa-pc{opacity:0;animation:faAssemble 8s infinite;}
+/* the fish-tank PC is forged into being at the strike, grows a touch, then just stays */
+.fa-pc{opacity:0;animation:faAssemble 3.6s 1 both;}
 @keyframes faAssemble{
-  0%,24%{opacity:0;transform:scale(0.5);animation-timing-function:cubic-bezier(.34,1.56,.64,1);}
-  38%{opacity:1;transform:scale(1.06);animation-timing-function:cubic-bezier(.4,0,.6,1);}
-  44%{opacity:1;transform:scale(1);animation-timing-function:cubic-bezier(.4,0,.4,1);}
-  80%{opacity:1;transform:scale(1.16);}
-  90%{opacity:0;transform:scale(1.22);}
-  100%{opacity:0;transform:scale(0.5);}
+  0%,55%{opacity:0;transform:scale(0.5);animation-timing-function:cubic-bezier(.34,1.56,.64,1);}
+  74%{opacity:1;transform:scale(1.08);animation-timing-function:cubic-bezier(.4,0,.6,1);}
+  84%{opacity:1;transform:scale(1);animation-timing-function:cubic-bezier(.35,0,.4,1);}
+  100%{opacity:1;transform:scale(1.06);}
 }
 .fa-caseglow{animation:faCaseGlow 2.4s ease-in-out infinite;}
 @keyframes faCaseGlow{0%,100%{stroke:#19e8db;stroke-opacity:0.25;}50%{stroke:#7c5cff;stroke-opacity:0.55;}}
@@ -4185,7 +4210,8 @@ h3{font-family:'Chakra Petch';font-weight:600;font-size:18px;margin:0 0 6px;}
 
 /* SAVED */
 .rf-saved-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px;}
-.rf-saved-card{background:var(--c-panel);border:1px solid var(--c-border);border-radius:16px;padding:20px;cursor:pointer;transition:transform .2s,border-color .2s,background .2s;}
+.rf-saved-card{background:var(--c-panel);border:1px solid var(--c-border);border-radius:16px;padding:20px;cursor:pointer;transition:transform .2s,border-color .2s,background .2s,box-shadow .2s;}
+.rf-saved-card:hover{transform:translateY(-3px);border-color:rgba(25,232,219,0.45);box-shadow:0 0 0 1px rgba(25,232,219,0.2),0 14px 36px -12px rgba(25,232,219,0.45);}
 .rf-saved-card:hover{transform:translateY(-2px);border-color:rgba(25,232,219,0.4);background:var(--c-panel-2);}
 .rf-saved-parts{margin-top:15px;padding-top:14px;border-top:1px solid var(--c-border);display:flex;flex-direction:column;gap:6px;}
 .rf-saved-part{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:12.5px;}
