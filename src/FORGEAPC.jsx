@@ -4522,6 +4522,9 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .pm-tour-win{color:var(--c-good);font-weight:600;}
 .pm-tour-vs{color:var(--c-muted);font-family:'Chakra Petch';font-size:12px;}
 .pm-namein{width:100%;text-align:center;font-family:'Sora',sans-serif;font-size:18px;padding:13px;margin-bottom:16px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid var(--c-border);color:var(--c-text);outline:none;}
+.pm-input{width:100%;max-width:320px;text-align:center;font-family:'Chakra Petch';font-size:16px;padding:12px 14px;margin:4px auto 16px;display:block;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid var(--c-border);color:var(--c-text);outline:none;}
+.pm-input::placeholder{color:var(--c-muted);}
+.pm-input:focus{border-color:var(--c-accent);box-shadow:0 0 0 2px rgba(25,232,219,0.18);}
 .pm-namein:focus{border-color:var(--c-accent);}
 .pm-mode:disabled{opacity:.4;cursor:not-allowed;}
 .pm-tour-players{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:4px 0 8px;}
