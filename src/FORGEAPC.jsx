@@ -3004,12 +3004,11 @@ function ForgeArt() {
         <circle className="fa-coreglow" cx="200" cy="200" r="155" fill="url(#faGlow)" />
         <g className="fa-ring"><circle cx="200" cy="200" r="128" fill="none" stroke="#19e8db" strokeOpacity="0.25" strokeWidth="1.2" strokeDasharray="5 12" /></g>
         <g className="fa-ring2"><circle cx="200" cy="200" r="152" fill="none" stroke="#7c5cff" strokeOpacity="0.2" strokeWidth="1" strokeDasharray="2 16" /></g>
-        <g className="fa-lines" stroke="url(#faEdge)" strokeWidth="1.4" fill="none">
-          <line className="fa-l fa-l1" x1="200" y1="200" x2="200" y2="78" />
-          <line className="fa-l fa-l2" x1="200" y1="200" x2="312" y2="156" />
-          <line className="fa-l fa-l3" x1="200" y1="200" x2="300" y2="262" />
-          <line className="fa-l fa-l4" x1="200" y1="200" x2="98" y2="116" />
-          <line className="fa-l fa-l5" x1="200" y1="200" x2="100" y2="288" />
+        {/* glowing ingot on the anvil, waiting to be forged */}
+        <g className="fa-ingot">
+          <ellipse cx="200" cy="214" rx="40" ry="9" fill="#000" fillOpacity="0.4" />
+          <rect x="172" y="188" width="56" height="26" rx="8" fill="url(#faEdge)" />
+          <rect x="172" y="188" width="56" height="26" rx="8" fill="#fff" fillOpacity="0.15" />
         </g>
 
         {/* ===== assembled FISH-TANK gaming PC (wide glass box) ===== */}
@@ -3046,30 +3045,25 @@ function ForgeArt() {
         {/* flash when it snaps together */}
         <circle className="fa-flash" cx="200" cy="200" r="74" fill="url(#faGlow)" />
 
-        {/* ===== scattered parts that fly in ===== */}
-        <g className="fa-piece fa-p1">
-          <rect x="180" y="52" width="40" height="40" rx="6" fill="#0d1320" stroke="#19e8db" strokeWidth="2" />
-          <rect x="190" y="62" width="20" height="20" rx="3" fill="#19e8db" fillOpacity="0.25" stroke="#19e8db" strokeWidth="1.2" />
-          <g stroke="#19e8db" strokeWidth="1.6"><line x1="186" y1="52" x2="186" y2="46" /><line x1="194" y1="52" x2="194" y2="46" /><line x1="202" y1="52" x2="202" y2="46" /><line x1="210" y1="52" x2="210" y2="46" /><line x1="186" y1="92" x2="186" y2="98" /><line x1="194" y1="92" x2="194" y2="98" /><line x1="202" y1="92" x2="202" y2="98" /><line x1="210" y1="92" x2="210" y2="98" /></g>
+        {/* sparks bursting from the strike point */}
+        <g className="fa-sparks" stroke="#ffd24a" strokeWidth="2.4" strokeLinecap="round" fill="#ffd24a">
+          <line x1="200" y1="190" x2="200" y2="168" />
+          <line x1="200" y1="190" x2="222" y2="176" />
+          <line x1="200" y1="190" x2="178" y2="176" />
+          <line x1="200" y1="190" x2="232" y2="192" />
+          <line x1="200" y1="190" x2="168" y2="192" />
+          <line x1="200" y1="190" x2="216" y2="206" />
+          <line x1="200" y1="190" x2="184" y2="206" />
+          <circle cx="238" cy="170" r="2.2" /><circle cx="162" cy="172" r="2" /><circle cx="226" cy="208" r="1.8" />
         </g>
-        <g className="fa-piece fa-p2">
-          <rect x="296" y="128" width="58" height="20" rx="3" fill="#0d1320" stroke="#7c5cff" strokeWidth="2" />
-          <g stroke="#7c5cff" strokeWidth="1.4" strokeOpacity="0.8"><line x1="304" y1="148" x2="304" y2="154" /><line x1="314" y1="148" x2="314" y2="154" /><line x1="324" y1="148" x2="324" y2="154" /><line x1="334" y1="148" x2="334" y2="154" /><line x1="344" y1="148" x2="344" y2="154" /></g>
-        </g>
-        <g className="fa-piece fa-p3">
-          <rect x="262" y="240" width="76" height="40" rx="6" fill="#0d1320" stroke="#19e8db" strokeWidth="2" />
-          <circle cx="284" cy="260" r="11" fill="none" stroke="#19e8db" strokeWidth="1.6" /><circle cx="284" cy="260" r="2.4" fill="#19e8db" />
-          <circle cx="316" cy="260" r="11" fill="none" stroke="#19e8db" strokeWidth="1.6" /><circle cx="316" cy="260" r="2.4" fill="#19e8db" />
-        </g>
-        <g className="fa-piece fa-p4">
-          <rect x="60" y="96" width="60" height="20" rx="4" fill="#0d1320" stroke="#7c5cff" strokeWidth="2" />
-          <circle cx="110" cy="106" r="4" fill="none" stroke="#7c5cff" strokeWidth="1.4" />
-          <rect x="68" y="103" width="22" height="6" rx="2" fill="#7c5cff" fillOpacity="0.3" />
-        </g>
-        <g className="fa-piece fa-p5">
-          <rect x="62" y="262" width="56" height="44" rx="6" fill="#0d1320" stroke="#19e8db" strokeWidth="2" />
-          <circle cx="90" cy="284" r="14" fill="none" stroke="#19e8db" strokeWidth="1.6" strokeOpacity="0.7" />
-          <path d="M90 274 v20 M80 284 h20" stroke="#19e8db" strokeWidth="1.4" strokeOpacity="0.6" />
+
+        {/* ===== the pickaxe that forges it ===== */}
+        <g className="fa-pick">
+          <line x1="252" y1="96" x2="194" y2="152" stroke="#c98a4b" strokeWidth="6.5" strokeLinecap="round" />
+          <line x1="252" y1="96" x2="194" y2="152" stroke="#8a5a2b" strokeWidth="2.6" strokeLinecap="round" />
+          <path d="M166 152 Q194 130 222 152 Q210 158 194 153 Q178 158 166 152 Z" fill="#cdd7e6" stroke="#19e8db" strokeWidth="1.8" />
+          <path d="M166 152 Q194 137 222 152" fill="none" stroke="#9fb0c4" strokeWidth="1" />
+          <circle cx="194" cy="152" r="3" fill="#8a5a2b" />
         </g>
       </svg>
     </div>
@@ -4108,23 +4102,35 @@ h3{font-family:'Chakra Petch';font-weight:600;font-size:18px;margin:0 0 6px;}
 .rf-forge-art{flex-shrink:0;width:min(40vw,420px);max-width:420px;align-self:center;}
 .rf-forge-art svg{width:100%;height:auto;display:block;overflow:visible;}
 @media (max-width:860px){.rf-forge-art{display:none;}}
-.fa-core,.fa-piece,.fa-coreglow,.fa-ring,.fa-ring2,.fa-flash,.fa-pc,.fa-blades{transform-box:fill-box;transform-origin:center;}
+.fa-core,.fa-piece,.fa-coreglow,.fa-ring,.fa-ring2,.fa-flash,.fa-pc,.fa-blades,.fa-sparks,.fa-ingot{transform-box:fill-box;transform-origin:center;}
 .fa-coreglow{animation:faPulse 8s ease-in-out infinite;}
-@keyframes faPulse{0%,100%{opacity:0.45;transform:scale(0.85);}30%{opacity:0.7;transform:scale(0.95);}44%{opacity:1;transform:scale(1.18);}70%{opacity:0.9;transform:scale(1.08);}}
+@keyframes faPulse{0%,100%{opacity:0.4;transform:scale(0.85);}20%{opacity:0.6;transform:scale(0.92);}28%{opacity:1;transform:scale(1.2);}70%{opacity:0.9;transform:scale(1.08);}}
 .fa-ring{animation:faSpin 30s linear infinite;}
 .fa-ring2{animation:faSpin 22s linear infinite reverse;}
 @keyframes faSpin{to{transform:rotate(360deg);}}
-.fa-l{stroke-dasharray:5 8;animation:faFlow 1.3s linear infinite,faLineFade 8s ease-in-out infinite;}
-@keyframes faFlow{to{stroke-dashoffset:-26;}}
-@keyframes faLineFade{0%,8%{opacity:0;}30%{opacity:0.9;}42%{opacity:0;}100%{opacity:0;}}
 .fa-flash{opacity:0;animation:faBurst 8s ease-out infinite;}
-@keyframes faBurst{0%,36%{opacity:0;transform:scale(0.25);}43%{opacity:1;transform:scale(1.15);}54%{opacity:0;transform:scale(1.6);}100%{opacity:0;transform:scale(1.6);}}
-/* the tower springs out as the parts collapse in, holds, then eases away */
+@keyframes faBurst{0%,24%{opacity:0;transform:scale(0.25);}28%{opacity:1;transform:scale(1.15);}40%{opacity:0;transform:scale(1.6);}100%{opacity:0;transform:scale(1.6);}}
+/* the glowing ingot, consumed at the moment of the strike */
+.fa-ingot{animation:faIngot 8s ease-in-out infinite;}
+@keyframes faIngot{0%,18%{opacity:0.9;transform:scale(1);}26%{opacity:1;transform:scale(1.12);}30%{opacity:0;transform:scale(0.6);}88%{opacity:0;transform:scale(0.6);}100%{opacity:0.9;transform:scale(1);}}
+/* sparks fly outward on impact */
+.fa-sparks{opacity:0;transform-origin:200px 190px;animation:faSparks 8s ease-out infinite;}
+@keyframes faSparks{0%,24%{opacity:0;transform:scale(0.15);}27%{opacity:1;transform:scale(0.6);}34%{opacity:0.7;transform:scale(1.15);}42%{opacity:0;transform:scale(1.4);}100%{opacity:0;}}
+/* the pickaxe winds up, strikes at ~26%, recoils, then lifts and waits */
+.fa-pick{transform-box:view-box;transform-origin:252px 96px;animation:faSwing 8s infinite;}
+@keyframes faSwing{
+  0%{transform:rotate(-50deg);animation-timing-function:cubic-bezier(.4,0,.2,1);}
+  16%{transform:rotate(-62deg);animation-timing-function:cubic-bezier(.7,0,.95,.3);}
+  26%{transform:rotate(7deg);animation-timing-function:cubic-bezier(.2,0,.3,1);}
+  31%{transform:rotate(-6deg);animation-timing-function:cubic-bezier(.3,0,.4,1);}
+  44%,100%{transform:rotate(-50deg);}
+}
+/* the fish-tank PC is forged into being at the strike, holds, then eases away */
 .fa-pc{opacity:0;animation:faAssemble 8s infinite;}
 @keyframes faAssemble{
-  0%,40%{opacity:0;transform:scale(0.5);animation-timing-function:cubic-bezier(.34,1.56,.64,1);}
-  54%{opacity:1;transform:scale(1.05);animation-timing-function:cubic-bezier(.4,0,.6,1);}
-  60%,80%{opacity:1;transform:scale(1);animation-timing-function:cubic-bezier(.6,0,.4,1);}
+  0%,24%{opacity:0;transform:scale(0.5);animation-timing-function:cubic-bezier(.34,1.56,.64,1);}
+  38%{opacity:1;transform:scale(1.05);animation-timing-function:cubic-bezier(.4,0,.6,1);}
+  44%,80%{opacity:1;transform:scale(1);animation-timing-function:cubic-bezier(.6,0,.4,1);}
   90%{opacity:0;transform:scale(0.62);}
   100%{opacity:0;transform:scale(0.5);}
 }
@@ -4138,15 +4144,7 @@ h3{font-family:'Chakra Petch';font-weight:600;font-size:18px;margin:0 0 6px;}
 .fa-bubble{animation:faBubble 2.6s ease-in infinite;}
 .fa-b2{animation-delay:.9s;}.fa-b3{animation-delay:1.7s;}
 @keyframes faBubble{0%{transform:translateY(0);opacity:0;}15%{opacity:0.9;}85%{opacity:0.9;}100%{transform:translateY(-70px);opacity:0;}}
-/* parts accelerate inward, collapse to the center, vanish into the merge, then reset */
-.fa-piece{animation-iteration-count:infinite;animation-duration:8s;}
-.fa-p1{animation-name:faForge1;}.fa-p2{animation-name:faForge2;}.fa-p3{animation-name:faForge3;}.fa-p4{animation-name:faForge4;}.fa-p5{animation-name:faForge5;}
-@keyframes faForge1{0%{transform:translate(0,0) scale(1);opacity:.45;animation-timing-function:cubic-bezier(.55,0,.9,.35);}38%{transform:translate(0,128px) scale(.42);opacity:1;animation-timing-function:ease-out;}44%{transform:translate(0,128px) scale(.22);opacity:0;}80%{transform:translate(0,128px) scale(.22);opacity:0;}88%{transform:translate(0,0) scale(1);opacity:0;}100%{transform:translate(0,0) scale(1);opacity:.45;}}
-@keyframes faForge2{0%{transform:translate(0,0) scale(1);opacity:.45;animation-timing-function:cubic-bezier(.55,0,.9,.35);}38%{transform:translate(-125px,62px) scale(.42);opacity:1;animation-timing-function:ease-out;}44%{transform:translate(-125px,62px) scale(.22);opacity:0;}80%{transform:translate(-125px,62px) scale(.22);opacity:0;}88%{transform:translate(0,0) scale(1);opacity:0;}100%{transform:translate(0,0) scale(1);opacity:.45;}}
-@keyframes faForge3{0%{transform:translate(0,0) scale(1);opacity:.45;animation-timing-function:cubic-bezier(.55,0,.9,.35);}38%{transform:translate(-100px,-60px) scale(.42);opacity:1;animation-timing-function:ease-out;}44%{transform:translate(-100px,-60px) scale(.22);opacity:0;}80%{transform:translate(-100px,-60px) scale(.22);opacity:0;}88%{transform:translate(0,0) scale(1);opacity:0;}100%{transform:translate(0,0) scale(1);opacity:.45;}}
-@keyframes faForge4{0%{transform:translate(0,0) scale(1);opacity:.45;animation-timing-function:cubic-bezier(.55,0,.9,.35);}38%{transform:translate(110px,94px) scale(.42);opacity:1;animation-timing-function:ease-out;}44%{transform:translate(110px,94px) scale(.22);opacity:0;}80%{transform:translate(110px,94px) scale(.22);opacity:0;}88%{transform:translate(0,0) scale(1);opacity:0;}100%{transform:translate(0,0) scale(1);opacity:.45;}}
-@keyframes faForge5{0%{transform:translate(0,0) scale(1);opacity:.45;animation-timing-function:cubic-bezier(.55,0,.9,.35);}38%{transform:translate(110px,-84px) scale(.42);opacity:1;animation-timing-function:ease-out;}44%{transform:translate(110px,-84px) scale(.22);opacity:0;}80%{transform:translate(110px,-84px) scale(.22);opacity:0;}88%{transform:translate(0,0) scale(1);opacity:0;}100%{transform:translate(0,0) scale(1);opacity:.45;}}
-@media (prefers-reduced-motion:reduce){.fa-coreglow,.fa-ring,.fa-ring2,.fa-l,.fa-piece,.fa-flash,.fa-pc,.fa-blades,.fa-caseglow,.fa-rgb,.fa-bubble{animation:none;}.fa-pc{opacity:1;}.fa-piece{opacity:0;}.fa-bubble{opacity:0;}}
+@media (prefers-reduced-motion:reduce){.fa-coreglow,.fa-ring,.fa-ring2,.fa-flash,.fa-pc,.fa-blades,.fa-caseglow,.fa-rgb,.fa-bubble,.fa-pick,.fa-sparks,.fa-ingot{animation:none;}.fa-pc{opacity:1;}.fa-sparks,.fa-ingot{opacity:0;}.fa-pick{transform:rotate(-50deg);transform-box:view-box;transform-origin:252px 96px;}}
 .rf-hero-title{font-size:clamp(34px,6vw,60px);line-height:1.04;letter-spacing:-0.01em;margin:6px 0 16px;font-family:'Chakra Petch';font-weight:700;}
 .rf-hero-grad{background:linear-gradient(100deg,var(--c-accent) 0%,#7ad8ff 40%,var(--c-accent2) 80%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;background-size:220% auto;animation:rfShine 6s linear infinite,rfTitleGlow 4.5s ease-in-out infinite;}
 @keyframes rfShine{to{background-position:220% center;}}
