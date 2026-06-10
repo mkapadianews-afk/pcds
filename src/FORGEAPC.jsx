@@ -4119,19 +4119,22 @@ h3{font-family:'Chakra Petch';font-weight:600;font-size:18px;margin:0 0 6px;}
 /* the pickaxe winds up, strikes at ~26%, recoils, then lifts and waits */
 .fa-pick{transform-box:view-box;transform-origin:252px 96px;animation:faSwing 8s infinite;}
 @keyframes faSwing{
-  0%{transform:rotate(-50deg);animation-timing-function:cubic-bezier(.4,0,.2,1);}
-  16%{transform:rotate(-62deg);animation-timing-function:cubic-bezier(.7,0,.95,.3);}
-  26%{transform:rotate(7deg);animation-timing-function:cubic-bezier(.2,0,.3,1);}
-  31%{transform:rotate(-6deg);animation-timing-function:cubic-bezier(.3,0,.4,1);}
-  44%,100%{transform:rotate(-50deg);}
+  0%{transform:rotate(-50deg);opacity:1;animation-timing-function:cubic-bezier(.4,0,.2,1);}
+  16%{transform:rotate(-62deg);opacity:1;animation-timing-function:cubic-bezier(.7,0,.95,.3);}
+  26%{transform:rotate(7deg);opacity:1;animation-timing-function:cubic-bezier(.2,0,.3,1);}
+  31%{transform:rotate(-6deg);opacity:1;animation-timing-function:cubic-bezier(.3,0,.4,1);}
+  40%{transform:rotate(-46deg);opacity:0;}
+  88%{transform:rotate(-50deg);opacity:0;}
+  100%{transform:rotate(-50deg);opacity:1;}
 }
-/* the fish-tank PC is forged into being at the strike, holds, then eases away */
+/* the fish-tank PC is forged into being at the strike, then grows a bit, holds, eases away */
 .fa-pc{opacity:0;animation:faAssemble 8s infinite;}
 @keyframes faAssemble{
   0%,24%{opacity:0;transform:scale(0.5);animation-timing-function:cubic-bezier(.34,1.56,.64,1);}
-  38%{opacity:1;transform:scale(1.05);animation-timing-function:cubic-bezier(.4,0,.6,1);}
-  44%,80%{opacity:1;transform:scale(1);animation-timing-function:cubic-bezier(.6,0,.4,1);}
-  90%{opacity:0;transform:scale(0.62);}
+  38%{opacity:1;transform:scale(1.06);animation-timing-function:cubic-bezier(.4,0,.6,1);}
+  44%{opacity:1;transform:scale(1);animation-timing-function:cubic-bezier(.4,0,.4,1);}
+  80%{opacity:1;transform:scale(1.16);}
+  90%{opacity:0;transform:scale(1.22);}
   100%{opacity:0;transform:scale(0.5);}
 }
 .fa-caseglow{animation:faCaseGlow 2.4s ease-in-out infinite;}
