@@ -1895,10 +1895,23 @@ function moggerAI(ucKey, budget, elo) {
   }
   return build;
 }
+// Custom rank can be plain text (legacy) or JSON {name,color,icon}.
+function parseCrank(c) {
+  if (!c) return null;
+  const s = String(c).trim(); if (!s) return null;
+  if (s.charCodeAt(0) === 123) { try { const o = JSON.parse(s); if (o && o.name) return { name: String(o.name), color: o.color || "#ff7ae0", icon: o.icon || "\u2B50" }; } catch (e) {} }
+  return { name: s, color: "#ff7ae0", icon: "\u2B50" };
+}
+function hexToRgba(hex, a) {
+  let h = String(hex || "").replace("#", "");
+  if (h.length === 3) h = h.split("").map((x) => x + x).join("");
+  const n = parseInt(h, 16); if (isNaN(n) || h.length !== 6) return "rgba(255,122,224," + a + ")";
+  return "rgba(" + ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + (n & 255) + "," + a + ")";
+}
 // Player rank from elo, or a custom override (set by admin).
 function moggerRank(elo, custom) {
-  const c = typeof custom === "string" ? custom.trim() : "";
-  if (c) return { name: c, cls: "custom", icon: "⭐", color: "#ff7ae0", custom: true };
+  const cr = parseCrank(custom);
+  if (cr) return { name: cr.name, cls: "custom", icon: cr.icon, color: cr.color, custom: true };
   const e = typeof elo === "number" && isFinite(elo) ? elo : 0;
   if (e >= 2500) return { name: "God Tier", cls: "god", icon: "👑", color: "#ffc24b" };
   if (e >= 1500) return { name: "Elite Tier", cls: "elite", icon: "💎", color: "#7c5cff" };
@@ -1906,6 +1919,36 @@ function moggerRank(elo, custom) {
   if (e >= 950) return { name: "High Tier", cls: "high", icon: "⚡", color: "#19e8db" };
   if (e >= 650) return { name: "Mid Tier", cls: "mid", icon: "🔧", color: "#46e0a0" };
   return { name: "Low Tier", cls: "low", icon: "🔩", color: "#8aa0b4" };
+}
+function RankBadge({ rank }) {
+  if (!rank) return null;
+  const style = rank.custom ? { color: "#fff", background: hexToRgba(rank.color, 0.2), borderColor: rank.color, boxShadow: "0 0 12px " + hexToRgba(rank.color, 0.45) } : undefined;
+  return <span className={"pm-rank pm-rank-" + rank.cls} style={style}>{rank.icon} {rank.name}</span>;
+}
+// Searchable icon set (system emoji, rendered crisp/pixelated via CSS).
+const MOGGER_EMOJI = [
+  ["🖥️", "pc computer desktop monitor"], ["💻", "laptop computer"], ["🕹️", "joystick game arcade"], ["🎮", "controller gamepad game"], ["⌨️", "keyboard"], ["🖱️", "mouse"], ["💾", "save floppy disk"], ["💿", "disc cd"], ["🧠", "brain smart ai"], ["⚙️", "gear settings cog"], ["🔧", "wrench tool fix"], ["🔩", "bolt nut screw"], ["🔌", "plug power"], ["🔋", "battery power"], ["⚡", "bolt lightning power fast"], ["🛠️", "tools build"],
+  ["👑", "crown king queen royal"], ["💎", "diamond gem rare"], ["🏆", "trophy win champion"], ["🥇", "gold medal first"], ["🥈", "silver medal second"], ["🥉", "bronze medal third"], ["🎖️", "medal honor"], ["🏅", "medal sports"], ["⭐", "star fav"], ["🌟", "star glowing"], ["✨", "sparkles shiny"], ["💫", "dizzy star"], ["🔥", "fire hot flame lit"], ["💥", "boom explosion"], ["☄️", "comet meteor"], ["🌈", "rainbow"],
+  ["😀", "happy smile grin face"], ["😎", "cool sunglasses"], ["🤓", "nerd geek glasses"], ["🤖", "robot bot ai"], ["👽", "alien ufo"], ["👾", "alien monster game invader"], ["💀", "skull dead"], ["☠️", "skull crossbones pirate"], ["🤡", "clown"], ["👻", "ghost boo"], ["🎃", "pumpkin halloween"], ["😈", "devil evil"], ["🤠", "cowboy"], ["🥶", "cold freeze"], ["🤯", "mind blown"], ["😤", "angry steam"],
+  ["🐉", "dragon mythical"], ["🦖", "dinosaur trex"], ["🦄", "unicorn"], ["🐺", "wolf"], ["🦁", "lion"], ["🐯", "tiger"], ["🐸", "frog"], ["🐢", "turtle slow"], ["🦈", "shark"], ["🐍", "snake"], ["🦅", "eagle bird"], ["🐝", "bee"], ["🦂", "scorpion"], ["🕷️", "spider"], ["🐙", "octopus"], ["🦀", "crab"],
+  ["⚔️", "swords battle fight"], ["🛡️", "shield defense"], ["🏹", "bow arrow archer"], ["🗡️", "dagger sword"], ["🔫", "gun"], ["💣", "bomb"], ["🧨", "dynamite"], ["🎯", "target dart bullseye"], ["🚀", "rocket launch fast"], ["🛸", "ufo spaceship"], ["✈️", "plane"], ["🏎️", "race car fast"], ["🏍️", "motorcycle"], ["⛵", "boat sail"], ["🚂", "train"], ["🛹", "skateboard"],
+  ["❤️", "heart love red"], ["🧡", "orange heart"], ["💛", "yellow heart"], ["💚", "green heart"], ["💙", "blue heart"], ["💜", "purple heart"], ["🖤", "black heart"], ["🤍", "white heart"], ["💯", "hundred perfect score"], ["✅", "check done ok"], ["❌", "x cross no"], ["⛔", "no stop forbidden"], ["⚠️", "warning caution"], ["🚩", "flag red"], ["🏁", "checkered flag finish race"], ["🎌", "flags"],
+  ["🎵", "music note"], ["🎧", "headphones audio"], ["🎸", "guitar rock"], ["🥁", "drums"], ["🎹", "piano keys"], ["🎤", "mic sing"], ["📷", "camera photo"], ["🎬", "movie film clapper"], ["📺", "tv"], ["💡", "idea light bulb"], ["🔦", "flashlight"], ["🕯️", "candle"], ["🪙", "coin money"], ["💰", "money bag rich"], ["💵", "cash dollar"], ["💳", "card"],
+  ["🌌", "galaxy space stars milky way"], ["🌙", "moon crescent night"], ["☀️", "sun"], ["⛈️", "storm thunder"], ["❄️", "snow ice cold"], ["🌊", "wave water ocean"], ["🍀", "clover luck"], ["🌹", "rose flower"], ["🌵", "cactus"], ["🍕", "pizza food"], ["🍔", "burger food"], ["🍩", "donut"], ["🍺", "beer"], ["☕", "coffee"], ["🧊", "ice cube cold"], ["🧃", "juice"],
+  ["👊", "fist punch"], ["✊", "fist raised"], ["🤛", "fist bump"], ["👍", "thumbs up like"], ["👎", "thumbs down"], ["🙌", "raise hands celebrate"], ["👀", "eyes look"], ["🫡", "salute"], ["🤙", "call shaka"], ["✌️", "peace victory"], ["🤘", "rock horns metal"], ["🫶", "heart hands"], ["💪", "muscle strong flex"], ["🦾", "robot arm cyborg"], ["🧿", "evil eye"], ["♾️", "infinity forever"],
+];
+function MoggerEmojiPicker({ onPick }) {
+  const [q, setQ] = useState("");
+  const list = useMemo(() => { const t = q.trim().toLowerCase(); return t ? MOGGER_EMOJI.filter(([e, k]) => k.includes(t)) : MOGGER_EMOJI; }, [q]);
+  return (
+    <div className="pm-emoji-pick">
+      <div className="pm-emoji-search"><Search size={13} /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search icons…" autoFocus /></div>
+      <div className="pm-emoji-grid">
+        {list.map(([e], i) => <button key={i} className="pm-emoji-btn" title={e} onClick={() => onPick(e)}>{e}</button>)}
+        {list.length === 0 && <span className="pm-emoji-none">No icons match</span>}
+      </div>
+    </div>
+  );
 }
 function moggerRollTier() { const r = Math.random(); return r < 0.62 ? "elite" : r < 0.93 ? "normal" : "fail"; }
 // AI difficulty by elo: higher elo -> stronger, more consistent builds.
@@ -2134,7 +2177,7 @@ function MoggerScoreCol({ title, build, s, win, shown, rank }) {
   return (
     <div className={"pm-scorecol" + (win ? " win" : "")}>
       <div className="pm-scorecol-head"><span className="pm-scorecol-title">{title}</span>{win && <span className="pm-crown">WINNER</span>}</div>
-      {rank && <div className={"pm-rank pm-rank-" + rank.cls + " pm-rank-col"}>{rank.icon} {rank.name}</div>}
+      {rank && <div className={"pm-rank pm-rank-" + rank.cls + " pm-rank-col"} style={rank.custom ? { color: "#fff", background: hexToRgba(rank.color, 0.2), borderColor: rank.color, boxShadow: "0 0 12px " + hexToRgba(rank.color, 0.45) } : undefined}>{rank.icon} {rank.name}</div>}
       <div className="pm-bigscore" style={rank ? { color: rank.color } : undefined}>{big}<small>/1000</small></div>
       <div className="pm-metrics"><span>Performance <b>{s.perf}</b></span><span>Value <b>{s.value}</b></span><span>Compatibility <b>{s.compat}</b></span><span>Spent <b className={s.over ? "pm-red" : ""}>{fmt(s.spend)}</b></span></div>
       {s.issues.length > 0 && <div className="pm-issues">{s.issues.map((i, n) => <span key={n}><AlertTriangle size={11} /> {i}</span>)}</div>}
@@ -2698,6 +2741,9 @@ function MoggerAdmin({ onBack }) {
   const [eloDraft, setEloDraft] = useState("");
   const [pwDraft, setPwDraft] = useState("");
   const [rankDraft, setRankDraft] = useState("");
+  const [colorDraft, setColorDraft] = useState("#ff7ae0");
+  const [iconDraft, setIconDraft] = useState("⭐");
+  const [emojiOpen, setEmojiOpen] = useState(false);
   const [msg, setMsg] = useState("");
   const load = async () => { setRows(null); const r = await netAllUsers(); if (r.error) { setErr(r.error); setRows([]); } else { setErr(""); setRows(r.rows); } };
   const tryAuth = () => { if (pw === ADMIN_PASS) { setAuthed(true); load(); } else setErr("Wrong admin password."); };
@@ -2708,7 +2754,7 @@ function MoggerAdmin({ onBack }) {
     if (!r.ok) { setErr(r.error || "Delete failed — did you run the delete-permission SQL?"); return; }
     setRows((prev) => (prev || []).filter((u) => u.id !== id));
   };
-  const openRow = (u) => { if (expanded === u.id) { setExpanded(null); return; } setExpanded(u.id); setEloDraft(String(u.elo)); setPwDraft(""); setRankDraft(u.crank || ""); setMsg(""); setErr(""); };
+  const openRow = (u) => { if (expanded === u.id) { setExpanded(null); return; } setExpanded(u.id); setEloDraft(String(u.elo)); setPwDraft(""); const cr = parseCrank(u.crank); setRankDraft(cr ? cr.name : ""); setColorDraft(cr ? cr.color : "#ff7ae0"); setIconDraft(cr ? cr.icon : "⭐"); setEmojiOpen(false); setMsg(""); setErr(""); };
   const saveElo = async (u) => {
     const v = parseInt(eloDraft, 10);
     if (isNaN(v) || v < 0 || v > 100000) { setErr("Enter a whole number between 0 and 100000."); return; }
@@ -2726,11 +2772,13 @@ function MoggerAdmin({ onBack }) {
   };
   const saveRank = async (u) => {
     setMsg(""); setErr("");
-    setBusyId(u.id); const r = await netSetCustomRank(u.id, rankDraft); setBusyId(null);
+    const nm = rankDraft.trim().slice(0, 24);
+    const payload = nm ? JSON.stringify({ name: nm, color: colorDraft, icon: iconDraft || "⭐" }) : "";
+    setBusyId(u.id); const r = await netSetCustomRank(u.id, payload); setBusyId(null);
     if (!r.ok) { setErr(r.error || "Could not set rank."); return; }
-    const v = rankDraft.trim().slice(0, 24) || null;
-    setRows((prev) => (prev || []).map((x) => x.id === u.id ? { ...x, crank: v } : x));
-    setMsg(v ? "Custom rank set to “" + v + "”." : "Custom rank cleared — back to elo rank.");
+    const stored = nm ? payload : null;
+    setRows((prev) => (prev || []).map((x) => x.id === u.id ? { ...x, crank: stored } : x));
+    setMsg(nm ? "Custom rank set to “" + nm + "”." : "Custom rank cleared — back to elo rank.");
   };
   if (!authed) {
     return (
@@ -2753,7 +2801,7 @@ function MoggerAdmin({ onBack }) {
           {rows.map((u) => (
             <div key={u.id} className="pm-admin-item">
               <div className="pm-lb-row pm-admin-row">
-                <button className="pm-admin-open" onClick={() => openRow(u)}><span className="pm-lb-name">{u.name}{(() => { const rk = moggerRank(u.elo, u.crank); return <span className={"pm-rank pm-rank-" + rk.cls}>{rk.icon} {rk.name}</span>; })()}</span></button>
+                <button className="pm-admin-open" onClick={() => openRow(u)}><span className="pm-lb-name">{u.name}<RankBadge rank={moggerRank(u.elo, u.crank)} /></span></button>
                 <span className="pm-lb-elo">{u.elo}</span>
                 {confirmId === u.id ? (
                   <span className="pm-admin-confirm"><button className="pm-del-yes" disabled={busyId === u.id} onClick={() => del(u.id)}>{busyId === u.id ? "…" : "Delete"}</button><button className="pm-del-no" onClick={() => setConfirmId(null)}>Cancel</button></span>
@@ -2764,7 +2812,10 @@ function MoggerAdmin({ onBack }) {
               {expanded === u.id && (
                 <div className="pm-admin-edit">
                   <div className="pm-admin-line"><span className="pm-admin-l">Elo</span><input className="pm-admin-in" value={eloDraft} onChange={(e) => setEloDraft(e.target.value.replace(/[^0-9]/g, ""))} inputMode="numeric" /><button className="pm-admin-save" disabled={busyId === u.id} onClick={() => saveElo(u)}>Save</button></div>
-                  <div className="pm-admin-line"><span className="pm-admin-l">Custom rank</span><input className="pm-admin-in" value={rankDraft} maxLength={24} onChange={(e) => setRankDraft(e.target.value)} placeholder="blank = elo rank" /><button className="pm-admin-save" disabled={busyId === u.id} onClick={() => saveRank(u)}>{rankDraft.trim() ? "Set" : "Clear"}</button></div>
+                  <div className="pm-admin-line"><span className="pm-admin-l">Custom rank</span><input className="pm-admin-in" value={rankDraft} maxLength={24} onChange={(e) => setRankDraft(e.target.value)} placeholder="blank = elo rank" /></div>
+                  <div className="pm-admin-line"><span className="pm-admin-l">Color & icon</span><input className="pm-admin-color" type="color" value={colorDraft} onChange={(e) => setColorDraft(e.target.value)} /><button className="pm-emoji-cur" onClick={() => setEmojiOpen((o) => !o)}>{iconDraft || "⭐"} ▾</button><button className="pm-admin-save" disabled={busyId === u.id} onClick={() => saveRank(u)}>{rankDraft.trim() ? "Set" : "Clear"}</button></div>
+                  {emojiOpen && <MoggerEmojiPicker onPick={(e) => { setIconDraft(e); setEmojiOpen(false); }} />}
+                  <div className="pm-admin-line"><span className="pm-admin-l">Preview</span><RankBadge rank={{ name: rankDraft.trim() || "(elo rank)", cls: "custom", icon: iconDraft || "⭐", color: colorDraft, custom: true }} /></div>
                   <div className="pm-admin-line"><span className="pm-admin-l">New password</span><input className="pm-admin-in" value={pwDraft} onChange={(e) => setPwDraft(e.target.value)} placeholder="set a new one" /><button className="pm-admin-save" disabled={busyId === u.id || !pwDraft} onClick={() => resetPw(u)}>Reset</button></div>
                   <div className="pm-admin-hash"><span className="pm-admin-l">Stored hash</span><code>{u.hash}</code></div>
                   <p className="pm-admin-hint">Passwords aren't stored — only this one-way hash, so the real password can't be shown. Use “Reset” to set a new one.</p>
@@ -2790,7 +2841,7 @@ function MoggerLeaderboard({ onBack, meName }) {
           {rows.map((r, i) => (
             <div key={i} className={"pm-lb-row" + (r.name === meName ? " me" : "")}>
               <span className="pm-lb-rank">{i + 1}</span>
-              <span className="pm-lb-name">{r.name}{(() => { const rk = moggerRank(r.elo, r.crank); return <span className={"pm-rank pm-rank-" + rk.cls}>{rk.icon} {rk.name}</span>; })()}</span>
+              <span className="pm-lb-name">{r.name}<RankBadge rank={moggerRank(r.elo, r.crank)} /></span>
               <span className="pm-lb-elo">{r.elo}</span>
             </div>
           ))}
@@ -2850,7 +2901,7 @@ function MoggerGame({ onExit }) {
     <div className="pm-mogger rf-fade">
       {screen === "menu" && (
         <div className="pm-menu">
-          <div className="pm-account">{user ? <><span className="pm-acct-name">{user.name}</span>{(() => { const rk = moggerRank(user.elo, user.crank); return <span className={"pm-rank pm-rank-" + rk.cls}>{rk.icon} {rk.name}</span>; })()}<span className="pm-acct-elo">{user.elo} elo</span><button className="pm-acct-btn" onClick={() => persist(null)}>Log out</button></> : <button className="pm-acct-btn" onClick={() => setShowAuth(true)}>Log in / Sign up</button>}</div>
+          <div className="pm-account">{user ? <><span className="pm-acct-name">{user.name}</span><RankBadge rank={moggerRank(user.elo, user.crank)} /><span className="pm-acct-elo">{user.elo} elo</span><button className="pm-acct-btn" onClick={() => persist(null)}>Log out</button></> : <button className="pm-acct-btn" onClick={() => setShowAuth(true)}>Log in / Sign up</button>}</div>
           <div className="pm-mtitle">PC <span className="rf-accent">MOGGER</span></div>
           <p className="pm-tag">Build the best PC for the challenge. AI judges. One winner.</p>
           <div className="pm-mode-grid">
@@ -4354,7 +4405,16 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .pm-admin-edit{background:rgba(255,255,255,0.03);border:1px solid var(--c-border);border-top:none;border-radius:0 0 10px 10px;padding:12px;display:flex;flex-direction:column;gap:9px;margin-top:-4px;}
 .pm-admin-line{display:flex;align-items:center;gap:8px;}
 .pm-admin-l{font-family:'Chakra Petch';font-size:12px;color:var(--c-muted);min-width:96px;}
-.pm-admin-in{flex:1;min-width:0;padding:7px 10px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid var(--c-border);color:var(--c-text);font-family:'JetBrains Mono';font-size:13px;}
+.pm-admin-in{flex:1;min-width:0;padding:7px 10px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid var(--c-border);color:var(--c-text);font-family:'Chakra Petch';font-size:13px;}
+.pm-admin-color{width:42px;height:34px;padding:2px;border-radius:8px;border:1px solid var(--c-border);background:rgba(255,255,255,0.05);cursor:pointer;}
+.pm-emoji-cur{flex:1;min-width:0;padding:7px 10px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid var(--c-border);color:var(--c-text);font-family:'Chakra Petch';font-size:15px;cursor:pointer;text-align:left;}
+.pm-emoji-pick{background:rgba(0,0,0,0.25);border:1px solid var(--c-border);border-radius:10px;padding:8px;}
+.pm-emoji-search{display:flex;align-items:center;gap:6px;color:var(--c-muted);border-bottom:1px solid var(--c-border);padding-bottom:6px;margin-bottom:6px;}
+.pm-emoji-search input{flex:1;background:none;border:none;color:var(--c-text);font-family:'Chakra Petch';font-size:13px;outline:none;}
+.pm-emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;max-height:170px;overflow-y:auto;}
+.pm-emoji-btn{aspect-ratio:1;border:1px solid transparent;border-radius:8px;background:rgba(255,255,255,0.04);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;image-rendering:pixelated;}
+.pm-emoji-btn:hover{border-color:var(--c-accent);background:rgba(25,232,219,0.12);}
+.pm-emoji-none{grid-column:1/-1;color:var(--c-muted);font-size:12px;padding:8px;text-align:center;}
 .pm-admin-save{padding:7px 14px;border-radius:8px;background:var(--c-accent);border:none;color:#04141a;font-family:'Chakra Petch';font-weight:700;cursor:pointer;}
 .pm-admin-save:disabled{opacity:0.5;cursor:default;}
 .pm-admin-hash{display:flex;align-items:flex-start;gap:8px;}
