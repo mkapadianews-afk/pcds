@@ -2984,34 +2984,105 @@ function MoggerGame({ onExit }) {
   );
 }
 
+function ForgeArt() {
+  return (
+    <div className="rf-forge-art" aria-hidden="true">
+      <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="faGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#19e8db" stopOpacity="0.5" />
+            <stop offset="55%" stopColor="#7c5cff" stopOpacity="0.12" />
+            <stop offset="100%" stopColor="#7c5cff" stopOpacity="0" />
+          </radialGradient>
+          <linearGradient id="faEdge" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#19e8db" />
+            <stop offset="100%" stopColor="#7c5cff" />
+          </linearGradient>
+        </defs>
+        <circle className="fa-coreglow" cx="200" cy="200" r="155" fill="url(#faGlow)" />
+        <g className="fa-ring"><circle cx="200" cy="200" r="125" fill="none" stroke="#19e8db" strokeOpacity="0.28" strokeWidth="1.2" strokeDasharray="5 12" /></g>
+        <g className="fa-ring2"><circle cx="200" cy="200" r="150" fill="none" stroke="#7c5cff" strokeOpacity="0.22" strokeWidth="1" strokeDasharray="2 16" /></g>
+        <g className="fa-lines" stroke="url(#faEdge)" strokeWidth="1.4" fill="none">
+          <line className="fa-l fa-l1" x1="200" y1="200" x2="200" y2="78" />
+          <line className="fa-l fa-l2" x1="200" y1="200" x2="312" y2="156" />
+          <line className="fa-l fa-l3" x1="200" y1="200" x2="300" y2="262" />
+          <line className="fa-l fa-l4" x1="200" y1="200" x2="98" y2="116" />
+          <line className="fa-l fa-l5" x1="200" y1="200" x2="100" y2="288" />
+        </g>
+        {/* central motherboard / forge core */}
+        <g className="fa-core">
+          <rect x="158" y="158" width="84" height="84" rx="12" fill="#0d1320" stroke="url(#faEdge)" strokeWidth="2.5" />
+          <path d="M192 176 l-12 26 h12 l-4 22 22-30 h-12 l8-18 z" fill="#19e8db" />
+          <rect x="166" y="166" width="10" height="10" rx="2" fill="none" stroke="#19e8db" strokeOpacity="0.5" />
+          <rect x="224" y="224" width="10" height="10" rx="2" fill="none" stroke="#7c5cff" strokeOpacity="0.6" />
+        </g>
+        {/* CPU (top) */}
+        <g className="fa-piece fa-p1">
+          <rect x="180" y="52" width="40" height="40" rx="6" fill="#0d1320" stroke="#19e8db" strokeWidth="2" />
+          <rect x="190" y="62" width="20" height="20" rx="3" fill="#19e8db" fillOpacity="0.25" stroke="#19e8db" strokeWidth="1.2" />
+          <g stroke="#19e8db" strokeWidth="1.6">
+            <line x1="186" y1="52" x2="186" y2="46" /><line x1="194" y1="52" x2="194" y2="46" /><line x1="202" y1="52" x2="202" y2="46" /><line x1="210" y1="52" x2="210" y2="46" />
+            <line x1="186" y1="92" x2="186" y2="98" /><line x1="194" y1="92" x2="194" y2="98" /><line x1="202" y1="92" x2="202" y2="98" /><line x1="210" y1="92" x2="210" y2="98" />
+          </g>
+        </g>
+        {/* RAM (right) */}
+        <g className="fa-piece fa-p2">
+          <rect x="296" y="128" width="58" height="20" rx="3" fill="#0d1320" stroke="#7c5cff" strokeWidth="2" />
+          <g stroke="#7c5cff" strokeWidth="1.4" strokeOpacity="0.8"><line x1="304" y1="148" x2="304" y2="154" /><line x1="314" y1="148" x2="314" y2="154" /><line x1="324" y1="148" x2="324" y2="154" /><line x1="334" y1="148" x2="334" y2="154" /><line x1="344" y1="148" x2="344" y2="154" /></g>
+        </g>
+        {/* GPU (bottom-right) */}
+        <g className="fa-piece fa-p3">
+          <rect x="262" y="240" width="76" height="40" rx="6" fill="#0d1320" stroke="#19e8db" strokeWidth="2" />
+          <circle cx="284" cy="260" r="11" fill="none" stroke="#19e8db" strokeWidth="1.6" /><circle cx="284" cy="260" r="2.4" fill="#19e8db" />
+          <circle cx="316" cy="260" r="11" fill="none" stroke="#19e8db" strokeWidth="1.6" /><circle cx="316" cy="260" r="2.4" fill="#19e8db" />
+        </g>
+        {/* SSD / M.2 (top-left) */}
+        <g className="fa-piece fa-p4">
+          <rect x="60" y="96" width="60" height="20" rx="4" fill="#0d1320" stroke="#7c5cff" strokeWidth="2" />
+          <circle cx="110" cy="106" r="4" fill="none" stroke="#7c5cff" strokeWidth="1.4" />
+          <rect x="68" y="103" width="22" height="6" rx="2" fill="#7c5cff" fillOpacity="0.3" />
+        </g>
+        {/* PSU (bottom-left) */}
+        <g className="fa-piece fa-p5">
+          <rect x="62" y="262" width="56" height="44" rx="6" fill="#0d1320" stroke="#19e8db" strokeWidth="2" />
+          <circle cx="90" cy="284" r="14" fill="none" stroke="#19e8db" strokeWidth="1.6" strokeOpacity="0.7" />
+          <path d="M90 274 v20 M80 284 h20" stroke="#19e8db" strokeWidth="1.4" strokeOpacity="0.6" />
+        </g>
+      </svg>
+    </div>
+  );
+}
 function Home({ saved, loading, onNew, onOpen, onDelete, priceInfo, onMogger }) {
   return (
     <div className="rf-fade">
       <div className="rf-hero rf-hero-flash">
-        <div className="rf-eyebrow">PART PICKER · COMPATIBILITY · SCORING</div>
-        <h1 className="rf-hero-title">How to forge the<br /><span className="rf-accent rf-hero-grad">perfect computer.</span></h1>
-        <p className="rf-muted rf-hero-sub">
-          Tell us your use case and budget. We score every part, auto-assemble a balanced build,
-          check full compatibility, and grade the result out of 100.
-        </p>
-        <div className="rf-cta-grid">
-          <div className="rf-cta-card">
-            <button className="rf-btn rf-btn-lg" onClick={onNew}><Plus size={18} /> {t("startBuild")}</button>
-            <span className="rf-cta-desc">Answer two quick questions — we auto-pick balanced, compatible parts for your budget and grade the result out of 100.</span>
-          </div>
-          {onMogger && (
+        <div className="rf-hero-text">
+          <div className="rf-eyebrow">PART PICKER · COMPATIBILITY · SCORING</div>
+          <h1 className="rf-hero-title">How to forge the<br /><span className="rf-accent rf-hero-grad">perfect computer.</span></h1>
+          <p className="rf-muted rf-hero-sub">
+            Tell us your use case and budget. We score every part, auto-assemble a balanced build,
+            check full compatibility, and grade the result out of 100.
+          </p>
+          <div className="rf-cta-grid">
             <div className="rf-cta-card">
-              <button className="rf-btn rf-btn-lg rf-mogger-cta" onClick={onMogger}><Gamepad2 size={18} /> Play PC Mogger</button>
-              <span className="rf-cta-desc">A head-to-head build-off game — assemble the best PC for a budget and use case, then beat players or AI to climb the elo leaderboard.</span>
+              <button className="rf-btn rf-btn-lg" onClick={onNew}><Plus size={18} /> {t("startBuild")}</button>
+              <span className="rf-cta-desc">Answer two quick questions — we auto-pick balanced, compatible parts for your budget and grade the result out of 100.</span>
             </div>
-          )}
+            {onMogger && (
+              <div className="rf-cta-card">
+                <button className="rf-btn rf-btn-lg rf-mogger-cta" onClick={onMogger}><Gamepad2 size={18} /> Play PC Mogger</button>
+                <span className="rf-cta-desc">A head-to-head build-off game — assemble the best PC for a budget and use case, then beat players or AI to climb the elo leaderboard.</span>
+              </div>
+            )}
+          </div>
+          <div className="rf-price-status">
+            <span className="rf-db-count"><Boxes size={13} /> {CATALOG_COUNT} {t("componentsDb")}</span>
+            <span className="rf-dot-sep">·</span>
+            <span className="rf-live-ind"><span className="rf-live-dot" /> {t("livePrices")}</span>
+            {priceInfo && <> · {t("updated")} {new Date(priceInfo.updatedAt).toLocaleDateString()}</>}
+          </div>
         </div>
-        <div className="rf-price-status">
-          <span className="rf-db-count"><Boxes size={13} /> {CATALOG_COUNT} {t("componentsDb")}</span>
-          <span className="rf-dot-sep">·</span>
-          <span className="rf-live-ind"><span className="rf-live-dot" /> {t("livePrices")}</span>
-          {priceInfo && <> · {t("updated")} {new Date(priceInfo.updatedAt).toLocaleDateString()}</>}
-        </div>
+        <ForgeArt />
       </div>
 
       <div className="rf-section-head">
@@ -4009,6 +4080,26 @@ h3{font-family:'Chakra Petch';font-weight:600;font-size:18px;margin:0 0 6px;}
 .rf-hero{padding:34px 0 14px;}
 .rf-hero-flash{position:relative;}
 .rf-hero-flash::before{content:"";position:absolute;left:-10%;top:-40px;width:120%;height:340px;z-index:-1;pointer-events:none;background:radial-gradient(620px 300px at 28% 30%,rgba(25,232,219,0.16),transparent 70%),radial-gradient(520px 260px at 75% 10%,rgba(124,92,255,0.16),transparent 70%);filter:blur(6px);animation:rfBreathe 6s ease-in-out infinite;}
+.rf-hero-flash{position:relative;display:flex;align-items:center;gap:24px;}
+.rf-hero-text{flex:1;min-width:0;}
+.rf-forge-art{flex-shrink:0;width:min(40vw,420px);max-width:420px;align-self:center;}
+.rf-forge-art svg{width:100%;height:auto;display:block;overflow:visible;}
+@media (max-width:860px){.rf-forge-art{display:none;}}
+.fa-core,.fa-piece,.fa-coreglow,.fa-ring,.fa-ring2{transform-box:fill-box;transform-origin:center;}
+.fa-coreglow{animation:faPulse 4.5s ease-in-out infinite;}
+@keyframes faPulse{0%,100%{opacity:0.75;transform:scale(1);}50%{opacity:1;transform:scale(1.08);}}
+.fa-core{animation:faCore 4.5s ease-in-out infinite;}
+@keyframes faCore{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+.fa-ring{animation:faSpin 34s linear infinite;}
+.fa-ring2{animation:faSpin 26s linear infinite reverse;}
+@keyframes faSpin{to{transform:rotate(360deg);}}
+.fa-l{stroke-dasharray:6 7;opacity:0.5;animation:faFlow 2.6s linear infinite;}
+.fa-l2{animation-delay:.4s;}.fa-l3{animation-delay:.8s;}.fa-l4{animation-delay:1.2s;}.fa-l5{animation-delay:1.6s;}
+@keyframes faFlow{to{stroke-dashoffset:-26;}}
+.fa-piece{animation:faFloat 6s ease-in-out infinite;}
+.fa-p1{animation-delay:0s;}.fa-p2{animation-delay:1.1s;}.fa-p3{animation-delay:2.2s;}.fa-p4{animation-delay:3.3s;}.fa-p5{animation-delay:4.4s;}
+@keyframes faFloat{0%,100%{transform:translate(0,0);}50%{transform:translate(0,-7px);}}
+@media (prefers-reduced-motion:reduce){.fa-coreglow,.fa-core,.fa-ring,.fa-ring2,.fa-l,.fa-piece{animation:none;}}
 .rf-hero-title{font-size:clamp(34px,6vw,60px);line-height:1.04;letter-spacing:-0.01em;margin:6px 0 16px;font-family:'Chakra Petch';font-weight:700;}
 .rf-hero-grad{background:linear-gradient(100deg,var(--c-accent) 0%,#7ad8ff 40%,var(--c-accent2) 80%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;background-size:220% auto;animation:rfShine 6s linear infinite;filter:drop-shadow(0 0 18px rgba(25,232,219,0.35));}
 @keyframes rfShine{to{background-position:220% center;}}
