@@ -3012,26 +3012,35 @@ function ForgeArt() {
           <line className="fa-l fa-l5" x1="200" y1="200" x2="100" y2="288" />
         </g>
 
-        {/* ===== assembled GAMING PC (revealed when parts converge) ===== */}
+        {/* ===== assembled FISH-TANK gaming PC (wide glass box) ===== */}
         <g className="fa-pc">
-          <rect x="146" y="104" width="108" height="192" rx="14" fill="none" stroke="#19e8db" strokeOpacity="0.3" strokeWidth="7" className="fa-caseglow" />
-          <rect x="146" y="104" width="108" height="192" rx="14" fill="#0b1018" stroke="url(#faEdge)" strokeWidth="2.5" />
-          <rect x="153" y="111" width="80" height="178" rx="8" fill="#0e1626" stroke="#7c5cff" strokeOpacity="0.28" strokeWidth="1" />
-          <rect x="153" y="111" width="3.5" height="178" rx="1.75" fill="url(#faRGB)" className="fa-rgb" />
-          {/* AIO + CPU fan */}
-          <rect x="161" y="120" width="48" height="22" rx="4" fill="#121a2b" stroke="#19e8db" strokeOpacity="0.55" />
-          <g className="fa-fan"><circle cx="185" cy="131" r="7.5" fill="none" stroke="#19e8db" strokeWidth="1.3" /><g className="fa-blades"><path d="M185 131 L185 124 M185 131 L191 134 M185 131 L179 134" stroke="#19e8db" strokeWidth="1.3" /></g><circle cx="185" cy="131" r="1.6" fill="#19e8db" /></g>
-          {/* RAM with RGB top */}
-          <rect x="215" y="120" width="5" height="40" rx="1.5" fill="#121a2b" stroke="#7c5cff" strokeOpacity="0.7" />
-          <rect x="223" y="120" width="5" height="40" rx="1.5" fill="#121a2b" stroke="#7c5cff" strokeOpacity="0.7" />
-          <rect x="214" y="117" width="15" height="4" rx="2" fill="#ff7ae0" className="fa-rgb" />
-          {/* GPU with twin RGB fans */}
-          <rect x="158" y="196" width="86" height="26" rx="4" fill="#121a2b" stroke="#19e8db" strokeOpacity="0.7" />
-          <g className="fa-fan2"><circle cx="180" cy="209" r="9" fill="none" stroke="#19e8db" strokeWidth="1.3" /><g className="fa-blades"><path d="M180 209 L180 201 M180 209 L187 213 M180 209 L173 213" stroke="#19e8db" strokeWidth="1.3" /></g><circle cx="180" cy="209" r="1.7" fill="#19e8db" /></g>
-          <g className="fa-fan3"><circle cx="222" cy="209" r="9" fill="none" stroke="#7c5cff" strokeWidth="1.3" /><g className="fa-blades"><path d="M222 209 L222 201 M222 209 L229 213 M222 209 L215 213" stroke="#7c5cff" strokeWidth="1.3" /></g><circle cx="222" cy="209" r="1.7" fill="#7c5cff" /></g>
-          {/* PSU shroud */}
-          <rect x="153" y="262" width="94" height="26" rx="5" fill="#0c1320" stroke="#19e8db" strokeOpacity="0.3" />
-          <circle cx="240" cy="116" r="2.4" fill="#46e0a0" className="fa-rgb" />
+          <rect x="120" y="128" width="160" height="148" rx="14" fill="none" stroke="#19e8db" strokeOpacity="0.3" strokeWidth="8" className="fa-caseglow" />
+          <rect x="120" y="128" width="160" height="148" rx="14" fill="#0b1018" stroke="url(#faEdge)" strokeWidth="2.5" />
+          {/* glass front panel */}
+          <rect x="128" y="136" width="144" height="132" rx="9" fill="#0e1626" stroke="#7c5cff" strokeOpacity="0.3" strokeWidth="1" />
+          <rect x="128" y="136" width="60" height="132" rx="9" fill="#19e8db" fillOpacity="0.04" />
+          {/* top-mounted RGB radiator fans */}
+          <g className="fa-fan"><circle cx="155" cy="152" r="13" fill="none" stroke="#19e8db" strokeWidth="1.4" /><g className="fa-blades"><path d="M155 152 L155 142 M155 152 L163 158 M155 152 L147 158" stroke="#19e8db" strokeWidth="1.3" /></g><circle cx="155" cy="152" r="1.8" fill="#19e8db" /></g>
+          <g className="fa-fan2"><circle cx="186" cy="152" r="13" fill="none" stroke="#7c5cff" strokeWidth="1.4" /><g className="fa-blades"><path d="M186 152 L186 142 M186 152 L194 158 M186 152 L178 158" stroke="#7c5cff" strokeWidth="1.3" /></g><circle cx="186" cy="152" r="1.8" fill="#7c5cff" /></g>
+          <g className="fa-fan3"><circle cx="217" cy="152" r="13" fill="none" stroke="#ff7ae0" strokeWidth="1.4" /><g className="fa-blades"><path d="M217 152 L217 142 M217 152 L225 158 M217 152 L209 158" stroke="#ff7ae0" strokeWidth="1.3" /></g><circle cx="217" cy="152" r="1.8" fill="#ff7ae0" /></g>
+          {/* vertical GPU showcased behind the glass, twin RGB fans facing out */}
+          <rect x="140" y="180" width="32" height="80" rx="5" fill="#121a2b" stroke="#19e8db" strokeOpacity="0.7" strokeWidth="1.5" />
+          <g className="fa-fan2"><circle cx="156" cy="200" r="11" fill="none" stroke="#19e8db" strokeWidth="1.4" /><g className="fa-blades"><path d="M156 200 L156 191 M156 200 L164 205 M156 200 L148 205" stroke="#19e8db" strokeWidth="1.3" /></g><circle cx="156" cy="200" r="1.8" fill="#19e8db" /></g>
+          <g className="fa-fan"><circle cx="156" cy="232" r="11" fill="none" stroke="#7c5cff" strokeWidth="1.4" /><g className="fa-blades"><path d="M156 232 L156 223 M156 232 L164 237 M156 232 L148 237" stroke="#7c5cff" strokeWidth="1.3" /></g><circle cx="156" cy="232" r="1.8" fill="#7c5cff" /></g>
+          {/* RAM sticks with RGB tops */}
+          <rect x="196" y="180" width="5" height="34" rx="1.5" fill="#121a2b" stroke="#7c5cff" strokeOpacity="0.7" />
+          <rect x="204" y="180" width="5" height="34" rx="1.5" fill="#121a2b" stroke="#7c5cff" strokeOpacity="0.7" />
+          <rect x="195" y="177" width="15" height="4" rx="2" fill="#ff7ae0" className="fa-rgb" />
+          {/* water-cooling reservoir tube with rising bubbles */}
+          <rect x="224" y="178" width="12" height="80" rx="6" fill="#0c1320" stroke="#19e8db" strokeOpacity="0.5" />
+          <rect x="226" y="180" width="8" height="76" rx="4" fill="url(#faRGB)" fillOpacity="0.4" className="fa-rgb" />
+          <circle className="fa-bubble fa-b1" cx="230" cy="248" r="1.6" fill="#9be0ff" />
+          <circle className="fa-bubble fa-b2" cx="231" cy="252" r="1.2" fill="#9be0ff" />
+          <circle className="fa-bubble fa-b3" cx="229" cy="244" r="1.3" fill="#9be0ff" />
+          {/* PSU / bottom shroud + RGB strip */}
+          <rect x="132" y="252" width="136" height="14" rx="4" fill="#0c1320" stroke="#19e8db" strokeOpacity="0.3" />
+          <rect x="252" y="178" width="12" height="68" rx="4" fill="url(#faRGB)" className="fa-rgb" />
+          <circle cx="260" cy="142" r="2.2" fill="#46e0a0" className="fa-rgb" />
         </g>
 
         {/* flash when it snaps together */}
@@ -4100,35 +4109,44 @@ h3{font-family:'Chakra Petch';font-weight:600;font-size:18px;margin:0 0 6px;}
 .rf-forge-art svg{width:100%;height:auto;display:block;overflow:visible;}
 @media (max-width:860px){.rf-forge-art{display:none;}}
 .fa-core,.fa-piece,.fa-coreglow,.fa-ring,.fa-ring2,.fa-flash,.fa-pc,.fa-blades{transform-box:fill-box;transform-origin:center;}
-.fa-coreglow{animation:faPulse 7s ease-in-out infinite;}
-@keyframes faPulse{0%,100%{opacity:0.55;transform:scale(0.9);}36%,60%{opacity:1;transform:scale(1.12);}}
+.fa-coreglow{animation:faPulse 8s ease-in-out infinite;}
+@keyframes faPulse{0%,100%{opacity:0.45;transform:scale(0.85);}30%{opacity:0.7;transform:scale(0.95);}44%{opacity:1;transform:scale(1.18);}70%{opacity:0.9;transform:scale(1.08);}}
 .fa-ring{animation:faSpin 30s linear infinite;}
 .fa-ring2{animation:faSpin 22s linear infinite reverse;}
 @keyframes faSpin{to{transform:rotate(360deg);}}
-.fa-l{stroke-dasharray:5 8;animation:faFlow 1.6s linear infinite,faLineFade 7s ease-in-out infinite;}
+.fa-l{stroke-dasharray:5 8;animation:faFlow 1.3s linear infinite,faLineFade 8s ease-in-out infinite;}
 @keyframes faFlow{to{stroke-dashoffset:-26;}}
-@keyframes faLineFade{0%,16%,64%,100%{opacity:0;}30%{opacity:0.85;}38%{opacity:0;}}
-.fa-flash{opacity:0;animation:faBurst 7s ease-in-out infinite;}
-@keyframes faBurst{0%,30%,100%{opacity:0;transform:scale(0.4);}36%{opacity:0.95;transform:scale(1.1);}44%{opacity:0.45;transform:scale(1.4);}50%{opacity:0;transform:scale(1.4);}}
-/* the assembled PC reveals as the parts vanish, holds, then breaks apart */
-.fa-pc{opacity:0;animation:faAssemble 7s ease-in-out infinite;}
-@keyframes faAssemble{0%,30%{opacity:0;transform:scale(0.55);}40%{opacity:1;transform:scale(1.05);}46%,60%{opacity:1;transform:scale(1);}68%{opacity:0;transform:scale(0.6);}100%{opacity:0;transform:scale(0.55);}}
+@keyframes faLineFade{0%,8%{opacity:0;}30%{opacity:0.9;}42%{opacity:0;}100%{opacity:0;}}
+.fa-flash{opacity:0;animation:faBurst 8s ease-out infinite;}
+@keyframes faBurst{0%,36%{opacity:0;transform:scale(0.25);}43%{opacity:1;transform:scale(1.15);}54%{opacity:0;transform:scale(1.6);}100%{opacity:0;transform:scale(1.6);}}
+/* the tower springs out as the parts collapse in, holds, then eases away */
+.fa-pc{opacity:0;animation:faAssemble 8s infinite;}
+@keyframes faAssemble{
+  0%,40%{opacity:0;transform:scale(0.5);animation-timing-function:cubic-bezier(.34,1.56,.64,1);}
+  54%{opacity:1;transform:scale(1.05);animation-timing-function:cubic-bezier(.4,0,.6,1);}
+  60%,80%{opacity:1;transform:scale(1);animation-timing-function:cubic-bezier(.6,0,.4,1);}
+  90%{opacity:0;transform:scale(0.62);}
+  100%{opacity:0;transform:scale(0.5);}
+}
 .fa-caseglow{animation:faCaseGlow 2.4s ease-in-out infinite;}
-@keyframes faCaseGlow{0%,100%{stroke:#19e8db;stroke-opacity:0.25;}50%{stroke:#7c5cff;stroke-opacity:0.5;}}
+@keyframes faCaseGlow{0%,100%{stroke:#19e8db;stroke-opacity:0.25;}50%{stroke:#7c5cff;stroke-opacity:0.55;}}
 .fa-blades{animation:faSpin 2.2s linear infinite;}
-.fa-fan2 .fa-blades{animation-duration:1.6s;}
+.fa-fan2 .fa-blades{animation-duration:1.5s;}
 .fa-fan3 .fa-blades{animation-duration:1.9s;}
 .fa-rgb{animation:faRgbPulse 3s ease-in-out infinite;}
-@keyframes faRgbPulse{0%,100%{opacity:0.6;}50%{opacity:1;}}
-/* parts: fly in from spread, lock around center, fade as the PC forms, then return */
-.fa-piece{animation-timing-function:ease-in-out;animation-iteration-count:infinite;animation-duration:7s;}
+@keyframes faRgbPulse{0%,100%{opacity:0.55;}50%{opacity:1;}}
+.fa-bubble{animation:faBubble 2.6s ease-in infinite;}
+.fa-b2{animation-delay:.9s;}.fa-b3{animation-delay:1.7s;}
+@keyframes faBubble{0%{transform:translateY(0);opacity:0;}15%{opacity:0.9;}85%{opacity:0.9;}100%{transform:translateY(-70px);opacity:0;}}
+/* parts accelerate inward, collapse to the center, vanish into the merge, then reset */
+.fa-piece{animation-iteration-count:infinite;animation-duration:8s;}
 .fa-p1{animation-name:faForge1;}.fa-p2{animation-name:faForge2;}.fa-p3{animation-name:faForge3;}.fa-p4{animation-name:faForge4;}.fa-p5{animation-name:faForge5;}
-@keyframes faForge1{0%{transform:translate(0,-18px);opacity:.4;}28%{transform:translate(0,66px);opacity:1;}36%,64%{transform:translate(0,66px);opacity:0;}72%{transform:translate(0,40px);opacity:.9;}100%{transform:translate(0,-18px);opacity:.4;}}
-@keyframes faForge2{0%{transform:translate(22px,0);opacity:.4;}28%{transform:translate(-58px,42px);opacity:1;}36%,64%{transform:translate(-58px,42px);opacity:0;}72%{transform:translate(-40px,30px);opacity:.9;}100%{transform:translate(22px,0);opacity:.4;}}
-@keyframes faForge3{0%{transform:translate(18px,16px);opacity:.4;}28%{transform:translate(-54px,-30px);opacity:1;}36%,64%{transform:translate(-54px,-30px);opacity:0;}72%{transform:translate(-36px,-20px);opacity:.9;}100%{transform:translate(18px,16px);opacity:.4;}}
-@keyframes faForge4{0%{transform:translate(-18px,-14px);opacity:.4;}28%{transform:translate(70px,54px);opacity:1;}36%,64%{transform:translate(70px,54px);opacity:0;}72%{transform:translate(48px,36px);opacity:.9;}100%{transform:translate(-18px,-14px);opacity:.4;}}
-@keyframes faForge5{0%{transform:translate(-18px,14px);opacity:.4;}28%{transform:translate(70px,-46px);opacity:1;}36%,64%{transform:translate(70px,-46px);opacity:0;}72%{transform:translate(48px,-30px);opacity:.9;}100%{transform:translate(-18px,14px);opacity:.4;}}
-@media (prefers-reduced-motion:reduce){.fa-coreglow,.fa-ring,.fa-ring2,.fa-l,.fa-piece,.fa-flash,.fa-pc,.fa-blades,.fa-caseglow,.fa-rgb{animation:none;}.fa-pc{opacity:1;}.fa-piece{opacity:0;}}
+@keyframes faForge1{0%{transform:translate(0,0) scale(1);opacity:.45;animation-timing-function:cubic-bezier(.55,0,.9,.35);}38%{transform:translate(0,128px) scale(.42);opacity:1;animation-timing-function:ease-out;}44%{transform:translate(0,128px) scale(.22);opacity:0;}80%{transform:translate(0,128px) scale(.22);opacity:0;}88%{transform:translate(0,0) scale(1);opacity:0;}100%{transform:translate(0,0) scale(1);opacity:.45;}}
+@keyframes faForge2{0%{transform:translate(0,0) scale(1);opacity:.45;animation-timing-function:cubic-bezier(.55,0,.9,.35);}38%{transform:translate(-125px,62px) scale(.42);opacity:1;animation-timing-function:ease-out;}44%{transform:translate(-125px,62px) scale(.22);opacity:0;}80%{transform:translate(-125px,62px) scale(.22);opacity:0;}88%{transform:translate(0,0) scale(1);opacity:0;}100%{transform:translate(0,0) scale(1);opacity:.45;}}
+@keyframes faForge3{0%{transform:translate(0,0) scale(1);opacity:.45;animation-timing-function:cubic-bezier(.55,0,.9,.35);}38%{transform:translate(-100px,-60px) scale(.42);opacity:1;animation-timing-function:ease-out;}44%{transform:translate(-100px,-60px) scale(.22);opacity:0;}80%{transform:translate(-100px,-60px) scale(.22);opacity:0;}88%{transform:translate(0,0) scale(1);opacity:0;}100%{transform:translate(0,0) scale(1);opacity:.45;}}
+@keyframes faForge4{0%{transform:translate(0,0) scale(1);opacity:.45;animation-timing-function:cubic-bezier(.55,0,.9,.35);}38%{transform:translate(110px,94px) scale(.42);opacity:1;animation-timing-function:ease-out;}44%{transform:translate(110px,94px) scale(.22);opacity:0;}80%{transform:translate(110px,94px) scale(.22);opacity:0;}88%{transform:translate(0,0) scale(1);opacity:0;}100%{transform:translate(0,0) scale(1);opacity:.45;}}
+@keyframes faForge5{0%{transform:translate(0,0) scale(1);opacity:.45;animation-timing-function:cubic-bezier(.55,0,.9,.35);}38%{transform:translate(110px,-84px) scale(.42);opacity:1;animation-timing-function:ease-out;}44%{transform:translate(110px,-84px) scale(.22);opacity:0;}80%{transform:translate(110px,-84px) scale(.22);opacity:0;}88%{transform:translate(0,0) scale(1);opacity:0;}100%{transform:translate(0,0) scale(1);opacity:.45;}}
+@media (prefers-reduced-motion:reduce){.fa-coreglow,.fa-ring,.fa-ring2,.fa-l,.fa-piece,.fa-flash,.fa-pc,.fa-blades,.fa-caseglow,.fa-rgb,.fa-bubble{animation:none;}.fa-pc{opacity:1;}.fa-piece{opacity:0;}.fa-bubble{opacity:0;}}
 .rf-hero-title{font-size:clamp(34px,6vw,60px);line-height:1.04;letter-spacing:-0.01em;margin:6px 0 16px;font-family:'Chakra Petch';font-weight:700;}
 .rf-hero-grad{background:linear-gradient(100deg,var(--c-accent) 0%,#7ad8ff 40%,var(--c-accent2) 80%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;background-size:220% auto;animation:rfShine 6s linear infinite,rfTitleGlow 4.5s ease-in-out infinite;}
 @keyframes rfShine{to{background-position:220% center;}}
