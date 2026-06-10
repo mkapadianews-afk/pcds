@@ -1630,11 +1630,16 @@ export default function RigForge() {
             </button>
           )}
           {hdrUser ? (
-            <div className="rf-acct-chip">
-              <span className="rf-acct-name">{hdrUser.name}</span>
-              <RankBadge rank={moggerRank(hdrUser.elo, hdrUser.crank)} />
-              <button className="rf-acct-out" onClick={() => setHdrLogoutAsk(true)} title="Log out"><X size={13} /></button>
-            </div>
+            <>
+              {hdrUser.name === "Rayaan" && (
+                <button className="rf-ghost rf-admin-btn" onClick={() => setView("mogger-admin")} title="Admin panel">⚙️ Admin</button>
+              )}
+              <div className="rf-acct-chip">
+                <span className="rf-acct-name">{hdrUser.name}</span>
+                <RankBadge rank={moggerRank(hdrUser.elo, hdrUser.crank)} />
+                <button className="rf-acct-out" onClick={() => setHdrLogoutAsk(true)} title="Log out"><X size={13} /></button>
+              </div>
+            </>
           ) : (
             <button className="rf-ghost rf-login-btn" onClick={() => setHdrAuth(true)}>Log in</button>
           )}
@@ -1694,6 +1699,7 @@ export default function RigForge() {
           <Home saved={saved} loading={loadingSaved} onNew={startSurvey} onOpen={openSaved} onDelete={deleteBuild} priceInfo={priceInfo} onMogger={() => setView("mogger")} />
         )}
         {view === "mogger" && <MoggerGame onExit={() => setView("home")} onSaveBuild={saveExternalBuild} />}
+        {view === "mogger-admin" && <MoggerAdmin onBack={() => setView("home")} user={hdrUser} />}
         {view === "survey" && <Survey onPick={chooseUseCase} />}
         {view === "budget" && (
           <BudgetStep useCase={useCase} budget={budget} setBudget={setBudget} onBack={() => setView("survey")} onAuto={generateAuto} onManual={startManual} />
@@ -2829,8 +2835,8 @@ const DIFFS = [{ k: "easy", label: "Easy", elo: 250 }, { k: "medium", label: "Me
 
 const ADMIN_PASS = "Admin2014"; // change this to your own secret
 
-function MoggerAdmin({ onBack }) {
-  const [authed, setAuthed] = useState(false);
+function MoggerAdmin({ onBack, user }) {
+  const [authed, setAuthed] = useState(user && user.name === "Rayaan" ? true : false);
   const [pw, setPw] = useState("");
   const [rows, setRows] = useState(null);
   const [err, setErr] = useState("");
@@ -2845,6 +2851,7 @@ function MoggerAdmin({ onBack }) {
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [msg, setMsg] = useState("");
   const load = async () => { setRows(null); const r = await netAllUsers(); if (r.error) { setErr(r.error); setRows([]); } else { setErr(""); setRows(r.rows); } };
+  useEffect(() => { if (authed) load(); }, [authed]);
   const tryAuth = () => { if (pw === ADMIN_PASS) { setAuthed(true); load(); } else setErr("Wrong admin password."); };
   const del = async (id) => {
     setBusyId(id);
@@ -3050,7 +3057,7 @@ function MoggerGame({ onExit, onSaveBuild }) {
           <button className="rf-btn rf-ghost-btn" onClick={menu}><ChevronLeft size={16} /> Back</button>
         </div>
       )}
-      {screen === "admin" && <MoggerAdmin onBack={exitToRoot} />}
+      {screen === "admin" && <MoggerAdmin onBack={exitToRoot} user={user} />}
       {screen === "leaderboard" && <MoggerLeaderboard onBack={menu} meName={user ? user.name : null} />}
       {screen === "online" && (user ? <MoggerOnline onExit={menu} user={user} setUser={persist} onNeedAuth={() => setShowAuth(true)} onSaveBuild={onSaveBuild} /> : (
         <div className="pm-card pm-center rf-fade">
@@ -4163,6 +4170,7 @@ background:linear-gradient(135deg,var(--c-accent),#19b89f);box-shadow:0 0 18px r
 @media (prefers-reduced-motion:reduce){.rf-logo,.rf-btn::after{animation:none;}.rf-btn::after{display:none;}}
 .rf-accent{color:var(--c-accent);}
 .rf-login-btn{font-weight:600;}
+.rf-admin-btn{font-weight:600;font-size:13px;}
 .rf-acct-chip{display:inline-flex;align-items:center;gap:8px;padding:5px 8px 5px 12px;border-radius:11px;background:rgba(255,255,255,0.05);border:1px solid var(--c-border);}
 .rf-acct-name{font-family:'Chakra Petch';font-weight:600;font-size:13.5px;color:var(--c-text);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .rf-acct-out{display:grid;place-items:center;width:22px;height:22px;border-radius:7px;border:none;cursor:pointer;background:rgba(255,255,255,0.06);color:var(--c-muted);transition:background .15s,color .15s;}
