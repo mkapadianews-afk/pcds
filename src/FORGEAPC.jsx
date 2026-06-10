@@ -4431,7 +4431,7 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .pm-del-yes{padding:5px 10px;border-radius:8px;background:var(--c-bad);border:none;color:#fff;font-family:'Chakra Petch';font-weight:600;cursor:pointer;}
 .pm-del-no{padding:5px 10px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid var(--c-border);color:var(--c-text);font-family:'Chakra Petch';cursor:pointer;}
 .pm-admin-item{border-radius:10px;overflow:hidden;}
-.pm-admin-open{flex:1;min-width:0;text-align:left;background:none;border:none;cursor:pointer;padding:0;}
+.pm-admin-open{flex:1;min-width:0;text-align:left;background:none;border:none;cursor:pointer;padding:0;color:var(--c-text);font-family:'Chakra Petch';}
 .pm-admin-msg{background:rgba(70,224,160,0.12);border:1px solid var(--c-good);color:var(--c-good);border-radius:10px;padding:9px 12px;font-size:13px;margin-bottom:10px;word-break:break-word;}
 .pm-admin-edit{background:rgba(255,255,255,0.03);border:1px solid var(--c-border);border-top:none;border-radius:0 0 10px 10px;padding:12px;display:flex;flex-direction:column;gap:9px;margin-top:-4px;}
 .pm-admin-line{display:flex;align-items:center;gap:8px;}
