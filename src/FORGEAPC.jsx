@@ -2718,13 +2718,13 @@ function MoggerOnline({ onExit, user, setUser, onNeedAuth }) {
           <button className={!onlineRanked ? "on" : ""} onClick={() => setOnlineRanked(false)}>Unranked</button>
         </div>
         <p className="pm-seg-note">{onlineRanked ? "Ranked — Find a match puts your elo on the line." : "Unranked — play casually, your elo won't change."}</p>
-        <div className="pm-mode-grid">
+        <div className="pm-mode-grid pm-mode-grid-top">
           <button className="pm-mode" onClick={doRandom}><span className="pm-mode-icon"><Radio size={22} /></span><span className="pm-mode-name">Find a match</span><span className="pm-mode-sub">{onlineRanked ? "Ranked · random opponent" : "Casual · random opponent"}</span></button>
-          {!onlineRanked && (<>
-            <button className="pm-mode" onClick={doHost}><span className="pm-mode-icon"><Plus size={22} /></span><span className="pm-mode-name">Host a room</span><span className="pm-mode-sub">Get a code, play a friend · Unranked</span></button>
-            <button className="pm-mode" onClick={() => setPhase("joinentry")}><span className="pm-mode-icon"><ChevronRight size={22} /></span><span className="pm-mode-name">Join a room</span><span className="pm-mode-sub">Enter a friend's code · Unranked</span></button>
-            <button className="pm-mode" onClick={() => setPhase("tournament")}><span className="pm-mode-icon">🏆</span><span className="pm-mode-name">Tournament</span><span className="pm-mode-sub">Bracket · 3+ players, AI fills seats · Unranked</span></button>
-          </>)}
+        </div>
+        <div className={"pm-extra-modes" + (onlineRanked ? " collapsed" : "")}>
+          <button className="pm-mode" onClick={doHost}><span className="pm-mode-icon"><Plus size={22} /></span><span className="pm-mode-name">Host a room</span><span className="pm-mode-sub">Get a code, play a friend · Unranked</span></button>
+          <button className="pm-mode" onClick={() => setPhase("joinentry")}><span className="pm-mode-icon"><ChevronRight size={22} /></span><span className="pm-mode-name">Join a room</span><span className="pm-mode-sub">Enter a friend's code · Unranked</span></button>
+          <button className="pm-mode" onClick={() => setPhase("tournament")}><span className="pm-mode-icon">🏆</span><span className="pm-mode-name">Tournament</span><span className="pm-mode-sub">Bracket · 3+ players, AI fills seats · Unranked</span></button>
         </div>
         <button className="rf-ghost pm-exit" onClick={() => { cleanup(); onExit(); }}><ChevronLeft size={15} /> Back</button>
       </>)}
@@ -4603,6 +4603,10 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .pm-mtitle{font-family:'Chakra Petch';font-weight:700;font-size:40px;letter-spacing:1px;}
 .pm-tag{color:var(--c-muted);margin:8px 0 26px;}
 .pm-mode-grid{display:flex;flex-direction:column;gap:13px;max-width:430px;margin:0 auto 22px;}
+.pm-mode-grid-top{margin:0 auto 13px;}
+.pm-extra-modes{display:flex;flex-direction:column;gap:13px;max-width:430px;margin:0 auto 22px;overflow:hidden;max-height:440px;opacity:1;transition:max-height .45s var(--ease),opacity .35s ease,margin .4s var(--ease);}
+.pm-extra-modes.collapsed{max-height:0;opacity:0;margin-top:0;margin-bottom:0;pointer-events:none;}
+.pm-seg button{transition:background .25s,border-color .25s,color .25s;}
 .pm-mode{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:18px 20px;border-radius:16px;cursor:pointer;text-align:left;color:var(--c-text);
   background:var(--c-panel);border:1px solid var(--c-border);backdrop-filter:blur(18px) saturate(1.5);-webkit-backdrop-filter:blur(18px) saturate(1.5);box-shadow:inset 0 1px 0 rgba(255,255,255,0.1),0 10px 30px rgba(0,0,0,0.3);transition:transform .15s,border-color .15s,box-shadow .15s;}
 .pm-mode:hover{transform:translateY(-2px);border-color:var(--c-accent);box-shadow:inset 0 1px 0 rgba(255,255,255,0.12),0 14px 40px rgba(25,232,219,0.18);}
