@@ -3016,6 +3016,7 @@ function ForgeArt() {
           <rect x="166" y="166" width="10" height="10" rx="2" fill="none" stroke="#19e8db" strokeOpacity="0.5" />
           <rect x="224" y="224" width="10" height="10" rx="2" fill="none" stroke="#7c5cff" strokeOpacity="0.6" />
         </g>
+        <circle className="fa-flash" cx="200" cy="200" r="70" fill="url(#faGlow)" />
         {/* CPU (top) */}
         <g className="fa-piece fa-p1">
           <rect x="180" y="52" width="40" height="40" rx="6" fill="#0d1320" stroke="#19e8db" strokeWidth="2" />
@@ -4085,28 +4086,44 @@ h3{font-family:'Chakra Petch';font-weight:600;font-size:18px;margin:0 0 6px;}
 .rf-forge-art{flex-shrink:0;width:min(40vw,420px);max-width:420px;align-self:center;}
 .rf-forge-art svg{width:100%;height:auto;display:block;overflow:visible;}
 @media (max-width:860px){.rf-forge-art{display:none;}}
-.fa-core,.fa-piece,.fa-coreglow,.fa-ring,.fa-ring2{transform-box:fill-box;transform-origin:center;}
-.fa-coreglow{animation:faPulse 4.5s ease-in-out infinite;}
-@keyframes faPulse{0%,100%{opacity:0.75;transform:scale(1);}50%{opacity:1;transform:scale(1.08);}}
-.fa-core{animation:faCore 4.5s ease-in-out infinite;}
-@keyframes faCore{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
-.fa-ring{animation:faSpin 34s linear infinite;}
-.fa-ring2{animation:faSpin 26s linear infinite reverse;}
+.fa-core,.fa-piece,.fa-coreglow,.fa-ring,.fa-ring2,.fa-flash{transform-box:fill-box;transform-origin:center;}
+.fa-coreglow{animation:faPulse 6.5s ease-in-out infinite;}
+@keyframes faPulse{0%,100%{opacity:0.6;transform:scale(0.92);}38%,52%{opacity:1;transform:scale(1.12);}}
+.fa-core{animation:faCore 6.5s ease-in-out infinite;}
+@keyframes faCore{0%,100%{transform:scale(0.94);}40%,50%{transform:scale(1.06);}}
+.fa-ring{animation:faSpin 30s linear infinite;}
+.fa-ring2{animation:faSpin 22s linear infinite reverse;}
 @keyframes faSpin{to{transform:rotate(360deg);}}
-.fa-l{stroke-dasharray:6 7;opacity:0.5;animation:faFlow 2.6s linear infinite;}
-.fa-l2{animation-delay:.4s;}.fa-l3{animation-delay:.8s;}.fa-l4{animation-delay:1.2s;}.fa-l5{animation-delay:1.6s;}
+/* energy lines only light up as the parts lock together */
+.fa-l{stroke-dasharray:5 8;animation:faFlow 1.6s linear infinite,faLineFade 6.5s ease-in-out infinite;}
 @keyframes faFlow{to{stroke-dashoffset:-26;}}
-.fa-piece{animation:faFloat 6s ease-in-out infinite;}
-.fa-p1{animation-delay:0s;}.fa-p2{animation-delay:1.1s;}.fa-p3{animation-delay:2.2s;}.fa-p4{animation-delay:3.3s;}.fa-p5{animation-delay:4.4s;}
-@keyframes faFloat{0%,100%{transform:translate(0,0);}50%{transform:translate(0,-7px);}}
-@media (prefers-reduced-motion:reduce){.fa-coreglow,.fa-core,.fa-ring,.fa-ring2,.fa-l,.fa-piece{animation:none;}}
+@keyframes faLineFade{0%,18%,72%,100%{opacity:0;}38%,52%{opacity:0.85;}}
+/* flash burst when everything snaps into place */
+.fa-flash{opacity:0;animation:faBurst 6.5s ease-in-out infinite;}
+@keyframes faBurst{0%,30%,60%,100%{opacity:0;transform:scale(0.4);}40%{opacity:0.9;transform:scale(1.1);}48%{opacity:0.5;transform:scale(1.35);}}
+/* each part flies in from its spread position, locks around the core, then drifts back out */
+.fa-piece{animation:none;}
+.fa-p1{animation:faForge1 6.5s ease-in-out infinite;}
+.fa-p2{animation:faForge2 6.5s ease-in-out infinite;}
+.fa-p3{animation:faForge3 6.5s ease-in-out infinite;}
+.fa-p4{animation:faForge4 6.5s ease-in-out infinite;}
+.fa-p5{animation:faForge5 6.5s ease-in-out infinite;}
+@keyframes faForge1{0%,100%{transform:translate(0,-14px);opacity:.45;}32%,50%{transform:translate(0,70px);opacity:1;}70%{transform:translate(0,-14px);opacity:.45;}}
+@keyframes faForge2{0%,100%{transform:translate(18px,0);opacity:.45;}32%,50%{transform:translate(-58px,42px);opacity:1;}70%{transform:translate(18px,0);opacity:.45;}}
+@keyframes faForge3{0%,100%{transform:translate(16px,14px);opacity:.45;}32%,50%{transform:translate(-54px,-30px);opacity:1;}70%{transform:translate(16px,14px);opacity:.45;}}
+@keyframes faForge4{0%,100%{transform:translate(-16px,-12px);opacity:.45;}32%,50%{transform:translate(70px,54px);opacity:1;}70%{transform:translate(-16px,-12px);opacity:.45;}}
+@keyframes faForge5{0%,100%{transform:translate(-16px,12px);opacity:.45;}32%,50%{transform:translate(70px,-46px);opacity:1;}70%{transform:translate(-16px,12px);opacity:.45;}}
+@media (prefers-reduced-motion:reduce){.fa-coreglow,.fa-core,.fa-ring,.fa-ring2,.fa-l,.fa-piece,.fa-flash{animation:none;}}
 .rf-hero-title{font-size:clamp(34px,6vw,60px);line-height:1.04;letter-spacing:-0.01em;margin:6px 0 16px;font-family:'Chakra Petch';font-weight:700;}
-.rf-hero-grad{background:linear-gradient(100deg,var(--c-accent) 0%,#7ad8ff 40%,var(--c-accent2) 80%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;background-size:220% auto;animation:rfShine 6s linear infinite;filter:drop-shadow(0 0 18px rgba(25,232,219,0.35));}
+.rf-hero-grad{background:linear-gradient(100deg,var(--c-accent) 0%,#7ad8ff 40%,var(--c-accent2) 80%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;background-size:220% auto;animation:rfShine 6s linear infinite,rfTitleGlow 4.5s ease-in-out infinite;}
 @keyframes rfShine{to{background-position:220% center;}}
+@keyframes rfTitleGlow{0%,100%{filter:drop-shadow(0 0 14px rgba(25,232,219,0.3));}50%{filter:drop-shadow(0 0 26px rgba(124,92,255,0.55));}}
 .rf-hero-sub{max-width:560px;font-size:15px;line-height:1.6;margin:0 0 26px;}
 .rf-cta-grid{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:6px;}
 .rf-cta-card{display:flex;flex-direction:column;align-items:flex-start;gap:10px;flex:1;min-width:240px;max-width:340px;padding:16px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid var(--c-border);backdrop-filter:blur(8px);transition:border-color .2s,transform .2s;}
 .rf-cta-card:hover{border-color:rgba(25,232,219,0.5);transform:translateY(-2px);}
+.rf-cta-card:first-child{box-shadow:0 0 0 1px rgba(25,232,219,0.15),0 0 30px -8px rgba(25,232,219,0.4);animation:rfCtaGlow 4.5s ease-in-out infinite;}
+@keyframes rfCtaGlow{0%,100%{box-shadow:0 0 0 1px rgba(25,232,219,0.12),0 0 24px -10px rgba(25,232,219,0.35);}50%{box-shadow:0 0 0 1px rgba(25,232,219,0.3),0 0 40px -6px rgba(25,232,219,0.6);}}
 .rf-cta-card .rf-btn-lg{width:100%;justify-content:center;}
 .rf-cta-desc{font-size:13px;line-height:1.5;color:var(--c-muted);}
 .rf-price-status{display:flex;align-items:center;gap:8px;margin-top:16px;font-size:12px;color:var(--c-muted);font-family:'JetBrains Mono';letter-spacing:0.3px;flex-wrap:wrap;}
