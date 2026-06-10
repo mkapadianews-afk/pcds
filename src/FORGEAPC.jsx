@@ -2912,6 +2912,10 @@ function MoggerGame({ onExit }) {
   const finishP2 = (b) => { setOpp(b); setScreen("result"); };
   const again = () => { setYou(null); setOpp(null); setEloMsg(null); eloAppliedRef.current = false; setScreen(mode === "ai" ? "diff" : "lobby"); };
   const menu = () => { setYou(null); setOpp(null); setRound(null); setEloMsg(null); setScreen("menu"); };
+  const exitToRoot = () => {
+    try { if (typeof window !== "undefined" && window.history && window.location.pathname.replace(/\/+$/, "").split("/").pop() === "admin") window.history.replaceState(null, "", "/"); } catch (e) {}
+    onExit();
+  };
 
   // apply elo after a vs-AI result
   useEffect(() => {
@@ -2960,7 +2964,7 @@ function MoggerGame({ onExit }) {
           <button className="rf-btn rf-ghost-btn" onClick={menu}><ChevronLeft size={16} /> Back</button>
         </div>
       )}
-      {screen === "admin" && <MoggerAdmin onBack={menu} />}
+      {screen === "admin" && <MoggerAdmin onBack={exitToRoot} />}
       {screen === "leaderboard" && <MoggerLeaderboard onBack={menu} meName={user ? user.name : null} />}
       {screen === "online" && (user ? <MoggerOnline onExit={menu} user={user} setUser={persist} onNeedAuth={() => setShowAuth(true)} /> : (
         <div className="pm-card pm-center rf-fade">
