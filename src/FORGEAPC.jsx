@@ -2995,13 +2995,15 @@ function ForgeArt() {
             <stop offset="100%" stopColor="#7c5cff" stopOpacity="0" />
           </radialGradient>
           <linearGradient id="faEdge" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#19e8db" />
-            <stop offset="100%" stopColor="#7c5cff" />
+            <stop offset="0%" stopColor="#19e8db" /><stop offset="100%" stopColor="#7c5cff" />
+          </linearGradient>
+          <linearGradient id="faRGB" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#19e8db" /><stop offset="50%" stopColor="#7c5cff" /><stop offset="100%" stopColor="#ff7ae0" />
           </linearGradient>
         </defs>
         <circle className="fa-coreglow" cx="200" cy="200" r="155" fill="url(#faGlow)" />
-        <g className="fa-ring"><circle cx="200" cy="200" r="125" fill="none" stroke="#19e8db" strokeOpacity="0.28" strokeWidth="1.2" strokeDasharray="5 12" /></g>
-        <g className="fa-ring2"><circle cx="200" cy="200" r="150" fill="none" stroke="#7c5cff" strokeOpacity="0.22" strokeWidth="1" strokeDasharray="2 16" /></g>
+        <g className="fa-ring"><circle cx="200" cy="200" r="128" fill="none" stroke="#19e8db" strokeOpacity="0.25" strokeWidth="1.2" strokeDasharray="5 12" /></g>
+        <g className="fa-ring2"><circle cx="200" cy="200" r="152" fill="none" stroke="#7c5cff" strokeOpacity="0.2" strokeWidth="1" strokeDasharray="2 16" /></g>
         <g className="fa-lines" stroke="url(#faEdge)" strokeWidth="1.4" fill="none">
           <line className="fa-l fa-l1" x1="200" y1="200" x2="200" y2="78" />
           <line className="fa-l fa-l2" x1="200" y1="200" x2="312" y2="156" />
@@ -3009,41 +3011,52 @@ function ForgeArt() {
           <line className="fa-l fa-l4" x1="200" y1="200" x2="98" y2="116" />
           <line className="fa-l fa-l5" x1="200" y1="200" x2="100" y2="288" />
         </g>
-        {/* central motherboard / forge core */}
-        <g className="fa-core">
-          <rect x="158" y="158" width="84" height="84" rx="12" fill="#0d1320" stroke="url(#faEdge)" strokeWidth="2.5" />
-          <path d="M192 176 l-12 26 h12 l-4 22 22-30 h-12 l8-18 z" fill="#19e8db" />
-          <rect x="166" y="166" width="10" height="10" rx="2" fill="none" stroke="#19e8db" strokeOpacity="0.5" />
-          <rect x="224" y="224" width="10" height="10" rx="2" fill="none" stroke="#7c5cff" strokeOpacity="0.6" />
+
+        {/* ===== assembled GAMING PC (revealed when parts converge) ===== */}
+        <g className="fa-pc">
+          <rect x="146" y="104" width="108" height="192" rx="14" fill="none" stroke="#19e8db" strokeOpacity="0.3" strokeWidth="7" className="fa-caseglow" />
+          <rect x="146" y="104" width="108" height="192" rx="14" fill="#0b1018" stroke="url(#faEdge)" strokeWidth="2.5" />
+          <rect x="153" y="111" width="80" height="178" rx="8" fill="#0e1626" stroke="#7c5cff" strokeOpacity="0.28" strokeWidth="1" />
+          <rect x="153" y="111" width="3.5" height="178" rx="1.75" fill="url(#faRGB)" className="fa-rgb" />
+          {/* AIO + CPU fan */}
+          <rect x="161" y="120" width="48" height="22" rx="4" fill="#121a2b" stroke="#19e8db" strokeOpacity="0.55" />
+          <g className="fa-fan"><circle cx="185" cy="131" r="7.5" fill="none" stroke="#19e8db" strokeWidth="1.3" /><g className="fa-blades"><path d="M185 131 L185 124 M185 131 L191 134 M185 131 L179 134" stroke="#19e8db" strokeWidth="1.3" /></g><circle cx="185" cy="131" r="1.6" fill="#19e8db" /></g>
+          {/* RAM with RGB top */}
+          <rect x="215" y="120" width="5" height="40" rx="1.5" fill="#121a2b" stroke="#7c5cff" strokeOpacity="0.7" />
+          <rect x="223" y="120" width="5" height="40" rx="1.5" fill="#121a2b" stroke="#7c5cff" strokeOpacity="0.7" />
+          <rect x="214" y="117" width="15" height="4" rx="2" fill="#ff7ae0" className="fa-rgb" />
+          {/* GPU with twin RGB fans */}
+          <rect x="158" y="196" width="86" height="26" rx="4" fill="#121a2b" stroke="#19e8db" strokeOpacity="0.7" />
+          <g className="fa-fan2"><circle cx="180" cy="209" r="9" fill="none" stroke="#19e8db" strokeWidth="1.3" /><g className="fa-blades"><path d="M180 209 L180 201 M180 209 L187 213 M180 209 L173 213" stroke="#19e8db" strokeWidth="1.3" /></g><circle cx="180" cy="209" r="1.7" fill="#19e8db" /></g>
+          <g className="fa-fan3"><circle cx="222" cy="209" r="9" fill="none" stroke="#7c5cff" strokeWidth="1.3" /><g className="fa-blades"><path d="M222 209 L222 201 M222 209 L229 213 M222 209 L215 213" stroke="#7c5cff" strokeWidth="1.3" /></g><circle cx="222" cy="209" r="1.7" fill="#7c5cff" /></g>
+          {/* PSU shroud */}
+          <rect x="153" y="262" width="94" height="26" rx="5" fill="#0c1320" stroke="#19e8db" strokeOpacity="0.3" />
+          <circle cx="240" cy="116" r="2.4" fill="#46e0a0" className="fa-rgb" />
         </g>
-        <circle className="fa-flash" cx="200" cy="200" r="70" fill="url(#faGlow)" />
-        {/* CPU (top) */}
+
+        {/* flash when it snaps together */}
+        <circle className="fa-flash" cx="200" cy="200" r="74" fill="url(#faGlow)" />
+
+        {/* ===== scattered parts that fly in ===== */}
         <g className="fa-piece fa-p1">
           <rect x="180" y="52" width="40" height="40" rx="6" fill="#0d1320" stroke="#19e8db" strokeWidth="2" />
           <rect x="190" y="62" width="20" height="20" rx="3" fill="#19e8db" fillOpacity="0.25" stroke="#19e8db" strokeWidth="1.2" />
-          <g stroke="#19e8db" strokeWidth="1.6">
-            <line x1="186" y1="52" x2="186" y2="46" /><line x1="194" y1="52" x2="194" y2="46" /><line x1="202" y1="52" x2="202" y2="46" /><line x1="210" y1="52" x2="210" y2="46" />
-            <line x1="186" y1="92" x2="186" y2="98" /><line x1="194" y1="92" x2="194" y2="98" /><line x1="202" y1="92" x2="202" y2="98" /><line x1="210" y1="92" x2="210" y2="98" />
-          </g>
+          <g stroke="#19e8db" strokeWidth="1.6"><line x1="186" y1="52" x2="186" y2="46" /><line x1="194" y1="52" x2="194" y2="46" /><line x1="202" y1="52" x2="202" y2="46" /><line x1="210" y1="52" x2="210" y2="46" /><line x1="186" y1="92" x2="186" y2="98" /><line x1="194" y1="92" x2="194" y2="98" /><line x1="202" y1="92" x2="202" y2="98" /><line x1="210" y1="92" x2="210" y2="98" /></g>
         </g>
-        {/* RAM (right) */}
         <g className="fa-piece fa-p2">
           <rect x="296" y="128" width="58" height="20" rx="3" fill="#0d1320" stroke="#7c5cff" strokeWidth="2" />
           <g stroke="#7c5cff" strokeWidth="1.4" strokeOpacity="0.8"><line x1="304" y1="148" x2="304" y2="154" /><line x1="314" y1="148" x2="314" y2="154" /><line x1="324" y1="148" x2="324" y2="154" /><line x1="334" y1="148" x2="334" y2="154" /><line x1="344" y1="148" x2="344" y2="154" /></g>
         </g>
-        {/* GPU (bottom-right) */}
         <g className="fa-piece fa-p3">
           <rect x="262" y="240" width="76" height="40" rx="6" fill="#0d1320" stroke="#19e8db" strokeWidth="2" />
           <circle cx="284" cy="260" r="11" fill="none" stroke="#19e8db" strokeWidth="1.6" /><circle cx="284" cy="260" r="2.4" fill="#19e8db" />
           <circle cx="316" cy="260" r="11" fill="none" stroke="#19e8db" strokeWidth="1.6" /><circle cx="316" cy="260" r="2.4" fill="#19e8db" />
         </g>
-        {/* SSD / M.2 (top-left) */}
         <g className="fa-piece fa-p4">
           <rect x="60" y="96" width="60" height="20" rx="4" fill="#0d1320" stroke="#7c5cff" strokeWidth="2" />
           <circle cx="110" cy="106" r="4" fill="none" stroke="#7c5cff" strokeWidth="1.4" />
           <rect x="68" y="103" width="22" height="6" rx="2" fill="#7c5cff" fillOpacity="0.3" />
         </g>
-        {/* PSU (bottom-left) */}
         <g className="fa-piece fa-p5">
           <rect x="62" y="262" width="56" height="44" rx="6" fill="#0d1320" stroke="#19e8db" strokeWidth="2" />
           <circle cx="90" cy="284" r="14" fill="none" stroke="#19e8db" strokeWidth="1.6" strokeOpacity="0.7" />
@@ -4086,34 +4099,36 @@ h3{font-family:'Chakra Petch';font-weight:600;font-size:18px;margin:0 0 6px;}
 .rf-forge-art{flex-shrink:0;width:min(40vw,420px);max-width:420px;align-self:center;}
 .rf-forge-art svg{width:100%;height:auto;display:block;overflow:visible;}
 @media (max-width:860px){.rf-forge-art{display:none;}}
-.fa-core,.fa-piece,.fa-coreglow,.fa-ring,.fa-ring2,.fa-flash{transform-box:fill-box;transform-origin:center;}
-.fa-coreglow{animation:faPulse 6.5s ease-in-out infinite;}
-@keyframes faPulse{0%,100%{opacity:0.6;transform:scale(0.92);}38%,52%{opacity:1;transform:scale(1.12);}}
-.fa-core{animation:faCore 6.5s ease-in-out infinite;}
-@keyframes faCore{0%,100%{transform:scale(0.94);}40%,50%{transform:scale(1.06);}}
+.fa-core,.fa-piece,.fa-coreglow,.fa-ring,.fa-ring2,.fa-flash,.fa-pc,.fa-blades{transform-box:fill-box;transform-origin:center;}
+.fa-coreglow{animation:faPulse 7s ease-in-out infinite;}
+@keyframes faPulse{0%,100%{opacity:0.55;transform:scale(0.9);}36%,60%{opacity:1;transform:scale(1.12);}}
 .fa-ring{animation:faSpin 30s linear infinite;}
 .fa-ring2{animation:faSpin 22s linear infinite reverse;}
 @keyframes faSpin{to{transform:rotate(360deg);}}
-/* energy lines only light up as the parts lock together */
-.fa-l{stroke-dasharray:5 8;animation:faFlow 1.6s linear infinite,faLineFade 6.5s ease-in-out infinite;}
+.fa-l{stroke-dasharray:5 8;animation:faFlow 1.6s linear infinite,faLineFade 7s ease-in-out infinite;}
 @keyframes faFlow{to{stroke-dashoffset:-26;}}
-@keyframes faLineFade{0%,18%,72%,100%{opacity:0;}38%,52%{opacity:0.85;}}
-/* flash burst when everything snaps into place */
-.fa-flash{opacity:0;animation:faBurst 6.5s ease-in-out infinite;}
-@keyframes faBurst{0%,30%,60%,100%{opacity:0;transform:scale(0.4);}40%{opacity:0.9;transform:scale(1.1);}48%{opacity:0.5;transform:scale(1.35);}}
-/* each part flies in from its spread position, locks around the core, then drifts back out */
-.fa-piece{animation:none;}
-.fa-p1{animation:faForge1 6.5s ease-in-out infinite;}
-.fa-p2{animation:faForge2 6.5s ease-in-out infinite;}
-.fa-p3{animation:faForge3 6.5s ease-in-out infinite;}
-.fa-p4{animation:faForge4 6.5s ease-in-out infinite;}
-.fa-p5{animation:faForge5 6.5s ease-in-out infinite;}
-@keyframes faForge1{0%,100%{transform:translate(0,-14px);opacity:.45;}32%,50%{transform:translate(0,70px);opacity:1;}70%{transform:translate(0,-14px);opacity:.45;}}
-@keyframes faForge2{0%,100%{transform:translate(18px,0);opacity:.45;}32%,50%{transform:translate(-58px,42px);opacity:1;}70%{transform:translate(18px,0);opacity:.45;}}
-@keyframes faForge3{0%,100%{transform:translate(16px,14px);opacity:.45;}32%,50%{transform:translate(-54px,-30px);opacity:1;}70%{transform:translate(16px,14px);opacity:.45;}}
-@keyframes faForge4{0%,100%{transform:translate(-16px,-12px);opacity:.45;}32%,50%{transform:translate(70px,54px);opacity:1;}70%{transform:translate(-16px,-12px);opacity:.45;}}
-@keyframes faForge5{0%,100%{transform:translate(-16px,12px);opacity:.45;}32%,50%{transform:translate(70px,-46px);opacity:1;}70%{transform:translate(-16px,12px);opacity:.45;}}
-@media (prefers-reduced-motion:reduce){.fa-coreglow,.fa-core,.fa-ring,.fa-ring2,.fa-l,.fa-piece,.fa-flash{animation:none;}}
+@keyframes faLineFade{0%,16%,64%,100%{opacity:0;}30%{opacity:0.85;}38%{opacity:0;}}
+.fa-flash{opacity:0;animation:faBurst 7s ease-in-out infinite;}
+@keyframes faBurst{0%,30%,100%{opacity:0;transform:scale(0.4);}36%{opacity:0.95;transform:scale(1.1);}44%{opacity:0.45;transform:scale(1.4);}50%{opacity:0;transform:scale(1.4);}}
+/* the assembled PC reveals as the parts vanish, holds, then breaks apart */
+.fa-pc{opacity:0;animation:faAssemble 7s ease-in-out infinite;}
+@keyframes faAssemble{0%,30%{opacity:0;transform:scale(0.55);}40%{opacity:1;transform:scale(1.05);}46%,60%{opacity:1;transform:scale(1);}68%{opacity:0;transform:scale(0.6);}100%{opacity:0;transform:scale(0.55);}}
+.fa-caseglow{animation:faCaseGlow 2.4s ease-in-out infinite;}
+@keyframes faCaseGlow{0%,100%{stroke:#19e8db;stroke-opacity:0.25;}50%{stroke:#7c5cff;stroke-opacity:0.5;}}
+.fa-blades{animation:faSpin 2.2s linear infinite;}
+.fa-fan2 .fa-blades{animation-duration:1.6s;}
+.fa-fan3 .fa-blades{animation-duration:1.9s;}
+.fa-rgb{animation:faRgbPulse 3s ease-in-out infinite;}
+@keyframes faRgbPulse{0%,100%{opacity:0.6;}50%{opacity:1;}}
+/* parts: fly in from spread, lock around center, fade as the PC forms, then return */
+.fa-piece{animation-timing-function:ease-in-out;animation-iteration-count:infinite;animation-duration:7s;}
+.fa-p1{animation-name:faForge1;}.fa-p2{animation-name:faForge2;}.fa-p3{animation-name:faForge3;}.fa-p4{animation-name:faForge4;}.fa-p5{animation-name:faForge5;}
+@keyframes faForge1{0%{transform:translate(0,-18px);opacity:.4;}28%{transform:translate(0,66px);opacity:1;}36%,64%{transform:translate(0,66px);opacity:0;}72%{transform:translate(0,40px);opacity:.9;}100%{transform:translate(0,-18px);opacity:.4;}}
+@keyframes faForge2{0%{transform:translate(22px,0);opacity:.4;}28%{transform:translate(-58px,42px);opacity:1;}36%,64%{transform:translate(-58px,42px);opacity:0;}72%{transform:translate(-40px,30px);opacity:.9;}100%{transform:translate(22px,0);opacity:.4;}}
+@keyframes faForge3{0%{transform:translate(18px,16px);opacity:.4;}28%{transform:translate(-54px,-30px);opacity:1;}36%,64%{transform:translate(-54px,-30px);opacity:0;}72%{transform:translate(-36px,-20px);opacity:.9;}100%{transform:translate(18px,16px);opacity:.4;}}
+@keyframes faForge4{0%{transform:translate(-18px,-14px);opacity:.4;}28%{transform:translate(70px,54px);opacity:1;}36%,64%{transform:translate(70px,54px);opacity:0;}72%{transform:translate(48px,36px);opacity:.9;}100%{transform:translate(-18px,-14px);opacity:.4;}}
+@keyframes faForge5{0%{transform:translate(-18px,14px);opacity:.4;}28%{transform:translate(70px,-46px);opacity:1;}36%,64%{transform:translate(70px,-46px);opacity:0;}72%{transform:translate(48px,-30px);opacity:.9;}100%{transform:translate(-18px,14px);opacity:.4;}}
+@media (prefers-reduced-motion:reduce){.fa-coreglow,.fa-ring,.fa-ring2,.fa-l,.fa-piece,.fa-flash,.fa-pc,.fa-blades,.fa-caseglow,.fa-rgb{animation:none;}.fa-pc{opacity:1;}.fa-piece{opacity:0;}}
 .rf-hero-title{font-size:clamp(34px,6vw,60px);line-height:1.04;letter-spacing:-0.01em;margin:6px 0 16px;font-family:'Chakra Petch';font-weight:700;}
 .rf-hero-grad{background:linear-gradient(100deg,var(--c-accent) 0%,#7ad8ff 40%,var(--c-accent2) 80%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;background-size:220% auto;animation:rfShine 6s linear infinite,rfTitleGlow 4.5s ease-in-out infinite;}
 @keyframes rfShine{to{background-position:220% center;}}
