@@ -1590,6 +1590,23 @@ export default function RigForge() {
     setView("home");
   };
   const deleteBuild = async (id) => { await sDel("build:" + id); const u = acct(); if (u && u.id) await netDeleteBuild(u.id, id); await refreshSaved(); };
+  // Save a build that came from somewhere else (e.g. a PC Mogger match) into My Rigs.
+  const saveExternalBuild = async (partsMap, ucKey, bud, name) => {
+    const uc = ensureUseCase(ucKey);
+    const a = analyzeBuild(partsMap, uc, bud);
+    const build = {
+      id: "b" + Date.now() + Math.floor(Math.random() * 1000),
+      name: name || `${USE_CASES[uc].label} Build`,
+      useCase: uc, budget: bud, parts: partsMap,
+      total: a.total, overallScore: a.score, ppScore: a.ppScore,
+      verdict: generateVerdict(partsMap, a, uc, bud),
+      compatPass: a.compat.pass, savedAt: Date.now(),
+    };
+    await sSet("build:" + build.id, build);
+    const u = acct(); if (u && u.id) await netSyncBuild(u.id, build);
+    await refreshSaved();
+    return true;
+  };
   const openSaved = (b) => { setAutoGen(false); setUseCase(ensureUseCase(b.useCase)); setBudget(b.budget); setParts(b.parts); setView("results"); };
 
   return (
@@ -1676,7 +1693,7 @@ export default function RigForge() {
         {view === "home" && (
           <Home saved={saved} loading={loadingSaved} onNew={startSurvey} onOpen={openSaved} onDelete={deleteBuild} priceInfo={priceInfo} onMogger={() => setView("mogger")} />
         )}
-        {view === "mogger" && <MoggerGame onExit={() => setView("home")} />}
+        {view === "mogger" && <MoggerGame onExit={() => setView("home")} onSaveBuild={saveExternalBuild} />}
         {view === "survey" && <Survey onPick={chooseUseCase} />}
         {view === "budget" && (
           <BudgetStep useCase={useCase} budget={budget} setBudget={setBudget} onBack={() => setView("survey")} onAuto={generateAuto} onManual={startManual} />
@@ -2240,7 +2257,7 @@ function MoggerScoreCol({ title, build, s, win, shown, rank }) {
   );
 }
 
-function MoggerResult({ round, you, opp, oppName, oppElo, myElo, myCrank, eloMsg, onAgain, onMenu }) {
+function MoggerResult({ round, you, opp, oppName, oppElo, myElo, myCrank, eloMsg, onAgain, onMenu, onSaveBuild }) {
   const sy = useMemo(() => moggerScore(you, round.useCase, round.budget), []);
   const so = useMemo(() => moggerScore(opp, round.useCase, round.budget), []);
   const myRank = myElo != null ? moggerRank(myElo, myCrank) : null;
@@ -2251,6 +2268,14 @@ function MoggerResult({ round, you, opp, oppName, oppElo, myElo, myCrank, eloMsg
   const [ao, setAo] = useState(0);
   const [verdict, setVerdict] = useState("");
   const [busy, setBusy] = useState(true);
+  const [savedYou, setSavedYou] = useState(false);
+  const [savedOpp, setSavedOpp] = useState(false);
+  const saveSide = async (which) => {
+    if (!onSaveBuild) return;
+    const ucLabel = USE_CASES[round.useCase].label;
+    if (which === "you") { await onSaveBuild(you, round.useCase, round.budget, ucLabel + " — Mogger"); setSavedYou(true); }
+    else { await onSaveBuild(opp, round.useCase, round.budget, oppName + "'s " + ucLabel); setSavedOpp(true); }
+  };
   useEffect(() => {
     let dead = false;
     let raf;
@@ -2299,6 +2324,15 @@ function MoggerResult({ round, you, opp, oppName, oppElo, myElo, myCrank, eloMsg
         <MoggerScoreCol title="You" build={you} s={sy} win={youWin} shown={ay} rank={myRank} />
         <MoggerScoreCol title={oppName} build={opp} s={so} win={!youWin} shown={ao} rank={oppRank} />
       </div>
+      {onSaveBuild && phase === "reveal" && (
+        <div className="pm-save-row">
+          <span className="pm-save-label">Like a build? Save it to My Rigs:</span>
+          <div className="pm-save-btns">
+            <button className={"pm-save-btn" + (savedYou ? " done" : "")} disabled={savedYou} onClick={() => saveSide("you")}>{savedYou ? <><Check size={14} /> Saved your build</> : <><Save size={14} /> Save your build</>}</button>
+            <button className={"pm-save-btn" + (savedOpp ? " done" : "")} disabled={savedOpp} onClick={() => saveSide("opp")}>{savedOpp ? <><Check size={14} /> Saved {oppName}'s</> : <><Save size={14} /> Save {oppName}'s build</>}</button>
+          </div>
+        </div>
+      )}
       <div className="pm-row pm-center-row"><button className="rf-btn rf-ghost-btn" onClick={onMenu}>Menu</button><button className="rf-btn" onClick={onAgain}><Repeat2 size={16} /> Play again</button></div>
     </div>
   );
@@ -2558,7 +2592,7 @@ function MoggerTournament({ onExit }) {
   );
 }
 
-function MoggerOnline({ onExit, user, setUser, onNeedAuth }) {
+function MoggerOnline({ onExit, user, setUser, onNeedAuth, onSaveBuild }) {
   const [phase, setPhase] = useState("menu"); // menu|joinentry|host|join|search|starting|intro|build|waiting|result|left
   const [onlineRanked, setOnlineRanked] = useState(true);
   const [code, setCode] = useState("");
@@ -2707,7 +2741,7 @@ function MoggerOnline({ onExit, user, setUser, onNeedAuth }) {
   if (phase === "tournament") return <MoggerTournament onExit={() => setPhase("menu")} />;
   if (phase === "intro" && round) return <MoggerIntro round={round} player={null} onGo={() => setPhase("build")} />;
   if (phase === "build" && round) return <MoggerBuild round={round} player="You" oppLabel={oppName} oppBuild={aiOpp || null} oppIsAI={!!aiOpp} oppLocked={false} liveOpp={!aiOpp} oppLiveScore={oppLiveScore} oppLiveDone={!!oppBuild} onMyScore={aiOpp ? undefined : broadcastScore} myElo={myElo} oppElo={aiOpp ? aiOppElo : oppElo} onDone={onBuildDone} />;
-  if (phase === "result" && round && myBuildRef.current && (aiOpp || oppBuild)) return <MoggerResult round={round} you={myBuildRef.current} opp={aiOpp || oppBuild} oppName={oppName} oppElo={aiOpp ? aiOppElo : oppElo} myElo={myElo} myCrank={user ? user.crank : null} eloMsg={eloMsg} onAgain={reset} onMenu={() => { cleanup(); onExit(); }} />;
+  if (phase === "result" && round && myBuildRef.current && (aiOpp || oppBuild)) return <MoggerResult round={round} you={myBuildRef.current} opp={aiOpp || oppBuild} oppName={oppName} oppElo={aiOpp ? aiOppElo : oppElo} myElo={myElo} myCrank={user ? user.crank : null} eloMsg={eloMsg} onAgain={reset} onMenu={() => { cleanup(); onExit(); }} onSaveBuild={onSaveBuild} />;
 
   return (
     <div className="pm-card pm-center rf-fade">
@@ -2917,7 +2951,7 @@ function MoggerLeaderboard({ onBack, meName }) {
   );
 }
 
-function MoggerGame({ onExit }) {
+function MoggerGame({ onExit, onSaveBuild }) {
   const [screen, setScreen] = useState(() => { try { if (window.location.pathname.replace(/\/+$/, "").split("/").pop() === "admin") return "admin"; } catch (e) {} return "menu"; });
   const [mode, setMode] = useState("ai");
   const [round, setRound] = useState(null);
@@ -3018,7 +3052,7 @@ function MoggerGame({ onExit }) {
       )}
       {screen === "admin" && <MoggerAdmin onBack={exitToRoot} />}
       {screen === "leaderboard" && <MoggerLeaderboard onBack={menu} meName={user ? user.name : null} />}
-      {screen === "online" && (user ? <MoggerOnline onExit={menu} user={user} setUser={persist} onNeedAuth={() => setShowAuth(true)} /> : (
+      {screen === "online" && (user ? <MoggerOnline onExit={menu} user={user} setUser={persist} onNeedAuth={() => setShowAuth(true)} onSaveBuild={onSaveBuild} /> : (
         <div className="pm-card pm-center rf-fade">
           <h2 className="pm-h2">🌐 Online Multiplayer</h2>
           <p className="pm-p">Playing with real people needs an account (so elo and names work). It's quick and free.</p>
@@ -3031,7 +3065,7 @@ function MoggerGame({ onExit }) {
       {screen === "handoff" && <div className="pm-card pm-center rf-fade"><h2 className="pm-h2"><Repeat2 size={20} /> Pass the device</h2><p className="pm-p">Player 1 is locked in. Hand the device to <b>Player 2</b> — same challenge, same clock. No peeking.</p><button className="rf-btn" onClick={() => setScreen("intro2")}>I am Player 2 — start <ChevronRight size={16} /></button></div>}
       {screen === "intro2" && round && <MoggerIntro round={round} player="Player 2" onGo={() => setScreen("p2")} />}
       {screen === "p2" && round && <MoggerBuild round={round} player="Player 2" oppLabel="Player 1" oppBuild={you} oppIsAI={false} oppLocked={true} onDone={finishP2} />}
-      {screen === "result" && round && you && opp && <MoggerResult round={round} you={you} opp={opp} oppName={mode === "ai" ? "AI Opponent" : "Player 2"} oppElo={mode === "ai" ? aiElo : null} myElo={mode === "ai" && user ? user.elo : null} myCrank={user ? user.crank : null} eloMsg={eloMsg} onAgain={again} onMenu={menu} />}
+      {screen === "result" && round && you && opp && <MoggerResult round={round} you={you} opp={opp} oppName={mode === "ai" ? "AI Opponent" : "Player 2"} oppElo={mode === "ai" ? aiElo : null} myElo={mode === "ai" && user ? user.elo : null} myCrank={user ? user.crank : null} eloMsg={eloMsg} onAgain={again} onMenu={menu} onSaveBuild={onSaveBuild} />}
     </div>
   );
 }
@@ -4659,6 +4693,12 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .pm-seg-note{font-size:13px;color:var(--c-muted);margin:0 0 14px;text-align:center;}
 .pm-seg-disabled{opacity:0.45;cursor:not-allowed;filter:grayscale(0.6);}
 .pm-unranked-tag{display:inline-block;margin:0 auto 16px;padding:5px 12px;border-radius:999px;font-family:'JetBrains Mono';font-size:11px;letter-spacing:0.4px;color:var(--c-muted);background:rgba(255,255,255,0.05);border:1px solid var(--c-border);}
+.pm-save-row{display:flex;flex-direction:column;align-items:center;gap:10px;margin:6px auto 14px;}
+.pm-save-label{font-size:13px;color:var(--c-muted);}
+.pm-save-btns{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+.pm-save-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:11px;cursor:pointer;font-family:'Sora';font-weight:600;font-size:13px;color:var(--c-text);background:rgba(255,255,255,0.05);border:1px solid var(--c-border);transition:background .18s,border-color .18s,transform .18s;}
+.pm-save-btn:hover{background:rgba(25,232,219,0.12);border-color:var(--c-accent);color:var(--c-accent);transform:translateY(-1px);}
+.pm-save-btn.done{color:var(--c-good);border-color:rgba(70,224,160,0.5);background:rgba(70,224,160,0.1);cursor:default;}
 .pm-ranked-prompt{display:flex;flex-direction:column;align-items:center;gap:12px;margin:4px auto 16px;padding:14px 16px;max-width:320px;border-radius:14px;background:rgba(124,92,255,0.08);border:1px solid rgba(124,92,255,0.3);}
 .pm-ranked-prompt span{color:var(--c-text);font-size:13.5px;}
 .rf-modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(2,4,8,0.72);backdrop-filter:blur(5px);display:grid;place-items:center;padding:20px;animation:rfFade .22s var(--ease);}
