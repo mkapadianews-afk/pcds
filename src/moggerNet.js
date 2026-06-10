@@ -118,7 +118,7 @@ export async function allUsers() {
   catch (e) { return { error: "Could not load accounts." }; }
 }
 export async function setCustomRank(id, crank) {
-  try { const v = (crank || "").trim(); const { error } = await supabase.from("mogger_users").update({ crank: v ? v.slice(0, 24) : null }).eq("id", id); if (error) return { ok: false, error: error.message }; return { ok: true }; }
+  try { const v = (crank || "").trim(); const { error } = await supabase.from("mogger_users").update({ crank: v ? v.slice(0, 400) : null }).eq("id", id); if (error) return { ok: false, error: error.message }; return { ok: true }; }
   catch (e) { return { ok: false, error: "Could not set rank." }; }
 }
 export async function deleteUser(id) {
