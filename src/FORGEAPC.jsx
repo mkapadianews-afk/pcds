@@ -2559,6 +2559,7 @@ function MoggerTournament({ onExit }) {
 
 function MoggerOnline({ onExit, user, setUser, onNeedAuth }) {
   const [phase, setPhase] = useState("menu"); // menu|joinentry|host|join|search|starting|intro|build|waiting|result|left
+  const [onlineRanked, setOnlineRanked] = useState(true);
   const [code, setCode] = useState("");
   const [joinCode, setJoinCode] = useState("");
   const [round, setRound] = useState(null);
@@ -2664,7 +2665,7 @@ function MoggerOnline({ onExit, user, setUser, onNeedAuth }) {
     setRound({ useCase, budget: bud, secs }); startedRef.current = true; setPhase("intro");
   };
   const doRandom = () => {
-    rankedRef.current = true;
+    rankedRef.current = onlineRanked;
     pairedRef.current = false;
     const lob = netLobby(); lobbyRef.current = lob;
     lob.on("broadcast", { event: "match" }, ({ payload }) => {
@@ -2711,10 +2712,15 @@ function MoggerOnline({ onExit, user, setUser, onNeedAuth }) {
     <div className="pm-card pm-center rf-fade">
       {phase === "menu" && (<>
         <h2 className="pm-h2">🌐 Online Multiplayer</h2>
+        <div className="pm-seg">
+          <button className={onlineRanked ? "on" : ""} onClick={() => setOnlineRanked(true)}>Ranked</button>
+          <button className={!onlineRanked ? "on" : ""} onClick={() => setOnlineRanked(false)}>Unranked</button>
+        </div>
+        <p className="pm-seg-note">{onlineRanked ? "Ranked — Find a match puts your elo on the line." : "Unranked — play casually, your elo won't change."}</p>
         <div className="pm-mode-grid">
-          <button className="pm-mode" onClick={doRandom}><span className="pm-mode-icon"><Radio size={22} /></span><span className="pm-mode-name">Find a match</span><span className="pm-mode-sub">Random opponent · AI if none</span></button>
-          <button className="pm-mode" onClick={doHost}><span className="pm-mode-icon"><Plus size={22} /></span><span className="pm-mode-name">Host a room</span><span className="pm-mode-sub">Get a code, play a friend</span></button>
-          <button className="pm-mode" onClick={() => setPhase("joinentry")}><span className="pm-mode-icon"><ChevronRight size={22} /></span><span className="pm-mode-name">Join a room</span><span className="pm-mode-sub">Enter a friend's code</span></button>
+          <button className="pm-mode" onClick={doRandom}><span className="pm-mode-icon"><Radio size={22} /></span><span className="pm-mode-name">Find a match</span><span className="pm-mode-sub">{onlineRanked ? "Ranked · random opponent" : "Casual · random opponent"}</span></button>
+          <button className="pm-mode" onClick={doHost}><span className="pm-mode-icon"><Plus size={22} /></span><span className="pm-mode-name">Host a room</span><span className="pm-mode-sub">Get a code, play a friend · Unranked</span></button>
+          <button className="pm-mode" onClick={() => setPhase("joinentry")}><span className="pm-mode-icon"><ChevronRight size={22} /></span><span className="pm-mode-name">Join a room</span><span className="pm-mode-sub">Enter a friend's code · Unranked</span></button>
           <button className="pm-mode" onClick={() => setPhase("tournament")}><span className="pm-mode-icon">🏆</span><span className="pm-mode-name">Tournament</span><span className="pm-mode-sub">Bracket · 3+ players, AI fills seats</span></button>
         </div>
         <button className="rf-ghost pm-exit" onClick={() => { cleanup(); onExit(); }}><ChevronLeft size={15} /> Back</button>
@@ -2722,12 +2728,14 @@ function MoggerOnline({ onExit, user, setUser, onNeedAuth }) {
 
       {phase === "joinentry" && (<>
         <h2 className="pm-h2">Join a room</h2>
+        <div className="pm-unranked-tag">Unranked — ranked isn't allowed for private rooms</div>
         <input className="pm-codein" value={joinCode} maxLength={5} onChange={(e) => setJoinCode(e.target.value.toUpperCase())} placeholder="CODE" />
         <div className="pm-row"><button className="rf-btn rf-ghost-btn" onClick={reset}><ChevronLeft size={16} /> Back</button><button className="rf-btn" onClick={doJoin}>Join <ChevronRight size={16} /></button></div>
       </>)}
 
       {phase === "host" && (<>
         <h2 className="pm-h2">Your room code</h2>
+        <div className="pm-unranked-tag">Unranked — ranked isn't allowed for private rooms</div>
         <div className="pm-code">{code}</div>
         <p className="pm-p">{oppPresent ? "A player joined! Set it up and start." : "Share this code with a friend. Waiting for them to join…"}</p>
         <label className="pm-toggle"><input type="checkbox" checked={pick} onChange={(e) => setPick(e.target.checked)} /><span>Pick the challenge (off = random)</span></label>
@@ -4643,6 +4651,7 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .pm-seg button.on{background:rgba(25,232,219,0.12);border-color:var(--c-accent);color:var(--c-accent);}
 .pm-seg-note{font-size:13px;color:var(--c-muted);margin:0 0 14px;text-align:center;}
 .pm-seg-disabled{opacity:0.45;cursor:not-allowed;filter:grayscale(0.6);}
+.pm-unranked-tag{display:inline-block;margin:0 auto 16px;padding:5px 12px;border-radius:999px;font-family:'JetBrains Mono';font-size:11px;letter-spacing:0.4px;color:var(--c-muted);background:rgba(255,255,255,0.05);border:1px solid var(--c-border);}
 .pm-ranked-prompt{display:flex;flex-direction:column;align-items:center;gap:12px;margin:4px auto 16px;padding:14px 16px;max-width:320px;border-radius:14px;background:rgba(124,92,255,0.08);border:1px solid rgba(124,92,255,0.3);}
 .pm-ranked-prompt span{color:var(--c-text);font-size:13.5px;}
 .rf-modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(2,4,8,0.72);backdrop-filter:blur(5px);display:grid;place-items:center;padding:20px;animation:rfFade .22s var(--ease);}
