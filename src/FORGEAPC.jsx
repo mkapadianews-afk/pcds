@@ -1898,8 +1898,33 @@ function moggerAI(ucKey, budget, elo) {
 // Custom rank can be plain text (legacy) or JSON {name,color,icon}.
 function parseCrank(c) {
   if (!c) return null;
-  const s = String(c).trim(); if (!s) return null;
-  if (s.charCodeAt(0) === 123) { try { const o = JSON.parse(s); if (o && o.name) return { name: String(o.name), color: o.color || "#ff7ae0", icon: o.icon || "\u2B50" }; } catch (e) {} }
+  let s = String(c).trim(); if (!s) return null;
+  const Q = String.fromCharCode(34); // a double-quote char, without writing one in code
+  // try JSON (and unwrap a double-encoded string once)
+  for (let i = 0; i < 2; i++) {
+    if (s.charCodeAt(0) === 123) {
+      try {
+        const o = JSON.parse(s);
+        if (o && typeof o === "object" && o.name) return { name: String(o.name), color: o.color || "#ff7ae0", icon: o.icon || "\u2B50" };
+        if (typeof o === "string") { s = o.trim(); continue; }
+      } catch (e) {}
+    }
+    break;
+  }
+  // malformed-but-recognizable JSON: pull fields out manually so raw braces never show
+  if (s.indexOf(Q + "name" + Q) >= 0) {
+    const grab = (key) => {
+      const t = s.indexOf(Q + key + Q); if (t < 0) return null;
+      const colon = s.indexOf(":", t); if (colon < 0) return null;
+      const q1 = s.indexOf(Q, colon + 1); if (q1 < 0) return null;
+      const q2 = s.indexOf(Q, q1 + 1); if (q2 < 0) return null;
+      return s.slice(q1 + 1, q2);
+    };
+    const nm = grab("name");
+    if (nm) return { name: nm, color: grab("color") || "#ff7ae0", icon: grab("icon") || "\u2B50" };
+  }
+  // plain text legacy rank
+  if (s.charCodeAt(0) === 123) return null; // looked like JSON but unreadable — fall back to elo rank
   return { name: s, color: "#ff7ae0", icon: "\u2B50" };
 }
 function hexToRgba(hex, a) {
