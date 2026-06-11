@@ -1307,6 +1307,30 @@ function OfflineBanner({ offlinePriceStatus, priceInfo }) {
   );
 }
 
+// ---------------------------------------------------------------------------
+// STRIPE — no config needed in the app. The serverless function holds the keys
+// (set STRIPE_SECRET_KEY + STRIPE_PUBLISHABLE_KEY in Vercel) and returns the
+// publishable key with each session, so checkout "just works" once those two
+// env vars are set. See api/create-checkout-session.js.
+// Load Stripe.js once (no npm dependency — just the official script tag).
+// ---------------------------------------------------------------------------
+let _stripeJsPromise = null;
+function loadStripeJs() {
+  if (typeof window === "undefined") return Promise.resolve(null);
+  if (window.Stripe) return Promise.resolve(window.Stripe);
+  if (!_stripeJsPromise) {
+    _stripeJsPromise = new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.src = "https://js.stripe.com/v3/";
+      s.async = true;
+      s.onload = () => resolve(window.Stripe);
+      s.onerror = () => reject(new Error("Could not load Stripe.js"));
+      document.head.appendChild(s);
+    });
+  }
+  return _stripeJsPromise;
+}
+
 export default function RigForge() {
   const [view, setView] = useState(() => { try { if (typeof window !== "undefined") { const h = window.location.hostname.split(".")[0]; const p = window.location.pathname.replace(/\/+$/, "").split("/").pop(); if (h === "pcmogger" || p === "admin" || p === "coadmin") return "mogger"; } } catch (e) {} return "home"; }); // home | survey | budget | results | mogger
   const [useCase, setUseCase] = useState(null);
@@ -1338,6 +1362,11 @@ export default function RigForge() {
   const [hdrAuth, setHdrAuth] = useState(false);
   const [hdrLogoutAsk, setHdrLogoutAsk] = useState(false);
   const [plansOpen, setPlansOpen] = useState(false);
+  const [checkoutPlan, setCheckoutPlan] = useState(null); // the tier object being purchased
+  const [checkoutErr, setCheckoutErr] = useState("");
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const checkoutInstanceRef = useRef(null);
+  const [payBanner, setPayBanner] = useState(null); // { ok, text }
   const [lang, setLang] = useState("en");
   CUR_LANG = lang;
 
@@ -1474,6 +1503,65 @@ export default function RigForge() {
   const acct = () => { try { const s = localStorage.getItem("mogger_user"); return s ? JSON.parse(s) : null; } catch (e) { return null; } };
   useEffect(() => { setHdrUser(acct()); }, [view]);
   const hdrLogout = () => { try { localStorage.removeItem("mogger_user"); } catch (e) {} setHdrUser(null); };
+
+  // Mount Stripe Embedded Checkout inside the Plans popup when a paid tier is chosen.
+  useEffect(() => {
+    if (!checkoutPlan) return;
+    let cancelled = false;
+    setCheckoutErr(""); setCheckoutLoading(true);
+    (async () => {
+      try {
+        const u = acct();
+        const r = await fetch("/api/create-checkout-session", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ tier: checkoutPlan.key, email: u && u.email ? u.email : undefined }),
+        });
+        const data = await r.json();
+        if (!r.ok || !data.clientSecret || !data.publishableKey) throw new Error(data.error || "Could not start checkout.");
+        if (cancelled) return;
+        const Stripe = await loadStripeJs();
+        if (cancelled) return;
+        const stripe = Stripe(data.publishableKey);
+        const checkout = await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
+        if (cancelled) { checkout.destroy(); return; }
+        checkoutInstanceRef.current = checkout;
+        checkout.mount("#rf-embedded-checkout");
+        setCheckoutLoading(false);
+      } catch (e) {
+        if (!cancelled) { setCheckoutErr((e && e.message) || "Checkout failed."); setCheckoutLoading(false); }
+      }
+    })();
+    return () => {
+      cancelled = true;
+      if (checkoutInstanceRef.current) { try { checkoutInstanceRef.current.destroy(); } catch (e) {} checkoutInstanceRef.current = null; }
+    };
+  }, [checkoutPlan]);
+
+  const closePlans = () => { setCheckoutPlan(null); setCheckoutErr(""); setPlansOpen(false); };
+
+  // After Stripe checkout, the customer returns to /?checkout=return&session_id=...
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("checkout") !== "return") return;
+      const sid = params.get("session_id");
+      // clean the URL so a refresh doesn't re-trigger this
+      window.history.replaceState(null, "", window.location.pathname);
+      if (!sid) return;
+      (async () => {
+        try {
+          const r = await fetch("/api/create-checkout-session?session_id=" + encodeURIComponent(sid));
+          const d = await r.json();
+          if (r.ok && d.status === "complete") setPayBanner({ ok: true, text: "Payment successful — your plan is active. Thank you!" });
+          else if (r.ok && d.status === "open") setPayBanner({ ok: false, text: "Checkout wasn't completed. You can try again anytime." });
+          else setPayBanner({ ok: false, text: "We couldn't confirm the payment. If you were charged, contact support." });
+        } catch (e) {
+          setPayBanner({ ok: true, text: "Thanks! If your payment went through, your plan is active." });
+        }
+      })();
+    } catch (e) {}
+  }, []);
   const refreshSaved = useCallback(async () => {
     setLoadingSaved(true);
     const keys = await sList("build:");
@@ -1683,30 +1771,49 @@ export default function RigForge() {
       </header>
 
       {hdrAuth && <MoggerAuth onClose={() => setHdrAuth(false)} onAuth={(u) => { try { localStorage.setItem("mogger_user", JSON.stringify(u)); } catch (e) {} setHdrUser(u); setHdrAuth(false); }} />}
+      {payBanner && (
+        <div className="rf-pay-banner" style={payBanner.ok ? {} : { background: "linear-gradient(135deg,#ff8a5c,#e23a52)", color: "#fff" }}>
+          {payBanner.ok ? <Check size={18} /> : <AlertTriangle size={18} />} {payBanner.text}
+          <button onClick={() => setPayBanner(null)} title="Dismiss"><X size={14} /></button>
+        </div>
+      )}
       {plansOpen && (
-        <div className="rf-modal-overlay" onClick={() => setPlansOpen(false)}>
+        <div className="rf-modal-overlay" onClick={closePlans}>
           <div className="rf-plans" onClick={(e) => e.stopPropagation()}>
-            <button className="rf-plans-x" onClick={() => setPlansOpen(false)} title="Close"><X size={18} /></button>
-            <h2 className="rf-plans-title"><span className="rf-hero-grad">Choose your plan</span></h2>
-            <p className="rf-plans-sub">Upgrade for more power. Cancel anytime.</p>
-            <div className="rf-plans-grid">
-              {[
-                { key: "free", name: "Free", price: 0, tag: "", perks: ["Unlimited PC builds", "Full PC Mogger access", "Save rigs to this device"] },
-                { key: "plus", name: "Plus", price: 2, tag: "", perks: ["Everything in Free", "Ad-free experience", "Cloud-synced saves", "Custom rank color"] },
-                { key: "pro", name: "Pro", price: 5, tag: "Popular", perks: ["Everything in Plus", "Custom rank icon", "Priority price updates", "Early access to features"] },
-                { key: "max", name: "Max", price: 8, tag: "", perks: ["Everything in Pro", "Exclusive supporter badge", "Beta features first", "Support the developer"] },
-              ].map((p) => (
-                <div key={p.key} className={"rf-plan" + (p.tag ? " rf-plan-feat" : "")}>
-                  {p.tag && <span className="rf-plan-tag">{p.tag}</span>}
-                  <div className="rf-plan-name">{p.name}</div>
-                  <div className="rf-plan-price"><span className="rf-plan-amt">${p.price}</span><span className="rf-plan-per">/mo</span></div>
-                  <ul className="rf-plan-perks">
-                    {p.perks.map((x, i) => (<li key={i}><Check size={14} /> {x}</li>))}
-                  </ul>
-                  <button className={"rf-plan-cta" + (p.price === 0 ? " rf-plan-cta-free" : "")} onClick={() => alert("Checkout isn't connected yet — " + p.name + " ($" + p.price + "/mo)")}>{p.price === 0 ? "Current plan" : "Get " + p.name}</button>
-                </div>
-              ))}
-            </div>
+            <button className="rf-plans-x" onClick={closePlans} title="Close"><X size={18} /></button>
+            {checkoutPlan ? (
+              <div className="rf-checkout">
+                <button className="rf-checkout-back" onClick={() => { setCheckoutPlan(null); setCheckoutErr(""); }}><ChevronLeft size={16} /> Back to plans</button>
+                <h2 className="rf-plans-title"><span className="rf-hero-grad">{checkoutPlan.name} — ${checkoutPlan.price}/mo</span></h2>
+                {checkoutErr ? (
+                  <div className="rf-checkout-err">{checkoutErr}</div>
+                ) : checkoutLoading ? (
+                  <div className="rf-checkout-loading"><div className="pm-spinner" /> Loading secure checkout…</div>
+                ) : null}
+                <div id="rf-embedded-checkout" className="rf-embedded-checkout" />
+              </div>
+            ) : (<>
+              <h2 className="rf-plans-title"><span className="rf-hero-grad">Choose your plan</span></h2>
+              <p className="rf-plans-sub">Upgrade for more power. Cancel anytime.</p>
+              <div className="rf-plans-grid">
+                {[
+                  { key: "free", name: "Free", price: 0, tag: "", perks: ["Unlimited PC builds", "Full PC Mogger access", "Save rigs to this device"] },
+                  { key: "plus", name: "Plus", price: 2, tag: "", perks: ["Everything in Free", "Ad-free experience", "Cloud-synced saves", "Custom rank color"] },
+                  { key: "pro", name: "Pro", price: 5, tag: "Popular", perks: ["Everything in Plus", "Custom rank icon", "Priority price updates", "Early access to features"] },
+                  { key: "max", name: "Max", price: 8, tag: "", perks: ["Everything in Pro", "Exclusive supporter badge", "Beta features first", "Support the developer"] },
+                ].map((p) => (
+                  <div key={p.key} className={"rf-plan" + (p.tag ? " rf-plan-feat" : "")}>
+                    {p.tag && <span className="rf-plan-tag">{p.tag}</span>}
+                    <div className="rf-plan-name">{p.name}</div>
+                    <div className="rf-plan-price"><span className="rf-plan-amt">${p.price}</span><span className="rf-plan-per">/mo</span></div>
+                    <ul className="rf-plan-perks">
+                      {p.perks.map((x, i) => (<li key={i}><Check size={14} /> {x}</li>))}
+                    </ul>
+                    <button className={"rf-plan-cta" + (p.price === 0 ? " rf-plan-cta-free" : "")} disabled={p.price === 0} onClick={() => { if (p.price !== 0) { setCheckoutErr(""); setCheckoutPlan(p); } }}>{p.price === 0 ? "Current plan" : "Get " + p.name}</button>
+                  </div>
+                ))}
+              </div>
+            </>)}
           </div>
         </div>
       )}
@@ -4797,6 +4904,13 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .rf-plan-cta-free:hover{filter:none;transform:none;}
 @media (max-width:820px){.rf-plans-grid{grid-template-columns:repeat(2,1fr);}}
 @media (max-width:460px){.rf-plans-grid{grid-template-columns:1fr;}}
+.rf-checkout-back{display:inline-flex;align-items:center;gap:5px;background:none;border:none;color:var(--c-muted);cursor:pointer;font-family:'Sora';font-size:13.5px;padding:0;margin-bottom:10px;transition:color .15s;}
+.rf-checkout-back:hover{color:var(--c-accent);}
+.rf-embedded-checkout{margin-top:14px;min-height:120px;}
+.rf-checkout-loading{display:flex;align-items:center;gap:10px;justify-content:center;color:var(--c-muted);font-size:14px;padding:24px 0;}
+.rf-checkout-err{margin:8px 0 0;padding:12px 14px;border-radius:12px;background:rgba(255,92,114,0.1);border:1px solid rgba(255,92,114,0.4);color:var(--c-bad);font-size:13.5px;text-align:center;}
+.rf-pay-banner{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:300;display:flex;align-items:center;gap:10px;padding:13px 20px;border-radius:14px;background:linear-gradient(135deg,rgba(70,224,160,0.95),rgba(25,232,219,0.92));color:#04110f;font-family:'Sora';font-weight:600;font-size:14px;box-shadow:0 12px 40px -10px rgba(25,232,219,0.7);animation:rfToast .4s var(--ease-spring);}
+.rf-pay-banner button{background:rgba(4,17,15,0.16);border:none;border-radius:8px;color:#04110f;cursor:pointer;display:grid;place-items:center;width:24px;height:24px;}
 .pm-rank{display:inline-block;font-family:'Chakra Petch';font-weight:700;font-size:11px;letter-spacing:0.02em;padding:2px 8px;border-radius:999px;border:1px solid currentColor;line-height:1.3;white-space:nowrap;}
 .pm-rank-low{color:#8aa0b4;}
 .pm-rank-mid{color:#46e0a0;}
