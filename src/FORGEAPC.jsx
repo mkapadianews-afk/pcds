@@ -1337,6 +1337,7 @@ export default function RigForge() {
   const [hdrUser, setHdrUser] = useState(() => { try { const s = localStorage.getItem("mogger_user"); return s ? JSON.parse(s) : null; } catch (e) { return null; } });
   const [hdrAuth, setHdrAuth] = useState(false);
   const [hdrLogoutAsk, setHdrLogoutAsk] = useState(false);
+  const [plansOpen, setPlansOpen] = useState(false);
   const [lang, setLang] = useState("en");
   CUR_LANG = lang;
 
@@ -1629,6 +1630,7 @@ export default function RigForge() {
               <ChevronLeft size={16} /> {t("myRigs")}
             </button>
           )}
+          <button className="rf-ghost rf-plans-btn" onClick={() => setPlansOpen(true)}><Sparkles size={15} /> Plans</button>
           {hdrUser ? (
             <>
               {hdrUser.name === "Rayaan" && (
@@ -1681,6 +1683,33 @@ export default function RigForge() {
       </header>
 
       {hdrAuth && <MoggerAuth onClose={() => setHdrAuth(false)} onAuth={(u) => { try { localStorage.setItem("mogger_user", JSON.stringify(u)); } catch (e) {} setHdrUser(u); setHdrAuth(false); }} />}
+      {plansOpen && (
+        <div className="rf-modal-overlay" onClick={() => setPlansOpen(false)}>
+          <div className="rf-plans" onClick={(e) => e.stopPropagation()}>
+            <button className="rf-plans-x" onClick={() => setPlansOpen(false)} title="Close"><X size={18} /></button>
+            <h2 className="rf-plans-title"><span className="rf-hero-grad">Choose your plan</span></h2>
+            <p className="rf-plans-sub">Upgrade for more power. Cancel anytime.</p>
+            <div className="rf-plans-grid">
+              {[
+                { key: "free", name: "Free", price: 0, tag: "", perks: ["Unlimited PC builds", "Full PC Mogger access", "Save rigs to this device"] },
+                { key: "plus", name: "Plus", price: 2, tag: "", perks: ["Everything in Free", "Ad-free experience", "Cloud-synced saves", "Custom rank color"] },
+                { key: "pro", name: "Pro", price: 5, tag: "Popular", perks: ["Everything in Plus", "Custom rank icon", "Priority price updates", "Early access to features"] },
+                { key: "max", name: "Max", price: 8, tag: "", perks: ["Everything in Pro", "Exclusive supporter badge", "Beta features first", "Support the developer"] },
+              ].map((p) => (
+                <div key={p.key} className={"rf-plan" + (p.tag ? " rf-plan-feat" : "")}>
+                  {p.tag && <span className="rf-plan-tag">{p.tag}</span>}
+                  <div className="rf-plan-name">{p.name}</div>
+                  <div className="rf-plan-price"><span className="rf-plan-amt">${p.price}</span><span className="rf-plan-per">/mo</span></div>
+                  <ul className="rf-plan-perks">
+                    {p.perks.map((x, i) => (<li key={i}><Check size={14} /> {x}</li>))}
+                  </ul>
+                  <button className={"rf-plan-cta" + (p.price === 0 ? " rf-plan-cta-free" : "")} onClick={() => alert("Checkout isn't connected yet — " + p.name + " ($" + p.price + "/mo)")}>{p.price === 0 ? "Current plan" : "Get " + p.name}</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
       {hdrLogoutAsk && (
         <div className="rf-modal-overlay" onClick={() => setHdrLogoutAsk(false)}>
           <div className="rf-confirm" onClick={(e) => e.stopPropagation()}>
@@ -4744,6 +4773,30 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .rf-confirm-yes:hover{filter:brightness(1.08);transform:translateY(-1px);}
 .rf-confirm-no{flex:1;padding:11px 16px;border-radius:11px;cursor:pointer;font-family:'Sora';font-weight:600;font-size:14px;color:var(--c-text);background:#161c26;border:1px solid var(--c-border);transition:background .18s,transform .18s;}
 .rf-confirm-no:hover{background:#1e2632;transform:translateY(-1px);}
+.rf-plans-btn{font-weight:600;}
+.rf-plans{position:relative;width:min(940px,100%);max-height:90vh;overflow-y:auto;background:#0c1119;border:1px solid var(--c-border);border-radius:22px;padding:30px 28px 32px;animation:rfPop .45s var(--ease-spring);}
+.rf-plans-x{position:absolute;top:16px;right:16px;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;border:1px solid var(--c-border);background:rgba(255,255,255,0.04);color:var(--c-muted);cursor:pointer;transition:.15s;}
+.rf-plans-x:hover{background:rgba(255,255,255,0.09);color:var(--c-text);}
+.rf-plans-title{font-family:'Chakra Petch';font-size:30px;font-weight:800;text-align:center;margin:0 0 4px;}
+.rf-plans-sub{text-align:center;color:var(--c-muted);font-size:14px;margin:0 0 26px;}
+.rf-plans-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.rf-plan{position:relative;display:flex;flex-direction:column;background:rgba(255,255,255,0.03);border:1px solid var(--c-border);border-radius:16px;padding:22px 18px;transition:transform .2s,border-color .2s,box-shadow .2s;}
+.rf-plan:hover{transform:translateY(-4px);border-color:rgba(25,232,219,0.4);box-shadow:0 16px 40px -16px rgba(25,232,219,0.4);}
+.rf-plan-feat{border-color:var(--c-accent);background:linear-gradient(180deg,rgba(25,232,219,0.08),rgba(124,92,255,0.05));box-shadow:0 0 0 1px rgba(25,232,219,0.25),0 0 40px -10px rgba(25,232,219,0.45);}
+.rf-plan-tag{position:absolute;top:-11px;left:50%;transform:translateX(-50%);padding:3px 12px;border-radius:999px;font-family:'JetBrains Mono';font-size:10.5px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#04110f;background:linear-gradient(135deg,var(--c-accent),#19b89f);box-shadow:0 4px 14px rgba(25,232,219,0.5);}
+.rf-plan-name{font-family:'Chakra Petch';font-size:18px;font-weight:700;color:var(--c-text);}
+.rf-plan-price{display:flex;align-items:baseline;gap:3px;margin:8px 0 16px;}
+.rf-plan-amt{font-family:'JetBrains Mono';font-size:34px;font-weight:800;color:var(--c-text);text-shadow:0 0 20px rgba(25,232,219,0.3);}
+.rf-plan-per{color:var(--c-muted);font-size:14px;}
+.rf-plan-perks{list-style:none;padding:0;margin:0 0 18px;display:flex;flex-direction:column;gap:9px;flex:1;}
+.rf-plan-perks li{display:flex;align-items:flex-start;gap:7px;font-size:13px;color:var(--c-text);line-height:1.35;}
+.rf-plan-perks li svg{color:var(--c-accent);flex-shrink:0;margin-top:2px;}
+.rf-plan-cta{padding:11px;border-radius:11px;border:none;cursor:pointer;font-family:'Sora';font-weight:600;font-size:14px;color:#04110f;background:linear-gradient(135deg,var(--c-accent),#19b89f);box-shadow:0 6px 18px -6px rgba(25,232,219,0.6);transition:filter .18s,transform .18s;}
+.rf-plan-cta:hover{filter:brightness(1.08);transform:translateY(-1px);}
+.rf-plan-cta-free{background:#161c26;color:var(--c-muted);box-shadow:none;border:1px solid var(--c-border);cursor:default;}
+.rf-plan-cta-free:hover{filter:none;transform:none;}
+@media (max-width:820px){.rf-plans-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:460px){.rf-plans-grid{grid-template-columns:1fr;}}
 .pm-rank{display:inline-block;font-family:'Chakra Petch';font-weight:700;font-size:11px;letter-spacing:0.02em;padding:2px 8px;border-radius:999px;border:1px solid currentColor;line-height:1.3;white-space:nowrap;}
 .pm-rank-low{color:#8aa0b4;}
 .pm-rank-mid{color:#46e0a0;}
