@@ -1820,7 +1820,7 @@ export default function RigForge() {
                 <button className="rf-checkout-back" onClick={() => { setCheckoutPlan(null); setCheckoutErr(""); }}><ChevronLeft size={16} /> Back to plans</button>
                 <h2 className="rf-plans-title"><span className="rf-hero-grad">{checkoutPlan.name} — ${checkoutPlan.price}/mo</span></h2>
                 {checkoutLoading && <div className="rf-checkout-loading"><div className="pm-spinner" /> Loading secure form…</div>}
-                <div className="rf-card-form" style={checkoutLoading ? { display: "none" } : {}}>
+                <div className="rf-card-form">
                   <label className="rf-card-label">Card number</label>
                   <div id="rf-card-number" className="rf-card-field" />
                   <div className="rf-card-row">
