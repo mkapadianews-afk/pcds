@@ -1,53 +1,37 @@
 // api/create-checkout-session.js — Vercel (Node) serverless function
 // ---------------------------------------------------------------------------
-// Creates a Stripe SUBSCRIPTION and returns a PaymentIntent client_secret so a
-// native, dark, on-brand Payment Element can mount right inside the Plans popup
-// (not a "page in a page"). Your SECRET key stays on the server.
+// Creates a Stripe EMBEDDED Checkout session (a self-contained payment "box"
+// that mounts inside the Plans popup) and returns its client_secret + your
+// publishable key. Stripe renders the card fields and the Pay button inside the
+// box, so there is no fragile custom wiring. Your SECRET key stays on the server.
 //
-// EASIEST SETUP — just TWO environment variables in Vercel, no code edits and
-// no creating products in Stripe (a reusable price is made automatically the
-// first time, then reused via a lookup_key):
+// SETUP — just TWO environment variables in Vercel (no code edits, no creating
+// products in Stripe; the plan is built on the fly):
 //     STRIPE_SECRET_KEY        = sk_live_... / sk_test_...
 //     STRIPE_PUBLISHABLE_KEY   = pk_live_... / pk_test_...
-// Then redeploy.
+// Then redeploy.  (Optional: PRICE_PLUS / PRICE_PRO / PRICE_MAX = dollar amounts.)
 //
-// (Optional) Override amounts with PRICE_PLUS / PRICE_PRO / PRICE_MAX (dollars).
+// TIP: to make the box dark to match the site, set your colors in
+// Stripe Dashboard -> Settings -> Branding (background + accent + logo).
 // ---------------------------------------------------------------------------
 
 const SECRET = process.env.STRIPE_SECRET_KEY;
 const PUBLISHABLE = process.env.STRIPE_PUBLISHABLE_KEY;
 const STRIPE_API = "https://api.stripe.com/v1";
-const STRIPE_VERSION = "2025-03-31.basil"; // version where invoice.confirmation_secret exists
 
 const TIERS = {
-  plus: { name: "FORGEAPC Plus", dollars: Number(process.env.PRICE_PLUS) || 2, key: "forgeapc_plus" },
-  pro:  { name: "FORGEAPC Pro",  dollars: Number(process.env.PRICE_PRO)  || 5, key: "forgeapc_pro" },
-  max:  { name: "FORGEAPC Max",  dollars: Number(process.env.PRICE_MAX)  || 8, key: "forgeapc_max" },
+  plus: { name: "FORGEAPC Plus", dollars: Number(process.env.PRICE_PLUS) || 2 },
+  pro:  { name: "FORGEAPC Pro",  dollars: Number(process.env.PRICE_PRO)  || 5 },
+  max:  { name: "FORGEAPC Max",  dollars: Number(process.env.PRICE_MAX)  || 8 },
 };
 
 async function stripeFetch(path, { method = "GET", form } = {}) {
-  const opts = { method, headers: { Authorization: "Bearer " + SECRET, "Content-Type": "application/x-www-form-urlencoded", "Stripe-Version": STRIPE_VERSION } };
+  const opts = { method, headers: { Authorization: "Bearer " + SECRET, "Content-Type": "application/x-www-form-urlencoded" } };
   if (form) opts.body = new URLSearchParams(form).toString();
   const r = await fetch(STRIPE_API + path, opts);
   const data = await r.json();
   if (!r.ok) throw new Error((data && data.error && data.error.message) || ("Stripe " + r.status));
   return data;
-}
-
-// Find an existing monthly price by lookup_key, or create the product + price once.
-async function getOrCreatePrice(tier) {
-  const found = await stripeFetch("/prices?lookup_keys[]=" + encodeURIComponent(tier.key) + "&active=true&limit=1");
-  if (found.data && found.data.length && found.data[0].unit_amount === Math.round(tier.dollars * 100)) return found.data[0].id;
-  const product = await stripeFetch("/products", { method: "POST", form: { name: tier.name } });
-  const price = await stripeFetch("/prices", { method: "POST", form: {
-    unit_amount: String(Math.round(tier.dollars * 100)),
-    currency: "usd",
-    "recurring[interval]": "month",
-    product: product.id,
-    lookup_key: tier.key,
-    transfer_lookup_key: "true",
-  } });
-  return price.id;
 }
 
 export default async function handler(req, res) {
@@ -56,35 +40,40 @@ export default async function handler(req, res) {
     return;
   }
   try {
-    if (req.method !== "POST") { res.status(405).json({ error: "Method not allowed" }); return; }
-    const body = req.body || {};
-    const tier = TIERS[body.tier];
-    if (!tier) { res.status(400).json({ error: "Unknown plan." }); return; }
+    // status check after the customer returns from the box
+    if (req.method === "GET") {
+      const sessionId = req.query && req.query.session_id;
+      if (!sessionId) { res.status(400).json({ error: "session_id required" }); return; }
+      const s = await stripeFetch("/checkout/sessions/" + encodeURIComponent(sessionId));
+      res.status(200).json({ status: s.status, payment_status: s.payment_status });
+      return;
+    }
 
-    const priceId = await getOrCreatePrice(tier);
+    if (req.method === "POST") {
+      const body = req.body || {};
+      const tier = TIERS[body.tier];
+      if (!tier) { res.status(400).json({ error: "Unknown plan." }); return; }
 
-    const custForm = {};
-    if (body.email) custForm.email = body.email;
-    if (body.name) custForm.name = body.name;
-    const customer = await stripeFetch("/customers", { method: "POST", form: custForm });
+      const origin = req.headers.origin || ("https://" + (req.headers.host || "forgeapc.xyz"));
+      const form = {
+        ui_mode: "embedded_page",
+        mode: "subscription",
+        "line_items[0][quantity]": "1",
+        "line_items[0][price_data][currency]": "usd",
+        "line_items[0][price_data][unit_amount]": String(Math.round(tier.dollars * 100)),
+        "line_items[0][price_data][recurring][interval]": "month",
+        "line_items[0][price_data][product_data][name]": tier.name,
+        return_url: origin + "/?checkout=return&session_id={CHECKOUT_SESSION_ID}",
+        allow_promotion_codes: "true",
+      };
+      if (body.email) form.customer_email = body.email;
 
-    const sub = await stripeFetch("/subscriptions", { method: "POST", form: {
-      customer: customer.id,
-      "items[0][price]": priceId,
-      payment_behavior: "default_incomplete",
-      "payment_settings[save_default_payment_method]": "on_subscription",
-      "expand[0]": "latest_invoice.confirmation_secret",
-    } });
+      const session = await stripeFetch("/checkout/sessions", { method: "POST", form });
+      res.status(200).json({ clientSecret: session.client_secret, publishableKey: PUBLISHABLE });
+      return;
+    }
 
-    const inv = sub.latest_invoice || {};
-    const clientSecret =
-      (inv.confirmation_secret && inv.confirmation_secret.client_secret) ||
-      (inv.payment_intent && inv.payment_intent.client_secret) ||
-      (sub.pending_setup_intent && sub.pending_setup_intent.client_secret) ||
-      null;
-    if (!clientSecret) throw new Error("Could not initialize payment.");
-
-    res.status(200).json({ clientSecret, publishableKey: PUBLISHABLE, subscriptionId: sub.id });
+    res.status(405).json({ error: "Method not allowed" });
   } catch (e) {
     res.status(500).json({ error: (e && e.message) || "Checkout failed" });
   }
