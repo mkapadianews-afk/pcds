@@ -1366,8 +1366,10 @@ export default function RigForge() {
   const [checkoutErr, setCheckoutErr] = useState("");
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [checkoutPaying, setCheckoutPaying] = useState(false);
+  const [cardFieldErr, setCardFieldErr] = useState("");
   const stripeRef = useRef(null);
-  const stripeElementsRef = useRef(null);
+  const cardNumberRef = useRef(null);
+  const clientSecretRef = useRef(null);
   const [payBanner, setPayBanner] = useState(null); // { ok, text }
   const [lang, setLang] = useState("en");
   CUR_LANG = lang;
@@ -1506,12 +1508,12 @@ export default function RigForge() {
   useEffect(() => { setHdrUser(acct()); }, [view]);
   const hdrLogout = () => { try { localStorage.removeItem("mogger_user"); } catch (e) {} setHdrUser(null); };
 
-  // Mount a dark, on-brand Stripe Payment Element inside the Plans popup.
+  // Mount individual, fully-themed card fields inside our own dark card.
   useEffect(() => {
     if (!checkoutPlan) return;
     let cancelled = false;
-    setCheckoutErr(""); setCheckoutLoading(true); setCheckoutPaying(false);
-    stripeElementsRef.current = null;
+    setCheckoutErr(""); setCardFieldErr(""); setCheckoutLoading(true); setCheckoutPaying(false);
+    stripeRef.current = null; cardNumberRef.current = null; clientSecretRef.current = null;
     (async () => {
       try {
         const u = acct();
@@ -1526,54 +1528,53 @@ export default function RigForge() {
         const Stripe = await loadStripeJs();
         if (cancelled) return;
         const stripe = Stripe(data.publishableKey);
-        const appearance = {
-          theme: "night",
-          variables: {
-            colorPrimary: "#19e8db",
-            colorBackground: "#0d131c",
-            colorText: "#e8eef5",
-            colorTextSecondary: "#9fb0c3",
-            colorDanger: "#ff5c72",
+        const elements = stripe.elements();
+        const style = {
+          base: {
+            color: "#e8eef5",
             fontFamily: "Sora, system-ui, sans-serif",
-            borderRadius: "12px",
-            spacingUnit: "4px",
+            fontSize: "15px",
+            fontSmoothing: "antialiased",
+            iconColor: "#19e8db",
+            "::placeholder": { color: "#5d6b7d" },
           },
-          rules: {
-            ".Input": { backgroundColor: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.12)" },
-            ".Input:focus": { border: "1px solid #19e8db", boxShadow: "0 0 0 1px #19e8db" },
-            ".Label": { color: "#9fb0c3" },
-          },
+          invalid: { color: "#ff5c72", iconColor: "#ff5c72" },
         };
-        const elements = stripe.elements({ clientSecret: data.clientSecret, appearance });
-        const paymentEl = elements.create("payment", { layout: "tabs" });
+        const cardNumber = elements.create("cardNumber", { style, showIcon: true, placeholder: "1234 1234 1234 1234" });
+        const cardExpiry = elements.create("cardExpiry", { style });
+        const cardCvc = elements.create("cardCvc", { style });
         if (cancelled) return;
-        paymentEl.mount("#rf-payment-element");
+        cardNumber.mount("#rf-card-number");
+        cardExpiry.mount("#rf-card-expiry");
+        cardCvc.mount("#rf-card-cvc");
+        const onChange = (e) => { if (!cancelled) setCardFieldErr(e.error ? e.error.message : ""); };
+        cardNumber.on("change", onChange); cardExpiry.on("change", onChange); cardCvc.on("change", onChange);
+        cardNumber.on("ready", () => { if (!cancelled) setCheckoutLoading(false); });
         stripeRef.current = stripe;
-        stripeElementsRef.current = elements;
-        paymentEl.on("ready", () => { if (!cancelled) setCheckoutLoading(false); });
+        cardNumberRef.current = cardNumber;
+        clientSecretRef.current = data.clientSecret;
       } catch (e) {
         if (!cancelled) { setCheckoutErr((e && e.message) || "Checkout failed."); setCheckoutLoading(false); }
       }
     })();
-    return () => { cancelled = true; stripeElementsRef.current = null; stripeRef.current = null; };
+    return () => { cancelled = true; stripeRef.current = null; cardNumberRef.current = null; clientSecretRef.current = null; };
   }, [checkoutPlan]);
 
   const payNow = async () => {
-    if (!stripeRef.current || !stripeElementsRef.current || checkoutPaying) return;
+    if (!stripeRef.current || !cardNumberRef.current || !clientSecretRef.current || checkoutPaying) return;
     setCheckoutPaying(true); setCheckoutErr("");
     try {
-      const { error, paymentIntent } = await stripeRef.current.confirmPayment({
-        elements: stripeElementsRef.current,
-        confirmParams: { return_url: window.location.origin + "/?checkout=return" },
-        redirect: "if_required",
+      const u = acct();
+      const { error, paymentIntent } = await stripeRef.current.confirmCardPayment(clientSecretRef.current, {
+        payment_method: { card: cardNumberRef.current, billing_details: u && u.name ? { name: u.name } : undefined },
       });
       if (error) { setCheckoutErr(error.message || "Payment failed."); setCheckoutPaying(false); return; }
-      if (paymentIntent && paymentIntent.status === "succeeded") {
+      if (paymentIntent && (paymentIntent.status === "succeeded" || paymentIntent.status === "processing")) {
         setPayBanner({ ok: true, text: "Payment successful — your " + checkoutPlan.name + " plan is active. Thank you!" });
         closePlans();
       } else {
-        setPayBanner({ ok: true, text: "Thanks! Your subscription is processing." });
-        closePlans();
+        setPayBanner({ ok: false, text: "Payment couldn't be completed. You can try again anytime." });
+        setCheckoutPaying(false);
       }
     } catch (e) {
       setCheckoutErr((e && e.message) || "Payment failed."); setCheckoutPaying(false);
@@ -1819,12 +1820,23 @@ export default function RigForge() {
                 <button className="rf-checkout-back" onClick={() => { setCheckoutPlan(null); setCheckoutErr(""); }}><ChevronLeft size={16} /> Back to plans</button>
                 <h2 className="rf-plans-title"><span className="rf-hero-grad">{checkoutPlan.name} — ${checkoutPlan.price}/mo</span></h2>
                 {checkoutLoading && <div className="rf-checkout-loading"><div className="pm-spinner" /> Loading secure form…</div>}
-                <div id="rf-payment-element" className="rf-embedded-checkout" />
-                {checkoutErr && <div className="rf-checkout-err">{checkoutErr}</div>}
-                {!checkoutLoading && (
+                <div className="rf-card-form" style={checkoutLoading ? { display: "none" } : {}}>
+                  <label className="rf-card-label">Card number</label>
+                  <div id="rf-card-number" className="rf-card-field" />
+                  <div className="rf-card-row">
+                    <div className="rf-card-col">
+                      <label className="rf-card-label">Expiry</label>
+                      <div id="rf-card-expiry" className="rf-card-field" />
+                    </div>
+                    <div className="rf-card-col">
+                      <label className="rf-card-label">CVC</label>
+                      <div id="rf-card-cvc" className="rf-card-field" />
+                    </div>
+                  </div>
+                  {(cardFieldErr || checkoutErr) && <div className="rf-checkout-err">{cardFieldErr || checkoutErr}</div>}
                   <button className="rf-btn rf-checkout-pay" disabled={checkoutPaying} onClick={payNow}>{checkoutPaying ? "Processing…" : "Subscribe · $" + checkoutPlan.price + "/mo"}</button>
-                )}
-                <p className="rf-checkout-fine">Secured by Stripe · cancel anytime</p>
+                  <p className="rf-checkout-fine">🔒 Secured by Stripe · cancel anytime</p>
+                </div>
               </div>
             ) : (<>
               <h2 className="rf-plans-title"><span className="rf-hero-grad">Choose your plan</span></h2>
@@ -4941,8 +4953,15 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .rf-checkout-back{display:inline-flex;align-items:center;gap:5px;background:none;border:none;color:var(--c-muted);cursor:pointer;font-family:'Sora';font-size:13.5px;padding:0;margin-bottom:10px;transition:color .15s;}
 .rf-checkout-back:hover{color:var(--c-accent);}
 .rf-embedded-checkout{margin-top:14px;min-height:60px;}
-.rf-checkout-pay{width:100%;margin-top:16px;justify-content:center;}
-.rf-checkout-fine{text-align:center;color:var(--c-muted);font-size:11.5px;margin:10px 0 0;}
+.rf-card-form{margin-top:16px;text-align:left;}
+.rf-card-label{display:block;font-family:'Sora';font-size:12px;font-weight:600;color:var(--c-muted);margin:0 0 6px;}
+.rf-card-field{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:13px 14px;margin-bottom:14px;transition:border-color .15s,box-shadow .15s,background .15s;}
+.rf-card-field.StripeElement--focus{border-color:var(--c-accent);box-shadow:0 0 0 1px var(--c-accent),0 0 18px -4px rgba(25,232,219,0.6);background:rgba(25,232,219,0.04);}
+.rf-card-field.StripeElement--invalid{border-color:var(--c-bad);box-shadow:0 0 0 1px rgba(255,92,114,0.5);}
+.rf-card-row{display:flex;gap:12px;}
+.rf-card-col{flex:1;}
+.rf-checkout-pay{width:100%;margin-top:4px;justify-content:center;}
+.rf-checkout-fine{text-align:center;color:var(--c-muted);font-size:11.5px;margin:12px 0 0;}
 .rf-checkout-loading{display:flex;align-items:center;gap:10px;justify-content:center;color:var(--c-muted);font-size:14px;padding:24px 0;}
 .rf-checkout-err{margin:8px 0 0;padding:12px 14px;border-radius:12px;background:rgba(255,92,114,0.1);border:1px solid rgba(255,92,114,0.4);color:var(--c-bad);font-size:13.5px;text-align:center;}
 .rf-pay-banner{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:300;display:flex;align-items:center;gap:10px;padding:13px 20px;border-radius:14px;background:linear-gradient(135deg,rgba(70,224,160,0.95),rgba(25,232,219,0.92));color:#04110f;font-family:'Sora';font-weight:600;font-size:14px;box-shadow:0 12px 40px -10px rgba(25,232,219,0.7);animation:rfToast .4s var(--ease-spring);}
