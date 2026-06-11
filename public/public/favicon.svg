@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2ee6cf"/>
+      <stop offset="1" stop-color="#7c5cff"/>
+    </linearGradient>
+  </defs>
+  <!-- tile -->
+  <rect x="4" y="4" width="56" height="56" rx="15" fill="url(#g)"/>
+  <!-- subtle inner depth -->
+  <rect x="4" y="4" width="56" height="56" rx="15" fill="#04110f" opacity="0.06"/>
+  <!-- forged "F": angular cut top arm + stem + mid arm, knocked out in dark -->
+  <path fill="#06090f" d="
+    M21 17
+    L47 17
+    L47 25
+    L31 25
+    L31 31
+    L43 31
+    L43 39
+    L31 39
+    L31 47
+    L21 47
+    Z"/>
+  <!-- spark accent -->
+  <circle cx="45" cy="44" r="3.2" fill="#06090f"/>
+  <circle cx="45" cy="44" r="1.5" fill="url(#g)"/>
+</svg>
