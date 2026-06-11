@@ -1307,30 +1307,6 @@ function OfflineBanner({ offlinePriceStatus, priceInfo }) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// STRIPE — no config needed in the app. The serverless function holds the keys
-// (set STRIPE_SECRET_KEY + STRIPE_PUBLISHABLE_KEY in Vercel) and returns the
-// publishable key with each session, so checkout "just works" once those two
-// env vars are set. See api/create-checkout-session.js.
-// Load Stripe.js once (no npm dependency — just the official script tag).
-// ---------------------------------------------------------------------------
-let _stripeJsPromise = null;
-function loadStripeJs() {
-  if (typeof window === "undefined") return Promise.resolve(null);
-  if (window.Stripe) return Promise.resolve(window.Stripe);
-  if (!_stripeJsPromise) {
-    _stripeJsPromise = new Promise((resolve, reject) => {
-      const s = document.createElement("script");
-      s.src = "https://js.stripe.com/v3/";
-      s.async = true;
-      s.onload = () => resolve(window.Stripe);
-      s.onerror = () => reject(new Error("Could not load Stripe.js"));
-      document.head.appendChild(s);
-    });
-  }
-  return _stripeJsPromise;
-}
-
 export default function RigForge() {
   const [view, setView] = useState(() => { try { if (typeof window !== "undefined") { const h = window.location.hostname.split(".")[0]; const p = window.location.pathname.replace(/\/+$/, "").split("/").pop(); if (h === "pcmogger" || p === "admin" || p === "coadmin") return "mogger"; } } catch (e) {} return "home"; }); // home | survey | budget | results | mogger
   const [useCase, setUseCase] = useState(null);
@@ -1361,12 +1337,6 @@ export default function RigForge() {
   const [hdrUser, setHdrUser] = useState(() => { try { const s = localStorage.getItem("mogger_user"); return s ? JSON.parse(s) : null; } catch (e) { return null; } });
   const [hdrAuth, setHdrAuth] = useState(false);
   const [hdrLogoutAsk, setHdrLogoutAsk] = useState(false);
-  const [plansOpen, setPlansOpen] = useState(false);
-  const [checkoutPlan, setCheckoutPlan] = useState(null); // the tier object being purchased
-  const [checkoutErr, setCheckoutErr] = useState("");
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const checkoutInstanceRef = useRef(null);
-  const [payBanner, setPayBanner] = useState(null); // { ok, text }
   const [lang, setLang] = useState("en");
   CUR_LANG = lang;
 
@@ -1503,65 +1473,6 @@ export default function RigForge() {
   const acct = () => { try { const s = localStorage.getItem("mogger_user"); return s ? JSON.parse(s) : null; } catch (e) { return null; } };
   useEffect(() => { setHdrUser(acct()); }, [view]);
   const hdrLogout = () => { try { localStorage.removeItem("mogger_user"); } catch (e) {} setHdrUser(null); };
-
-  // Mount Stripe Embedded Checkout inside the Plans popup when a paid tier is chosen.
-  useEffect(() => {
-    if (!checkoutPlan) return;
-    let cancelled = false;
-    setCheckoutErr(""); setCheckoutLoading(true);
-    (async () => {
-      try {
-        const u = acct();
-        const r = await fetch("/api/create-checkout-session", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ tier: checkoutPlan.key, email: u && u.email ? u.email : undefined }),
-        });
-        const data = await r.json();
-        if (!r.ok || !data.clientSecret || !data.publishableKey) throw new Error(data.error || "Could not start checkout.");
-        if (cancelled) return;
-        const Stripe = await loadStripeJs();
-        if (cancelled) return;
-        const stripe = Stripe(data.publishableKey);
-        const checkout = await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
-        if (cancelled) { checkout.destroy(); return; }
-        checkoutInstanceRef.current = checkout;
-        checkout.mount("#rf-embedded-checkout");
-        setCheckoutLoading(false);
-      } catch (e) {
-        if (!cancelled) { setCheckoutErr((e && e.message) || "Checkout failed."); setCheckoutLoading(false); }
-      }
-    })();
-    return () => {
-      cancelled = true;
-      if (checkoutInstanceRef.current) { try { checkoutInstanceRef.current.destroy(); } catch (e) {} checkoutInstanceRef.current = null; }
-    };
-  }, [checkoutPlan]);
-
-  const closePlans = () => { setCheckoutPlan(null); setCheckoutErr(""); setPlansOpen(false); };
-
-  // After Stripe checkout, the customer returns to /?checkout=return&session_id=...
-  useEffect(() => {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get("checkout") !== "return") return;
-      const sid = params.get("session_id");
-      // clean the URL so a refresh doesn't re-trigger this
-      window.history.replaceState(null, "", window.location.pathname);
-      if (!sid) return;
-      (async () => {
-        try {
-          const r = await fetch("/api/create-checkout-session?session_id=" + encodeURIComponent(sid));
-          const d = await r.json();
-          if (r.ok && d.status === "complete") setPayBanner({ ok: true, text: "Payment successful — your plan is active. Thank you!" });
-          else if (r.ok && d.status === "open") setPayBanner({ ok: false, text: "Checkout wasn't completed. You can try again anytime." });
-          else setPayBanner({ ok: false, text: "We couldn't confirm the payment. If you were charged, contact support." });
-        } catch (e) {
-          setPayBanner({ ok: true, text: "Thanks! If your payment went through, your plan is active." });
-        }
-      })();
-    } catch (e) {}
-  }, []);
   const refreshSaved = useCallback(async () => {
     setLoadingSaved(true);
     const keys = await sList("build:");
@@ -1718,7 +1629,6 @@ export default function RigForge() {
               <ChevronLeft size={16} /> {t("myRigs")}
             </button>
           )}
-          <button className="rf-ghost rf-plans-btn" onClick={() => setPlansOpen(true)}><Sparkles size={15} /> Plans</button>
           {hdrUser ? (
             <>
               {hdrUser.name === "Rayaan" && (
@@ -1771,52 +1681,6 @@ export default function RigForge() {
       </header>
 
       {hdrAuth && <MoggerAuth onClose={() => setHdrAuth(false)} onAuth={(u) => { try { localStorage.setItem("mogger_user", JSON.stringify(u)); } catch (e) {} setHdrUser(u); setHdrAuth(false); }} />}
-      {payBanner && (
-        <div className="rf-pay-banner" style={payBanner.ok ? {} : { background: "linear-gradient(135deg,#ff8a5c,#e23a52)", color: "#fff" }}>
-          {payBanner.ok ? <Check size={18} /> : <AlertTriangle size={18} />} {payBanner.text}
-          <button onClick={() => setPayBanner(null)} title="Dismiss"><X size={14} /></button>
-        </div>
-      )}
-      {plansOpen && (
-        <div className="rf-modal-overlay" onClick={closePlans}>
-          <div className="rf-plans" onClick={(e) => e.stopPropagation()}>
-            <button className="rf-plans-x" onClick={closePlans} title="Close"><X size={18} /></button>
-            {checkoutPlan ? (
-              <div className="rf-checkout">
-                <button className="rf-checkout-back" onClick={() => { setCheckoutPlan(null); setCheckoutErr(""); }}><ChevronLeft size={16} /> Back to plans</button>
-                <h2 className="rf-plans-title"><span className="rf-hero-grad">{checkoutPlan.name} — ${checkoutPlan.price}/mo</span></h2>
-                {checkoutErr ? (
-                  <div className="rf-checkout-err">{checkoutErr}</div>
-                ) : checkoutLoading ? (
-                  <div className="rf-checkout-loading"><div className="pm-spinner" /> Loading secure checkout…</div>
-                ) : null}
-                <div id="rf-embedded-checkout" className="rf-embedded-checkout" />
-              </div>
-            ) : (<>
-              <h2 className="rf-plans-title"><span className="rf-hero-grad">Choose your plan</span></h2>
-              <p className="rf-plans-sub">Upgrade for more power. Cancel anytime.</p>
-              <div className="rf-plans-grid">
-                {[
-                  { key: "free", name: "Free", price: 0, tag: "", perks: ["Unlimited PC builds", "Full PC Mogger access", "Save rigs to this device"] },
-                  { key: "plus", name: "Plus", price: 2, tag: "", perks: ["Everything in Free", "Ad-free experience", "Cloud-synced saves", "Custom rank color"] },
-                  { key: "pro", name: "Pro", price: 5, tag: "Popular", perks: ["Everything in Plus", "Custom rank icon", "Priority price updates", "Early access to features"] },
-                  { key: "max", name: "Max", price: 8, tag: "", perks: ["Everything in Pro", "Exclusive supporter badge", "Beta features first", "Support the developer"] },
-                ].map((p) => (
-                  <div key={p.key} className={"rf-plan" + (p.tag ? " rf-plan-feat" : "")}>
-                    {p.tag && <span className="rf-plan-tag">{p.tag}</span>}
-                    <div className="rf-plan-name">{p.name}</div>
-                    <div className="rf-plan-price"><span className="rf-plan-amt">${p.price}</span><span className="rf-plan-per">/mo</span></div>
-                    <ul className="rf-plan-perks">
-                      {p.perks.map((x, i) => (<li key={i}><Check size={14} /> {x}</li>))}
-                    </ul>
-                    <button className={"rf-plan-cta" + (p.price === 0 ? " rf-plan-cta-free" : "")} disabled={p.price === 0} onClick={() => { if (p.price !== 0) { setCheckoutErr(""); setCheckoutPlan(p); } }}>{p.price === 0 ? "Current plan" : "Get " + p.name}</button>
-                  </div>
-                ))}
-              </div>
-            </>)}
-          </div>
-        </div>
-      )}
       {hdrLogoutAsk && (
         <div className="rf-modal-overlay" onClick={() => setHdrLogoutAsk(false)}>
           <div className="rf-confirm" onClick={(e) => e.stopPropagation()}>
@@ -2977,19 +2841,20 @@ function MoggerCoAdmin({ onBack }) {
   const [pw, setPw] = useState("");
   const [err, setErr] = useState("");
   const tryAuth = () => { if (pw === COADMIN_PASS) { setAuthed(true); } else setErr("Wrong co-admin password."); };
-
+  
   if (!authed) {
     return (
-      <div className="pm-card pm-center rf-fade">
-        <h2 className="pm-h2">🔒 Co-Admin</h2>
-        <p className="pm-p">Enter the co-admin password to manage accounts.</p>
-        <input className="pm-input" type="password" value={pw} onChange={(e) => setPw(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") tryAuth(); }} placeholder="Co-admin password" />
-        {err && <div className="pm-auth-err">{err}</div>}
-        <div className="pm-row pm-center-row"><button className="rf-btn rf-ghost-btn" onClick={onBack}><ChevronLeft size={16} /> Back</button><button className="rf-btn" onClick={tryAuth}>Unlock</button></div>
+      <div className="pm-modal-wrap" onClick={onBack}>
+        <div className="pm-card pm-center" onClick={(e) => e.stopPropagation()} style={{minWidth:"320px"}}>
+          <h2 className="pm-h2">Co-Admin</h2>
+          <div className="pm-field"><label className="pm-field-l">Password</label><input className="pm-input" type="password" value={pw} onChange={(e) => setPw(e.target.value)} onKeyDown={(e) => e.key === "Enter" && tryAuth()} placeholder="Coadmin2014" /></div>
+          {err && <p style={{color:"var(--c-bad)",fontSize:"12px"}}>{err}</p>}
+          <div className="pm-row pm-center-row"><button className="rf-btn rf-ghost-btn" onClick={onBack}>Cancel</button><button className="rf-btn" onClick={tryAuth}>Unlock</button></div>
+        </div>
       </div>
     );
   }
-
+  
   return <MoggerAdmin onBack={onBack} user={null} isCoadmin={true} />;
 }
 
@@ -3057,7 +2922,7 @@ function MoggerAdmin({ onBack, user, isCoadmin }) {
   }
   return (
     <div className="pm-card pm-center rf-fade">
-      <h2 className="pm-h2">🔒 {isCoadmin ? "Co-Admin" : "Admin"} · Accounts</h2>
+      <h2 className="pm-h2">🔒 Admin · Accounts</h2>
       {err && <div className="pm-auth-err">{err}</div>}
       {msg && <div className="pm-admin-msg">{msg}</div>}
       {rows == null ? <div className="pm-spinner" /> : rows.length === 0 ? <p className="pm-p">No accounts found.</p> : (
@@ -3067,9 +2932,7 @@ function MoggerAdmin({ onBack, user, isCoadmin }) {
               <div className="pm-lb-row pm-admin-row">
                 <button className="pm-admin-open" onClick={() => openRow(u)}><span className="pm-lb-name">{u.name}<RankBadge rank={moggerRank(u.elo, u.crank)} /></span></button>
                 <span className="pm-lb-elo">{u.elo}</span>
-                {isCoadmin ? (
-                  <button className="pm-del-btn" disabled title="Co-admins can't delete accounts" style={{opacity:0.35,cursor:"not-allowed"}}><X size={14} /></button>
-                ) : confirmId === u.id ? (
+                {confirmId === u.id ? (
                   <span className="pm-admin-confirm"><button className="pm-del-yes" disabled={busyId === u.id} onClick={() => del(u.id)}>{busyId === u.id ? "…" : "Delete"}</button><button className="pm-del-no" onClick={() => setConfirmId(null)}>Cancel</button></span>
                 ) : (
                   <button className="pm-del-btn" onClick={() => { setErr(""); setConfirmId(u.id); }}><X size={14} /></button>
@@ -4880,37 +4743,6 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 .rf-confirm-yes:hover{filter:brightness(1.08);transform:translateY(-1px);}
 .rf-confirm-no{flex:1;padding:11px 16px;border-radius:11px;cursor:pointer;font-family:'Sora';font-weight:600;font-size:14px;color:var(--c-text);background:#161c26;border:1px solid var(--c-border);transition:background .18s,transform .18s;}
 .rf-confirm-no:hover{background:#1e2632;transform:translateY(-1px);}
-.rf-plans-btn{font-weight:600;}
-.rf-plans{position:relative;width:min(940px,100%);max-height:90vh;overflow-y:auto;background:#0c1119;border:1px solid var(--c-border);border-radius:22px;padding:30px 28px 32px;animation:rfPop .45s var(--ease-spring);}
-.rf-plans-x{position:absolute;top:16px;right:16px;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;border:1px solid var(--c-border);background:rgba(255,255,255,0.04);color:var(--c-muted);cursor:pointer;transition:.15s;}
-.rf-plans-x:hover{background:rgba(255,255,255,0.09);color:var(--c-text);}
-.rf-plans-title{font-family:'Chakra Petch';font-size:30px;font-weight:800;text-align:center;margin:0 0 4px;}
-.rf-plans-sub{text-align:center;color:var(--c-muted);font-size:14px;margin:0 0 26px;}
-.rf-plans-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
-.rf-plan{position:relative;display:flex;flex-direction:column;background:rgba(255,255,255,0.03);border:1px solid var(--c-border);border-radius:16px;padding:22px 18px;transition:transform .2s,border-color .2s,box-shadow .2s;}
-.rf-plan:hover{transform:translateY(-4px);border-color:rgba(25,232,219,0.4);box-shadow:0 16px 40px -16px rgba(25,232,219,0.4);}
-.rf-plan-feat{border-color:var(--c-accent);background:linear-gradient(180deg,rgba(25,232,219,0.08),rgba(124,92,255,0.05));box-shadow:0 0 0 1px rgba(25,232,219,0.25),0 0 40px -10px rgba(25,232,219,0.45);}
-.rf-plan-tag{position:absolute;top:-11px;left:50%;transform:translateX(-50%);padding:3px 12px;border-radius:999px;font-family:'JetBrains Mono';font-size:10.5px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:#04110f;background:linear-gradient(135deg,var(--c-accent),#19b89f);box-shadow:0 4px 14px rgba(25,232,219,0.5);}
-.rf-plan-name{font-family:'Chakra Petch';font-size:18px;font-weight:700;color:var(--c-text);}
-.rf-plan-price{display:flex;align-items:baseline;gap:3px;margin:8px 0 16px;}
-.rf-plan-amt{font-family:'JetBrains Mono';font-size:34px;font-weight:800;color:var(--c-text);text-shadow:0 0 20px rgba(25,232,219,0.3);}
-.rf-plan-per{color:var(--c-muted);font-size:14px;}
-.rf-plan-perks{list-style:none;padding:0;margin:0 0 18px;display:flex;flex-direction:column;gap:9px;flex:1;}
-.rf-plan-perks li{display:flex;align-items:flex-start;gap:7px;font-size:13px;color:var(--c-text);line-height:1.35;}
-.rf-plan-perks li svg{color:var(--c-accent);flex-shrink:0;margin-top:2px;}
-.rf-plan-cta{padding:11px;border-radius:11px;border:none;cursor:pointer;font-family:'Sora';font-weight:600;font-size:14px;color:#04110f;background:linear-gradient(135deg,var(--c-accent),#19b89f);box-shadow:0 6px 18px -6px rgba(25,232,219,0.6);transition:filter .18s,transform .18s;}
-.rf-plan-cta:hover{filter:brightness(1.08);transform:translateY(-1px);}
-.rf-plan-cta-free{background:#161c26;color:var(--c-muted);box-shadow:none;border:1px solid var(--c-border);cursor:default;}
-.rf-plan-cta-free:hover{filter:none;transform:none;}
-@media (max-width:820px){.rf-plans-grid{grid-template-columns:repeat(2,1fr);}}
-@media (max-width:460px){.rf-plans-grid{grid-template-columns:1fr;}}
-.rf-checkout-back{display:inline-flex;align-items:center;gap:5px;background:none;border:none;color:var(--c-muted);cursor:pointer;font-family:'Sora';font-size:13.5px;padding:0;margin-bottom:10px;transition:color .15s;}
-.rf-checkout-back:hover{color:var(--c-accent);}
-.rf-embedded-checkout{margin-top:14px;min-height:120px;}
-.rf-checkout-loading{display:flex;align-items:center;gap:10px;justify-content:center;color:var(--c-muted);font-size:14px;padding:24px 0;}
-.rf-checkout-err{margin:8px 0 0;padding:12px 14px;border-radius:12px;background:rgba(255,92,114,0.1);border:1px solid rgba(255,92,114,0.4);color:var(--c-bad);font-size:13.5px;text-align:center;}
-.rf-pay-banner{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:300;display:flex;align-items:center;gap:10px;padding:13px 20px;border-radius:14px;background:linear-gradient(135deg,rgba(70,224,160,0.95),rgba(25,232,219,0.92));color:#04110f;font-family:'Sora';font-weight:600;font-size:14px;box-shadow:0 12px 40px -10px rgba(25,232,219,0.7);animation:rfToast .4s var(--ease-spring);}
-.rf-pay-banner button{background:rgba(4,17,15,0.16);border:none;border-radius:8px;color:#04110f;cursor:pointer;display:grid;place-items:center;width:24px;height:24px;}
 .pm-rank{display:inline-block;font-family:'Chakra Petch';font-weight:700;font-size:11px;letter-spacing:0.02em;padding:2px 8px;border-radius:999px;border:1px solid currentColor;line-height:1.3;white-space:nowrap;}
 .pm-rank-low{color:#8aa0b4;}
 .pm-rank-mid{color:#46e0a0;}
