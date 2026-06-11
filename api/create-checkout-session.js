@@ -66,7 +66,7 @@ export default async function handler(req, res) {
 
       const origin = req.headers.origin || ("https://" + (req.headers.host || "forgeapc.xyz"));
       const form = {
-        ui_mode: "embedded_page",
+        ui_mode: "embedded",
         mode: "subscription",
         "line_items[0][quantity]": "1",
         "line_items[0][price_data][currency]": "usd",
