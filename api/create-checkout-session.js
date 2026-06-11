@@ -17,6 +17,7 @@
 const SECRET = process.env.STRIPE_SECRET_KEY;
 const PUBLISHABLE = process.env.STRIPE_PUBLISHABLE_KEY;
 const STRIPE_API = "https://api.stripe.com/v1";
+const STRIPE_VERSION = "2025-03-31.basil"; // version where invoice.confirmation_secret exists
 
 const TIERS = {
   plus: { name: "FORGEAPC Plus", dollars: Number(process.env.PRICE_PLUS) || 2, key: "forgeapc_plus" },
@@ -25,7 +26,7 @@ const TIERS = {
 };
 
 async function stripeFetch(path, { method = "GET", form } = {}) {
-  const opts = { method, headers: { Authorization: "Bearer " + SECRET, "Content-Type": "application/x-www-form-urlencoded" } };
+  const opts = { method, headers: { Authorization: "Bearer " + SECRET, "Content-Type": "application/x-www-form-urlencoded", "Stripe-Version": STRIPE_VERSION } };
   if (form) opts.body = new URLSearchParams(form).toString();
   const r = await fetch(STRIPE_API + path, opts);
   const data = await r.json();
@@ -72,13 +73,18 @@ export default async function handler(req, res) {
       "items[0][price]": priceId,
       payment_behavior: "default_incomplete",
       "payment_settings[save_default_payment_method]": "on_subscription",
-      "expand[]": "latest_invoice.payment_intent",
+      "expand[0]": "latest_invoice.confirmation_secret",
     } });
 
-    const pi = sub.latest_invoice && sub.latest_invoice.payment_intent;
-    if (!pi || !pi.client_secret) throw new Error("Could not initialize payment.");
+    const inv = sub.latest_invoice || {};
+    const clientSecret =
+      (inv.confirmation_secret && inv.confirmation_secret.client_secret) ||
+      (inv.payment_intent && inv.payment_intent.client_secret) ||
+      (sub.pending_setup_intent && sub.pending_setup_intent.client_secret) ||
+      null;
+    if (!clientSecret) throw new Error("Could not initialize payment.");
 
-    res.status(200).json({ clientSecret: pi.client_secret, publishableKey: PUBLISHABLE, subscriptionId: sub.id });
+    res.status(200).json({ clientSecret, publishableKey: PUBLISHABLE, subscriptionId: sub.id });
   } catch (e) {
     res.status(500).json({ error: (e && e.message) || "Checkout failed" });
   }
