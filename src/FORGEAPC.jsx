@@ -2841,20 +2841,19 @@ function MoggerCoAdmin({ onBack }) {
   const [pw, setPw] = useState("");
   const [err, setErr] = useState("");
   const tryAuth = () => { if (pw === COADMIN_PASS) { setAuthed(true); } else setErr("Wrong co-admin password."); };
-  
+
   if (!authed) {
     return (
-      <div className="pm-modal-wrap" onClick={onBack}>
-        <div className="pm-card pm-center" onClick={(e) => e.stopPropagation()} style={{minWidth:"320px"}}>
-          <h2 className="pm-h2">Co-Admin</h2>
-          <div className="pm-field"><label className="pm-field-l">Password</label><input className="pm-input" type="password" value={pw} onChange={(e) => setPw(e.target.value)} onKeyDown={(e) => e.key === "Enter" && tryAuth()} placeholder="Coadmin2014" /></div>
-          {err && <p style={{color:"var(--c-bad)",fontSize:"12px"}}>{err}</p>}
-          <div className="pm-row pm-center-row"><button className="rf-btn rf-ghost-btn" onClick={onBack}>Cancel</button><button className="rf-btn" onClick={tryAuth}>Unlock</button></div>
-        </div>
+      <div className="pm-card pm-center rf-fade">
+        <h2 className="pm-h2">🔒 Co-Admin</h2>
+        <p className="pm-p">Enter the co-admin password to manage accounts.</p>
+        <input className="pm-input" type="password" value={pw} onChange={(e) => setPw(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") tryAuth(); }} placeholder="Co-admin password" />
+        {err && <div className="pm-auth-err">{err}</div>}
+        <div className="pm-row pm-center-row"><button className="rf-btn rf-ghost-btn" onClick={onBack}><ChevronLeft size={16} /> Back</button><button className="rf-btn" onClick={tryAuth}>Unlock</button></div>
       </div>
     );
   }
-  
+
   return <MoggerAdmin onBack={onBack} user={null} isCoadmin={true} />;
 }
 
@@ -2922,7 +2921,7 @@ function MoggerAdmin({ onBack, user, isCoadmin }) {
   }
   return (
     <div className="pm-card pm-center rf-fade">
-      <h2 className="pm-h2">🔒 Admin · Accounts</h2>
+      <h2 className="pm-h2">🔒 {isCoadmin ? "Co-Admin" : "Admin"} · Accounts</h2>
       {err && <div className="pm-auth-err">{err}</div>}
       {msg && <div className="pm-admin-msg">{msg}</div>}
       {rows == null ? <div className="pm-spinner" /> : rows.length === 0 ? <p className="pm-p">No accounts found.</p> : (
@@ -2932,7 +2931,9 @@ function MoggerAdmin({ onBack, user, isCoadmin }) {
               <div className="pm-lb-row pm-admin-row">
                 <button className="pm-admin-open" onClick={() => openRow(u)}><span className="pm-lb-name">{u.name}<RankBadge rank={moggerRank(u.elo, u.crank)} /></span></button>
                 <span className="pm-lb-elo">{u.elo}</span>
-                {confirmId === u.id ? (
+                {isCoadmin ? (
+                  <button className="pm-del-btn" disabled title="Co-admins can't delete accounts" style={{opacity:0.35,cursor:"not-allowed"}}><X size={14} /></button>
+                ) : confirmId === u.id ? (
                   <span className="pm-admin-confirm"><button className="pm-del-yes" disabled={busyId === u.id} onClick={() => del(u.id)}>{busyId === u.id ? "…" : "Delete"}</button><button className="pm-del-no" onClick={() => setConfirmId(null)}>Cancel</button></span>
                 ) : (
                   <button className="pm-del-btn" onClick={() => { setErr(""); setConfirmId(u.id); }}><X size={14} /></button>
