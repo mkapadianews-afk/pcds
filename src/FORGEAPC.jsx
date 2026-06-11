@@ -2836,8 +2836,6 @@ const DIFFS = [{ k: "easy", label: "Easy", elo: 250 }, { k: "medium", label: "Me
 const ADMIN_PASS = "Admin2014"; // change this to your own secret
 const COADMIN_PASS = "Coadmin2014"; // co-admin password — limited access
 
-const COADMIN_PASS = "Coadmin2014"; // co-admin password — limited access
-
 function MoggerCoAdmin({ onBack }) {
   const [authed, setAuthed] = useState(false);
   const [pw, setPw] = useState("");
@@ -2861,7 +2859,7 @@ function MoggerCoAdmin({ onBack }) {
 }
 
 function MoggerAdmin({ onBack, user, isCoadmin }) {
-  const [authed, setAuthed] = useState(user && user.name === "Rayaan" ? true : false);
+  const [authed, setAuthed] = useState((user && user.name === "Rayaan") || isCoadmin ? true : false);
   const [pw, setPw] = useState("");
   const [rows, setRows] = useState(null);
   const [err, setErr] = useState("");
