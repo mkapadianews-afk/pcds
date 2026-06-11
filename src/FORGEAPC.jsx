@@ -1308,7 +1308,7 @@ function OfflineBanner({ offlinePriceStatus, priceInfo }) {
 }
 
 export default function RigForge() {
-  const [view, setView] = useState(() => { try { if (typeof window !== "undefined") { const h = window.location.hostname.split(".")[0]; const p = window.location.pathname.replace(/\/+$/, "").split("/").pop(); if (h === "pcmogger" || p === "admin") return "mogger"; } } catch (e) {} return "home"; }); // home | survey | budget | results | mogger
+  const [view, setView] = useState(() => { try { if (typeof window !== "undefined") { const h = window.location.hostname.split(".")[0]; const p = window.location.pathname.replace(/\/+$/, "").split("/").pop(); if (h === "pcmogger" || p === "admin" || p === "coadmin") return "mogger"; } } catch (e) {} return "home"; }); // home | survey | budget | results | mogger
   const [useCase, setUseCase] = useState(null);
   const [budget, setBudget] = useState(1200);
   const [parts, setParts] = useState(null);
@@ -2834,8 +2834,33 @@ function MoggerAuth({ onClose, onAuth }) {
 const DIFFS = [{ k: "easy", label: "Easy", elo: 250 }, { k: "medium", label: "Medium", elo: 550 }, { k: "hard", label: "Hard", elo: 1000 }, { k: "random", label: "Random", elo: 0 }, { k: "custom", label: "Custom", elo: 1500 }];
 
 const ADMIN_PASS = "Admin2014"; // change this to your own secret
+const COADMIN_PASS = "Coadmin2014"; // co-admin password — limited access
 
-function MoggerAdmin({ onBack, user }) {
+const COADMIN_PASS = "Coadmin2014"; // co-admin password — limited access
+
+function MoggerCoAdmin({ onBack }) {
+  const [authed, setAuthed] = useState(false);
+  const [pw, setPw] = useState("");
+  const [err, setErr] = useState("");
+  const tryAuth = () => { if (pw === COADMIN_PASS) { setAuthed(true); } else setErr("Wrong co-admin password."); };
+  
+  if (!authed) {
+    return (
+      <div className="pm-modal-wrap" onClick={onBack}>
+        <div className="pm-card pm-center" onClick={(e) => e.stopPropagation()} style={{minWidth:"320px"}}>
+          <h2 className="pm-h2">Co-Admin</h2>
+          <div className="pm-field"><label className="pm-field-l">Password</label><input className="pm-input" type="password" value={pw} onChange={(e) => setPw(e.target.value)} onKeyDown={(e) => e.key === "Enter" && tryAuth()} placeholder="Coadmin2014" /></div>
+          {err && <p style={{color:"var(--c-bad)",fontSize:"12px"}}>{err}</p>}
+          <div className="pm-row pm-center-row"><button className="rf-btn rf-ghost-btn" onClick={onBack}>Cancel</button><button className="rf-btn" onClick={tryAuth}>Unlock</button></div>
+        </div>
+      </div>
+    );
+  }
+  
+  return <MoggerAdmin onBack={onBack} user={null} isCoadmin={true} />;
+}
+
+function MoggerAdmin({ onBack, user, isCoadmin }) {
   const [authed, setAuthed] = useState(user && user.name === "Rayaan" ? true : false);
   const [pw, setPw] = useState("");
   const [rows, setRows] = useState(null);
@@ -2917,7 +2942,7 @@ function MoggerAdmin({ onBack, user }) {
               </div>
               {expanded === u.id && (
                 <div className="pm-admin-edit">
-                  <div className="pm-admin-line"><span className="pm-admin-l">Elo</span><input className="pm-admin-in" value={eloDraft} onChange={(e) => setEloDraft(e.target.value.replace(/[^0-9]/g, ""))} inputMode="numeric" /><button className="pm-admin-save" disabled={busyId === u.id} onClick={() => saveElo(u)}>Save</button></div>
+                  <div className="pm-admin-line" style={isCoadmin ? {opacity:0.5} : {}}><span className="pm-admin-l">Elo</span><input className="pm-admin-in" value={eloDraft} onChange={(e) => setEloDraft(e.target.value.replace(/[^0-9]/g, ""))} inputMode="numeric" disabled={isCoadmin} /><button className="pm-admin-save" disabled={busyId === u.id || isCoadmin} onClick={() => saveElo(u)}>Save</button></div>
                   <div className="pm-admin-line"><span className="pm-admin-l">Custom rank</span><input className="pm-admin-in" value={rankDraft} maxLength={24} onChange={(e) => setRankDraft(e.target.value)} placeholder="blank = elo rank" /></div>
                   <div className="pm-admin-line"><span className="pm-admin-l">Color & icon</span><input className="pm-admin-color" type="color" value={colorDraft} onChange={(e) => setColorDraft(e.target.value)} /><button className="pm-emoji-cur" onClick={() => setEmojiOpen((o) => !o)}>{iconDraft || "⭐"} ▾</button><button className="pm-admin-save" disabled={busyId === u.id} onClick={() => saveRank(u)}>{rankDraft.trim() ? "Set" : "Clear"}</button></div>
                   {emojiOpen && <MoggerEmojiPicker onPick={(e) => { setIconDraft(e); setEmojiOpen(false); }} />}
@@ -2959,7 +2984,7 @@ function MoggerLeaderboard({ onBack, meName }) {
 }
 
 function MoggerGame({ onExit, onSaveBuild }) {
-  const [screen, setScreen] = useState(() => { try { if (window.location.pathname.replace(/\/+$/, "").split("/").pop() === "admin") return "admin"; } catch (e) {} return "menu"; });
+  const [screen, setScreen] = useState(() => { try { const p = window.location.pathname.replace(/\/+$/, "").split("/").pop(); if (p === "admin") return "admin"; if (p === "coadmin") return "coadmin"; } catch (e) {} return "menu"; });
   const [mode, setMode] = useState("ai");
   const [round, setRound] = useState(null);
   const [you, setYou] = useState(null);
@@ -2995,7 +3020,7 @@ function MoggerGame({ onExit, onSaveBuild }) {
   const again = () => { setYou(null); setOpp(null); setEloMsg(null); eloAppliedRef.current = false; setScreen(mode === "ai" ? "diff" : "lobby"); };
   const menu = () => { setYou(null); setOpp(null); setRound(null); setEloMsg(null); setScreen("menu"); };
   const exitToRoot = () => {
-    try { if (typeof window !== "undefined" && window.history && window.location.pathname.replace(/\/+$/, "").split("/").pop() === "admin") window.history.replaceState(null, "", "/"); } catch (e) {}
+    try { if (typeof window !== "undefined" && window.history) { const p = window.location.pathname.replace(/\/+$/, "").split("/").pop(); if (p === "admin" || p === "coadmin") window.history.replaceState(null, "", "/"); } } catch (e) {}
     onExit();
   };
 
@@ -3058,6 +3083,7 @@ function MoggerGame({ onExit, onSaveBuild }) {
         </div>
       )}
       {screen === "admin" && <MoggerAdmin onBack={exitToRoot} user={user} />}
+      {screen === "coadmin" && <MoggerCoAdmin onBack={exitToRoot} />}
       {screen === "leaderboard" && <MoggerLeaderboard onBack={menu} meName={user ? user.name : null} />}
       {screen === "online" && (user ? <MoggerOnline onExit={menu} user={user} setUser={persist} onNeedAuth={() => setShowAuth(true)} onSaveBuild={onSaveBuild} /> : (
         <div className="pm-card pm-center rf-fade">

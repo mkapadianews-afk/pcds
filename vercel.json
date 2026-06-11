@@ -2,6 +2,7 @@
   "rewrites": [
     { "source": "/match-coverage", "destination": "/match-coverage.html" },
     { "source": "/prices", "destination": "/prices.html" },
-    { "source": "/admin", "destination": "/index.html" }
+    { "source": "/admin", "destination": "/index.html" },
+    { "source": "/coadmin", "destination": "/index.html" }
   ]
 }
