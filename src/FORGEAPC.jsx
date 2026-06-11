@@ -1365,7 +1365,9 @@ export default function RigForge() {
   const [checkoutPlan, setCheckoutPlan] = useState(null); // the tier object being purchased
   const [checkoutErr, setCheckoutErr] = useState("");
   const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const checkoutInstanceRef = useRef(null);
+  const [checkoutPaying, setCheckoutPaying] = useState(false);
+  const stripeRef = useRef(null);
+  const stripeElementsRef = useRef(null);
   const [payBanner, setPayBanner] = useState(null); // { ok, text }
   const [lang, setLang] = useState("en");
   CUR_LANG = lang;
@@ -1504,18 +1506,19 @@ export default function RigForge() {
   useEffect(() => { setHdrUser(acct()); }, [view]);
   const hdrLogout = () => { try { localStorage.removeItem("mogger_user"); } catch (e) {} setHdrUser(null); };
 
-  // Mount Stripe Embedded Checkout inside the Plans popup when a paid tier is chosen.
+  // Mount a dark, on-brand Stripe Payment Element inside the Plans popup.
   useEffect(() => {
     if (!checkoutPlan) return;
     let cancelled = false;
-    setCheckoutErr(""); setCheckoutLoading(true);
+    setCheckoutErr(""); setCheckoutLoading(true); setCheckoutPaying(false);
+    stripeElementsRef.current = null;
     (async () => {
       try {
         const u = acct();
         const r = await fetch("/api/create-checkout-session", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ tier: checkoutPlan.key, email: u && u.email ? u.email : undefined }),
+          body: JSON.stringify({ tier: checkoutPlan.key, email: u && u.email ? u.email : undefined, name: u && u.name ? u.name : undefined }),
         });
         const data = await r.json();
         if (!r.ok || !data.clientSecret || !data.publishableKey) throw new Error(data.error || "Could not start checkout.");
@@ -1523,43 +1526,73 @@ export default function RigForge() {
         const Stripe = await loadStripeJs();
         if (cancelled) return;
         const stripe = Stripe(data.publishableKey);
-        const checkout = await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
-        if (cancelled) { checkout.destroy(); return; }
-        checkoutInstanceRef.current = checkout;
-        checkout.mount("#rf-embedded-checkout");
-        setCheckoutLoading(false);
+        const appearance = {
+          theme: "night",
+          variables: {
+            colorPrimary: "#19e8db",
+            colorBackground: "#0d131c",
+            colorText: "#e8eef5",
+            colorTextSecondary: "#9fb0c3",
+            colorDanger: "#ff5c72",
+            fontFamily: "Sora, system-ui, sans-serif",
+            borderRadius: "12px",
+            spacingUnit: "4px",
+          },
+          rules: {
+            ".Input": { backgroundColor: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.12)" },
+            ".Input:focus": { border: "1px solid #19e8db", boxShadow: "0 0 0 1px #19e8db" },
+            ".Label": { color: "#9fb0c3" },
+          },
+        };
+        const elements = stripe.elements({ clientSecret: data.clientSecret, appearance });
+        const paymentEl = elements.create("payment", { layout: "tabs" });
+        if (cancelled) return;
+        paymentEl.mount("#rf-payment-element");
+        stripeRef.current = stripe;
+        stripeElementsRef.current = elements;
+        paymentEl.on("ready", () => { if (!cancelled) setCheckoutLoading(false); });
       } catch (e) {
         if (!cancelled) { setCheckoutErr((e && e.message) || "Checkout failed."); setCheckoutLoading(false); }
       }
     })();
-    return () => {
-      cancelled = true;
-      if (checkoutInstanceRef.current) { try { checkoutInstanceRef.current.destroy(); } catch (e) {} checkoutInstanceRef.current = null; }
-    };
+    return () => { cancelled = true; stripeElementsRef.current = null; stripeRef.current = null; };
   }, [checkoutPlan]);
+
+  const payNow = async () => {
+    if (!stripeRef.current || !stripeElementsRef.current || checkoutPaying) return;
+    setCheckoutPaying(true); setCheckoutErr("");
+    try {
+      const { error, paymentIntent } = await stripeRef.current.confirmPayment({
+        elements: stripeElementsRef.current,
+        confirmParams: { return_url: window.location.origin + "/?checkout=return" },
+        redirect: "if_required",
+      });
+      if (error) { setCheckoutErr(error.message || "Payment failed."); setCheckoutPaying(false); return; }
+      if (paymentIntent && paymentIntent.status === "succeeded") {
+        setPayBanner({ ok: true, text: "Payment successful — your " + checkoutPlan.name + " plan is active. Thank you!" });
+        closePlans();
+      } else {
+        setPayBanner({ ok: true, text: "Thanks! Your subscription is processing." });
+        closePlans();
+      }
+    } catch (e) {
+      setCheckoutErr((e && e.message) || "Payment failed."); setCheckoutPaying(false);
+    }
+  };
 
   const closePlans = () => { setCheckoutPlan(null); setCheckoutErr(""); setPlansOpen(false); };
 
-  // After Stripe checkout, the customer returns to /?checkout=return&session_id=...
+  // After a redirect-based payment (e.g. 3-D Secure), the customer returns to
+  // /?checkout=return&redirect_status=succeeded
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search);
       if (params.get("checkout") !== "return") return;
-      const sid = params.get("session_id");
-      // clean the URL so a refresh doesn't re-trigger this
+      const status = params.get("redirect_status");
       window.history.replaceState(null, "", window.location.pathname);
-      if (!sid) return;
-      (async () => {
-        try {
-          const r = await fetch("/api/create-checkout-session?session_id=" + encodeURIComponent(sid));
-          const d = await r.json();
-          if (r.ok && d.status === "complete") setPayBanner({ ok: true, text: "Payment successful — your plan is active. Thank you!" });
-          else if (r.ok && d.status === "open") setPayBanner({ ok: false, text: "Checkout wasn't completed. You can try again anytime." });
-          else setPayBanner({ ok: false, text: "We couldn't confirm the payment. If you were charged, contact support." });
-        } catch (e) {
-          setPayBanner({ ok: true, text: "Thanks! If your payment went through, your plan is active." });
-        }
-      })();
+      if (status === "succeeded") setPayBanner({ ok: true, text: "Payment successful — your plan is active. Thank you!" });
+      else if (status === "processing") setPayBanner({ ok: true, text: "Thanks! Your payment is processing." });
+      else if (status) setPayBanner({ ok: false, text: "Payment wasn't completed. You can try again anytime." });
     } catch (e) {}
   }, []);
   const refreshSaved = useCallback(async () => {
@@ -1785,12 +1818,13 @@ export default function RigForge() {
               <div className="rf-checkout">
                 <button className="rf-checkout-back" onClick={() => { setCheckoutPlan(null); setCheckoutErr(""); }}><ChevronLeft size={16} /> Back to plans</button>
                 <h2 className="rf-plans-title"><span className="rf-hero-grad">{checkoutPlan.name} — ${checkoutPlan.price}/mo</span></h2>
-                {checkoutErr ? (
-                  <div className="rf-checkout-err">{checkoutErr}</div>
-                ) : checkoutLoading ? (
-                  <div className="rf-checkout-loading"><div className="pm-spinner" /> Loading secure checkout…</div>
-                ) : null}
-                <div id="rf-embedded-checkout" className="rf-embedded-checkout" />
+                {checkoutLoading && <div className="rf-checkout-loading"><div className="pm-spinner" /> Loading secure form…</div>}
+                <div id="rf-payment-element" className="rf-embedded-checkout" />
+                {checkoutErr && <div className="rf-checkout-err">{checkoutErr}</div>}
+                {!checkoutLoading && (
+                  <button className="rf-btn rf-checkout-pay" disabled={checkoutPaying} onClick={payNow}>{checkoutPaying ? "Processing…" : "Subscribe · $" + checkoutPlan.price + "/mo"}</button>
+                )}
+                <p className="rf-checkout-fine">Secured by Stripe · cancel anytime</p>
               </div>
             ) : (<>
               <h2 className="rf-plans-title"><span className="rf-hero-grad">Choose your plan</span></h2>
@@ -4906,7 +4940,9 @@ background:var(--c-accent2);vertical-align:text-bottom;animation:rfCursor 1s ste
 @media (max-width:460px){.rf-plans-grid{grid-template-columns:1fr;}}
 .rf-checkout-back{display:inline-flex;align-items:center;gap:5px;background:none;border:none;color:var(--c-muted);cursor:pointer;font-family:'Sora';font-size:13.5px;padding:0;margin-bottom:10px;transition:color .15s;}
 .rf-checkout-back:hover{color:var(--c-accent);}
-.rf-embedded-checkout{margin-top:14px;min-height:120px;}
+.rf-embedded-checkout{margin-top:14px;min-height:60px;}
+.rf-checkout-pay{width:100%;margin-top:16px;justify-content:center;}
+.rf-checkout-fine{text-align:center;color:var(--c-muted);font-size:11.5px;margin:10px 0 0;}
 .rf-checkout-loading{display:flex;align-items:center;gap:10px;justify-content:center;color:var(--c-muted);font-size:14px;padding:24px 0;}
 .rf-checkout-err{margin:8px 0 0;padding:12px 14px;border-radius:12px;background:rgba(255,92,114,0.1);border:1px solid rgba(255,92,114,0.4);color:var(--c-bad);font-size:13.5px;text-align:center;}
 .rf-pay-banner{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:300;display:flex;align-items:center;gap:10px;padding:13px 20px;border-radius:14px;background:linear-gradient(135deg,rgba(70,224,160,0.95),rgba(25,232,219,0.92));color:#04110f;font-family:'Sora';font-weight:600;font-size:14px;box-shadow:0 12px 40px -10px rgba(25,232,219,0.7);animation:rfToast .4s var(--ease-spring);}
